@@ -3,28 +3,37 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLenis } from "lenis/react";
+import { useRouter, usePathname } from "next/navigation";
 
 const navLinks = [
-  { id: "intro", num: "", title: "Home" },
-  { id: "concert-organist", num: "1.", title: "The Architect" },
-  { id: "recording-artist", num: "2.", title: "Architect" },
-  { id: "titular-organist", num: "3.", title: "Projects" },
-  { id: "organ-professor", num: "4.", title: "About Umesh Kekre" },
-  { id: "author-composer", num: "5.", title: "Architect & Designer" },
-  { id: "goodies-contact", num: "6.", title: "Resources & Contact" },
+  { id: "/", num: "", title: "Home" },
+  { id: "/projects", num: "1.", title: "Projects" },
+  { id: "#concert-organist", num: "2.", title: "The Architect" },
+  { id: "#recording-artist", num: "3.", title: "Architect" },
+  { id: "#organ-professor", num: "4.", title: "About Umesh Kekre" },
+  { id: "#author-composer", num: "5.", title: "Architect & Designer" },
+  { id: "#goodies-contact", num: "6.", title: "Resources & Contact" },
 ];
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const lenis = useLenis();
+  const router = useRouter();
+  const pathname = usePathname();
 
   const handleNavClick = (id: string) => {
     setIsOpen(false);
     
     setTimeout(() => {
-      const el = document.getElementById(id);
-      if (el) {
-        lenis?.scrollTo(el, { duration: 1.5, offset: 0 });
+      if (id.startsWith("#")) {
+        const el = document.getElementById(id.replace("#", ""));
+        if (el && pathname === "/") {
+          lenis?.scrollTo(el, { duration: 1.5, offset: 0 });
+        } else {
+          router.push("/" + id);
+        }
+      } else {
+        router.push(id);
       }
     }, 500);
   };
