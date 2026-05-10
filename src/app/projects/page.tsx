@@ -54,6 +54,22 @@ const PROJECTS = RAW.map((p, i) => {
   };
 });
 
+const PHOTO_IDS = [
+  "1600585154340-be6161a56a0c","1600596542815-ffad4c1539a9",
+  "1600607687939-ce8a6c25118c","1486406146926-c627a92ad1ab",
+  "1545324418-cc1a3fa10c00","1512917774080-9991f1c4c750",
+  "1558618666-fcd25c85cd64","1449824913935-59a10b8d2000",
+  "1580587771525-78b9dba3b914","1497366216548-37526070297c",
+  "1497366754035-f200586c4a16","1497366811353-6870744d04b2",
+  "1431576901776-e539bd916ba2","1486325212027-8081e485255e",
+  "1519999482648-25049ddd37b1","1478476868527-bb19f5d68b37",
+  "1494145904049-0dca59b4bbad","1505843490701-d60d2f08ee02",
+  "1568605114967-8130f3a36994","1464082354059-0e3d0cfd76cf",
+  "1479839672679-a46cb5e2d4bc","1470723272604-efd9a2e5776a",
+  "1513584684374-8bab748fbf90","1415796994537-5ee154fc4e80",
+  "1507003211169-0a1dd7228f2d"
+];
+
 /* ── Wing renderer ─────────────────────────────────────── */
 function Wing({ l, r, t, hotFloor, side, sideLeft, onFloorHover, onFloorClick }: {
   l: number; r: number; t: number; hotFloor: number | null;
@@ -271,6 +287,10 @@ export default function ProjectsPage() {
 
         {/* ── ANIMATED SKY BIRDS ── */}
         <defs>
+          <linearGradient id="card-fade" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#0d0d0d" stopOpacity="0" />
+            <stop offset="100%" stopColor="#0d0d0d" stopOpacity="0.9" />
+          </linearGradient>
           <style>{`
             @keyframes flyRL { from { transform: translateX(1600px); } to { transform: translateX(-200px); } }
             @keyframes flyLR { from { transform: translateX(-200px); } to { transform: translateX(1600px); } }
@@ -416,72 +436,60 @@ export default function ProjectsPage() {
                   fill="none" stroke="#ddd" strokeWidth="0.9" />
               )}
 
-              {/* hover card */}
+              {/* hover card in pure SVG to fix Safari zoom bugs */}
               {isH && (
-                <foreignObject x={cardX} y={cardY} width="193" height="232">
-                  <div style={{ fontFamily: "'Inter',sans-serif", overflow: "hidden", borderRadius: "3px", border: "1px solid #2a2a2a", boxShadow: "0 12px 40px rgba(0,0,0,0.85)" }}>
-
-                    {/* ── Dark top: architectural grid + category + title ── */}
-                    <div style={{ background: "#0d0d0d", padding: "0", position: "relative", height: "112px", overflow: "hidden" }}>
-                      {/* grid lines */}
-                      <svg width="193" height="72" style={{ position: "absolute", top: "0", left: "0", opacity: 0.2 }} viewBox="0 0 193 72">
-                        <line x1="64" y1="0" x2="64" y2="72" stroke="#fff" strokeWidth="0.5"/>
-                        <line x1="128" y1="0" x2="128" y2="72" stroke="#fff" strokeWidth="0.5"/>
-                        <line x1="0" y1="24" x2="193" y2="24" stroke="#fff" strokeWidth="0.5"/>
-                        <line x1="0" y1="48" x2="193" y2="48" stroke="#fff" strokeWidth="0.5"/>
-                        <rect x="6" y="4" width="50" height="16" fill="none" stroke="#fff" strokeWidth="0.8" rx="1"/>
-                        <rect x="6" y="28" width="50" height="16" fill="none" stroke="#fff" strokeWidth="0.8" rx="1"/>
-                        <rect x="6" y="52" width="50" height="16" fill="none" stroke="#fff" strokeWidth="0.8" rx="1"/>
-                        <rect x="70" y="4" width="50" height="16" fill="none" stroke="#fff" strokeWidth="0.8" rx="1"/>
-                        <rect x="70" y="28" width="50" height="16" fill="none" stroke="#fff" strokeWidth="0.8" rx="1"/>
-                        <rect x="134" y="4" width="24" height="16" fill="none" stroke="#fff" strokeWidth="0.6" rx="1"/>
-                        <rect x="162" y="4" width="24" height="16" fill="none" stroke="#fff" strokeWidth="0.6" rx="1"/>
-                        <rect x="134" y="28" width="24" height="16" fill="none" stroke="#fff" strokeWidth="0.6" rx="1"/>
-                        <rect x="162" y="28" width="24" height="16" fill="none" stroke="#fff" strokeWidth="0.6" rx="1"/>
-                      </svg>
-                      {/* category pill */}
-                      <div style={{ position: "absolute", bottom: "30px", left: "10px" }}>
-                        <span style={{ border: "1px solid #555", borderRadius: "99px", padding: "2px 9px", fontSize: "7px", color: "#bbb", letterSpacing: "0.14em", textTransform: "uppercase", whiteSpace: "nowrap" }}>{p.cat}</span>
-                      </div>
-                      {/* title */}
-                      <div style={{ position: "absolute", bottom: "8px", left: "10px", right: "8px" }}>
-                        <div style={{ fontSize: "12px", fontWeight: 600, color: "#ffffff", lineHeight: 1.25, letterSpacing: "-0.01em" }}>{p.title}</div>
-                      </div>
-                    </div>
-
-                    {/* ── Light bottom: metadata + status + cta ── */}
-                    <div style={{ background: "#f7f7f7", padding: "9px 10px 10px" }}>
-                      {/* metadata row */}
-                      <div style={{ display: "flex", gap: "0", marginBottom: "8px", paddingBottom: "8px", borderBottom: "1px solid #e2e2e2" }}>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: "6.5px", color: "#999", textTransform: "uppercase", letterSpacing: "0.1em" }}>Type</div>
-                          <div style={{ fontSize: "10px", color: "#111", fontWeight: 600, marginTop: "2px" }}>{p.cat}</div>
-                        </div>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: "6.5px", color: "#999", textTransform: "uppercase", letterSpacing: "0.1em" }}>Location</div>
-                          <div style={{ fontSize: "10px", color: "#111", fontWeight: 600, marginTop: "2px" }}>Mumbai</div>
-                        </div>
-                      </div>
-                      {/* tag pill */}
-                      <div style={{ marginBottom: "8px" }}>
-                        <span style={{ border: "1px solid #ccc", borderRadius: "99px", padding: "2px 8px", fontSize: "7px", color: "#444", marginRight: "4px" }}>{p.cat}</span>
-                        <span style={{ border: "1px solid #ccc", borderRadius: "99px", padding: "2px 8px", fontSize: "7px", color: "#444" }}>Architecture</span>
-                      </div>
-                      {/* status + cta */}
-                        <div 
-                          style={{ display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer" }}
-                          onClick={(e) => { e.stopPropagation(); router.push(`/projects/${p.slug}`); }}
-                        >
-                          <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                            <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#22c55e", flexShrink: 0 }} />
-                            <span style={{ fontSize: "7.5px", color: "#555" }}>Completed</span>
-                          </div>
-                          <span style={{ fontSize: "7.5px", color: "#F59E0B", letterSpacing: "0.06em", fontWeight: 600 }}>View project →</span>
-                        </div>
-                    </div>
-
-                  </div>
-                </foreignObject>
+                <g transform={`translate(${cardX}, ${cardY})`}>
+                  {/* Outer border & shadow (simulated) */}
+                  <rect x="0" y="0" width="193" height="232" fill="#0d0d0d" stroke="#2a2a2a" strokeWidth="1" rx="3" />
+                  
+                  {/* Image in the empty space (dark top) */}
+                  <clipPath id={`clip-img-${p.id}`}>
+                    <rect x="1" y="1" width="191" height="112" rx="2" />
+                  </clipPath>
+                  <image 
+                    href={`https://images.unsplash.com/photo-${PHOTO_IDS[i % 25]}?q=80&w=400&auto=format&fit=crop`} 
+                    x="1" y="1" width="191" height="112" 
+                    preserveAspectRatio="xMidYMid slice" 
+                    clipPath={`url(#clip-img-${p.id})`}
+                  />
+                  
+                  {/* Fade overlay so text is readable */}
+                  <rect x="1" y="50" width="191" height="63" fill="url(#card-fade)" />
+                  
+                  {/* Category text */}
+                  <text x="12" y="85" fill="#ddd" fontSize="7" fontFamily="'Inter', sans-serif" letterSpacing="0.1em">{p.cat.toUpperCase()}</text>
+                  
+                  {/* Title */}
+                  <text x="12" y="103" fill="#fff" fontSize="13" fontWeight="600" fontFamily="'Inter', sans-serif" letterSpacing="-0.01em">{p.title}</text>
+                  
+                  {/* Light bottom */}
+                  <rect x="1" y="113" width="191" height="118" fill="#fcfcfc" rx="2" />
+                  <rect x="1" y="113" width="191" height="10" fill="#fcfcfc" /> {/* square top corners */}
+                  
+                  {/* Metadata Type */}
+                  <text x="16" y="138" fill="#888" fontSize="6.5" fontFamily="'Inter', sans-serif" letterSpacing="0.1em">TYPE</text>
+                  <text x="16" y="152" fill="#111" fontSize="10" fontWeight="600" fontFamily="'Inter', sans-serif">{p.cat}</text>
+                  
+                  {/* Metadata Location */}
+                  <text x="100" y="138" fill="#888" fontSize="6.5" fontFamily="'Inter', sans-serif" letterSpacing="0.1em">LOCATION</text>
+                  <text x="100" y="152" fill="#111" fontSize="10" fontWeight="600" fontFamily="'Inter', sans-serif">Mumbai</text>
+                  
+                  {/* Divider line */}
+                  <line x1="16" y1="166" x2="177" y2="166" stroke="#eaeaea" strokeWidth="1" />
+                  
+                  {/* Tags */}
+                  <text x="16" y="184" fill="#666" fontSize="7.5" fontFamily="'Inter', sans-serif"># {p.cat}  ·  # Architecture</text>
+                  
+                  {/* Footer: Status */}
+                  <circle cx="18" cy="214" r="2.5" fill="#22c55e" />
+                  <text x="25" y="216.5" fill="#555" fontSize="7.5" fontFamily="'Inter', sans-serif">Completed</text>
+                  
+                  {/* Footer: View project */}
+                  <text x="177" y="217" fill="#F59E0B" fontSize="8" fontWeight="600" fontFamily="'Inter', sans-serif" textAnchor="end" style={{ cursor: "pointer" }} onClick={(e) => { e.stopPropagation(); router.push(`/projects/${p.slug}`); }}>View project →</text>
+                  
+                  {/* Invisible click target for the CTA */}
+                  <rect x="110" y="200" width="80" height="30" fill="transparent" style={{ cursor: "pointer" }} onClick={(e) => { e.stopPropagation(); router.push(`/projects/${p.slug}`); }} />
+                </g>
               )}
             </g>
           );
