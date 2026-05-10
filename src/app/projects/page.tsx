@@ -419,7 +419,7 @@ export default function ProjectsPage() {
               {/* hover card */}
               {isH && (
                 <foreignObject x={cardX} y={cardY} width="193" height="232">
-                  <div xmlns="http://www.w3.org/1999/xhtml" style={{ fontFamily: "'Inter',sans-serif", overflow: "hidden", borderRadius: "3px", border: "1px solid #2a2a2a", boxShadow: "0 12px 40px rgba(0,0,0,0.85)" }}>
+                  <div style={{ fontFamily: "'Inter',sans-serif", overflow: "hidden", borderRadius: "3px", border: "1px solid #2a2a2a", boxShadow: "0 12px 40px rgba(0,0,0,0.85)" }}>
 
                     {/* ── Dark top: architectural grid + category + title ── */}
                     <div style={{ background: "#0d0d0d", padding: "0", position: "relative", height: "112px", overflow: "hidden" }}>
