@@ -13,7 +13,6 @@ const WA = [430, 535, 110];  // outer-left  (tallest)
 const WB = [557, 707, 138];  // inner-left
 const WC = [727, 877, 138];  // inner-right
 const WD = [899, 1004, 110]; // outer-right (tallest)
-const WINGS = [WA, WB, WC, WD];
 
 const RAW = [
   {id:1, title:"The Courtyard House",  cat:"Residential",   slug:"courtyard-house",    side:"L"},
@@ -54,22 +53,6 @@ const PROJECTS = RAW.map((p, i) => {
     nodeY: isL ? baseY : baseY + DY,
   };
 });
-
-const PHOTO_IDS = [
-  "1600585154340-be6161a56a0c","1600596542815-ffad4c1539a9",
-  "1600607687939-ce8a6c25118c","1486406146926-c627a92ad1ab",
-  "1545324418-cc1a3fa10c00","1512917774080-9991f1c4c750",
-  "1558618666-fcd25c85cd64","1449824913935-59a10b8d2000",
-  "1580587771525-78b9dba3b914","1497366216548-37526070297c",
-  "1497366754035-f200586c4a16","1497366811353-6870744d04b2",
-  "1431576901776-e539bd916ba2","1486325212027-8081e485255e",
-  "1519999482648-25049ddd37b1","1478476868527-bb19f5d68b37",
-  "1494145904049-0dca59b4bbad","1505843490701-d60d2f08ee02",
-  "1568605114967-8130f3a36994","1464082354059-0e3d0cfd76cf",
-  "1479839672679-a46cb5e2d4bc","1470723272604-efd9a2e5776a",
-  "1513584684374-8bab748fbf90","1415796994537-5ee154fc4e80",
-  "1507003211169-0a1dd7228f2d",
-];
 
 /* ── Wing renderer ─────────────────────────────────────── */
 function Wing({ l, r, t, hotFloor, side, sideLeft, onFloorHover, onFloorClick }: {
