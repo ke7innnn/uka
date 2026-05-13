@@ -270,9 +270,8 @@ export default function ProjectsPage() {
 
   return (
     <div className="w-screen h-screen overflow-hidden bg-[#111111]"
-      style={{ backgroundImage: 'url("/project building bg/WhatsApp Image 2026-05-10 at 4.57.17 PM.jpeg")', backgroundSize: 'cover', backgroundPosition: 'center' }}
+      style={{ backgroundImage: 'url("/project%20building%20bg/building%20background.png")', backgroundSize: 'cover', backgroundPosition: 'center' }}
     >
-      <p className="absolute top-5 left-8 z-10 text-[11px] tracking-[0.22em] uppercase text-white/40">Umesh Kekre &amp; Associates</p>
       <p className="absolute top-5 right-8 z-10 text-[11px] tracking-[0.22em] uppercase text-white/40">25 Projects</p>
 
       <svg viewBox="0 0 1400 790" className="w-full h-full" preserveAspectRatio="xMidYMid meet"
@@ -292,13 +291,6 @@ export default function ProjectsPage() {
             <stop offset="100%" stopColor="#0d0d0d" stopOpacity="0.9" />
           </linearGradient>
           <style>{`
-            @keyframes flyRL { from { transform: translateX(1600px); } to { transform: translateX(-200px); } }
-            @keyframes flyLR { from { transform: translateX(-200px); } to { transform: translateX(1600px); } }
-            @keyframes wingFlap {
-              0%   { transform: scaleY(1); }
-              50%  { transform: scaleY(0.45); }
-              100% { transform: scaleY(1); }
-            }
             @keyframes popFloor {
               0%   { opacity: 0; transform: translateY(15px) scaleY(0.5); }
               40%  { opacity: 1; transform: translateY(-2px) scaleY(1.05); }
@@ -317,24 +309,58 @@ export default function ProjectsPage() {
               60%  { opacity: 1; transform: scale(1.2); }
               100% { opacity: 1; transform: scale(1); }
             }
+            @keyframes flyInSun {
+              0%   { opacity: 0; transform: translate(400px, -100px); }
+              100% { opacity: 1; transform: translate(0px, 0px); }
+            }
           `}</style>
         </defs>
 
-        {/* Bird A — large, R→L, slow and majestic */}
-        <g transform="translate(0, 32)">
-          <g style={{ animation: "flyRL 34s linear -11s infinite" }}>
-            <path d="M0,2 C6,-7 13,-7 19,2 C25,-7 32,-7 38,2"
-              fill="none" stroke="rgba(255,255,255,0.82)" strokeWidth="2" strokeLinecap="round"
-              style={{ transformBox: "fill-box", transformOrigin: "center", animation: "wingFlap 0.9s ease-in-out infinite" }} />
-          </g>
-        </g>
+        {/* ── PALE SKETCH SUN (Top Right) ── */}
+        <g style={{ animation: "flyInSun 2.5s cubic-bezier(0.22, 1, 0.36, 1) forwards" }}>
+          <g>
+            <animateTransform attributeName="transform" type="translate" values="1200,150; 1210,140; 1200,150" dur="20s" repeatCount="indefinite" />
+            
+            {/* Scale down by 1.4x (1 / 1.4 = ~0.71) */}
+            <g transform="scale(0.71)">
+              {/* Very slow rotation for the whole sun to make it dynamic */}
+              <g>
+                <animateTransform attributeName="transform" type="rotate" values="0; 360" dur="180s" repeatCount="indefinite" />
 
-        {/* Bird B — smaller, L→R, different height */}
-        <g transform="translate(0, 58)">
-          <g style={{ animation: "flyLR 44s linear -28s infinite" }}>
-            <path d="M0,1 C5,-5 10,-5 15,1 C20,-5 25,-5 30,1"
-              fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="1.4" strokeLinecap="round"
-              style={{ transformBox: "fill-box", transformOrigin: "center", animation: "wingFlap 1.1s ease-in-out infinite" }} />
+                {/* Straight rays (Outer) */}
+                {Array.from({ length: 24 }).map((_, i) => {
+                  const isLong = i % 2 === 0;
+                  return (
+                    <line key={`ray-${i}`} 
+                      x1="0" y1="-35" 
+                      x2="0" y2={isLong ? "-95" : "-65"} 
+                      stroke="rgba(255,255,255,0.35)" 
+                      strokeWidth="1.2" 
+                      strokeLinecap="round"
+                      transform={`rotate(${i * (360 / 24)})`} 
+                    />
+                  );
+                })}
+
+                {/* Wavy rays (Inner) */}
+                {Array.from({ length: 16 }).map((_, i) => (
+                  <path key={`wave-${i}`} 
+                    d="M 0 -26 Q 10 -40 0 -50 T -5 -70" 
+                    fill="none" 
+                    stroke="rgba(255,255,255,0.7)" 
+                    strokeWidth="1.8" 
+                    strokeLinecap="round"
+                    transform={`rotate(${i * (360 / 16)})`} 
+                  />
+                ))}
+
+                {/* Central sketch rings */}
+                {/* Multiple rings to give that hand-drawn, chalky look */}
+                <circle cx="0" cy="0" r="26" fill="#0a0a0a" stroke="rgba(255,255,255,0.8)" strokeWidth="2.5" />
+                <circle cx="0" cy="0" r="24.5" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1" />
+                <circle cx="0" cy="0" r="28" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1" strokeDasharray="4 3" />
+              </g>
+            </g>
           </g>
         </g>
 

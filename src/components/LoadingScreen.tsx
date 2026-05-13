@@ -39,7 +39,7 @@ export default function LoadingScreen() {
           transition={{ duration: 0.9, ease: "easeInOut" }}
           className="fixed inset-0 z-[100] bg-black flex items-center justify-center"
         >
-          <div className="flex items-end gap-6 md:gap-10">
+          <div className="flex items-end gap-6 md:gap-10 relative">
             {letters.map(({ char, delay }) => (
               <motion.span
                 key={char}
@@ -52,6 +52,16 @@ export default function LoadingScreen() {
                 {char}
               </motion.span>
             ))}
+
+            {/* Fade in Pen Image */}
+            <motion.img
+              src="/pen/pen.png"
+              alt="Pen"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.8, duration: 1.2, ease: "easeOut" }}
+              className="absolute -right-[38vw] md:-right-[32vw] -bottom-[4vw] md:-bottom-[2vw] h-[56vw] md:h-[44vw] w-auto object-contain drop-shadow-xl"
+            />
           </div>
 
           {/* subtle thin horizontal line that draws under the letters */}
