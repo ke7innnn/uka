@@ -20,11 +20,6 @@ const C_R = 735;
 const R_L = 735;
 const R_R = 905;
 
-// Legacy constants mapping for interaction lines
-const WA = [L_L, L_R, TOWER_TOP]; 
-const WD = [R_L, R_R, TOWER_TOP];
-const DX = 0;
-const DY = 0;
 
 const RAW = [
   {id:1, title:"The Courtyard House",  cat:"Residential",   slug:"courtyard-house",    side:"L"},
