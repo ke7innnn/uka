@@ -845,7 +845,7 @@ export default function ProjectsPage() {
           </g>
         </g>
 
-        {/* ── BUILDING WRAPPER ── */}
+        {/* ── GOLDEN SKYSCRAPER SKETCH WRAPPER ── */}
         <g>
           <GoldenSkyscraper hotFloor={hf} onFloorHover={handleFloorHover} onFloorClick={handleFloorClick} />
         </g>
