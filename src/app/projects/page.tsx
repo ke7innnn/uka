@@ -2,17 +2,29 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-/* ── Building geometry ─────────────────────────────────── */
-const BB = 770;          // ground line
-const FH = 33;           // floor height
-const FLOORS = 20;
-const DX = 85, DY = -42; // 3-D depth (side face of right tower)
+/* ── Building geometry (Golden Skyscraper 2.5D Volumetric) ─────────────────────────── */
+const BB = 730;          // ground line
+const FH = 22;           // floor height (increased for slender, taller look)
+const FLOORS = 25;       // Number of tower floors
+const PODIUM_H = 220;    // podium height
+const TOWER_TOP = BB - PODIUM_H - (FLOORS * FH); // 730 - 220 - 550 = -40
+const DY_TOP = 15;       // Top-face 3D depth
 
-// 4 wings  [left, right, topY]
-const WA = [430, 535, 110];  // outer-left  (tallest)
-const WB = [557, 707, 138];  // inner-left
-const WC = [727, 877, 138];  // inner-right
-const WD = [899, 1004, 110]; // outer-right (tallest)
+// Left Wing
+const L_L = 495;
+const L_R = 665;
+// Central Core
+const C_L = 665;
+const C_R = 735;
+// Right Wing
+const R_L = 735;
+const R_R = 905;
+
+// Legacy constants mapping for interaction lines
+const WA = [L_L, L_R, TOWER_TOP]; 
+const WD = [R_L, R_R, TOWER_TOP];
+const DX = 0;
+const DY = 0;
 
 const RAW = [
   {id:1, title:"The Courtyard House",  cat:"Residential",   slug:"courtyard-house",    side:"L"},
@@ -42,15 +54,15 @@ const RAW = [
   {id:25,title:"Future City Plan",      cat:"Visualisation", slug:"future-city-plan",   side:"L"},
 ];
 
-const BH = BB - WA[2]; // tallest building height
+const BH = FLOORS * FH;
 const PROJECTS = RAW.map((p, i) => {
-  const baseY = WA[2] + (i / (RAW.length - 1)) * BH;
-  const floorIdx = Math.min(Math.floor((baseY - WA[2]) / FH), FLOORS - 1);
+  const baseY = TOWER_TOP + (i / (RAW.length - 1)) * BH;
+  const floorIdx = Math.min(Math.floor((baseY - TOWER_TOP) / FH), FLOORS - 1);
   const isL = p.side === "L";
   return {
     ...p, baseY, floorIdx,
-    nodeX: isL ? WA[0] : WD[1] + DX,
-    nodeY: isL ? baseY : baseY + DY,
+    nodeX: isL ? L_L - 32 : R_R + 32,
+    nodeY: baseY,
   };
 });
 
@@ -70,156 +82,377 @@ const PHOTO_IDS = [
   "1507003211169-0a1dd7228f2d"
 ];
 
-/* ── Wing renderer ─────────────────────────────────────── */
-function Wing({ l, r, t, hotFloor, side, sideLeft, onFloorHover, onFloorClick }: {
-  l: number; r: number; t: number; hotFloor: number | null;
-  side?: boolean; sideLeft?: boolean;
+/* ── Golden Skyscraper Renderer ────────────────────────── */
+function GoldenSkyscraper({ hotFloor, onFloorHover, onFloorClick }: {
+  hotFloor: number | null;
   onFloorHover: (f: number | null) => void;
   onFloorClick: (f: number) => void;
 }) {
-  const w = r - l;
-  const floors = Math.floor((BB - t) / FH);
-  const cx = (l + r) / 2;
-  const isOuter = (l === WA[0] || l === WD[0]);
-  // left-side depth constants (mirror of DX/DY)
-  const LDX = 60, LDY = -30;
-
   return (
     <g>
-      {/* ── LEFT SIDE FACE (Wing A only) ── */}
-      {sideLeft && (
+      <defs>
+        <linearGradient id="goldGradient" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#dcdcdc" />
+          <stop offset="35%" stopColor="#fafafa" />
+          <stop offset="70%" stopColor="#cfcfcf" />
+          <stop offset="100%" stopColor="#ffffff" />
+        </linearGradient>
+        <linearGradient id="bronzeGradient" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#a8a8a8" />
+          <stop offset="50%" stopColor="#dedede" />
+          <stop offset="100%" stopColor="#808080" />
+        </linearGradient>
+        
+        {/* Cylindrical Core Gradient: Dark edges, bright center highlight */}
+        <linearGradient id="cylinderGlass" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="rgba(30, 60, 80, 0.95)" />
+          <stop offset="25%" stopColor="rgba(100, 160, 190, 0.8)" />
+          <stop offset="50%" stopColor="rgba(255, 255, 255, 0.95)" />
+          <stop offset="75%" stopColor="rgba(100, 160, 190, 0.8)" />
+          <stop offset="100%" stopColor="rgba(30, 60, 80, 0.95)" />
+        </linearGradient>
+
+        {/* Elevator Car Gradient */}
+        <linearGradient id="elevatorGold" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#666666" />
+          <stop offset="50%" stopColor="#f0f0f0" />
+          <stop offset="100%" stopColor="#666666" />
+        </linearGradient>
+        
+        {/* Recessed Dark Background for Left Louvers */}
+        <linearGradient id="recessedDark" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#1A1510" />
+          <stop offset="100%" stopColor="#0F0C08" />
+        </linearGradient>
+
+        {/* Storefront Illuminated Interior */}
+        <linearGradient id="storeIllum" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#FEF08A" />
+          <stop offset="100%" stopColor="#FEFCE8" />
+        </linearGradient>
+
+        <filter id="shadowBlur">
+          <feGaussianBlur stdDeviation="3" />
+        </filter>
+      </defs>
+
+      {/* ── COMMERCIAL PODIUM BASE (2.5D Volumetric) ── */}
+      <g style={{ animation: "growPillar 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards", transformBox: "fill-box", transformOrigin: "bottom" }}>
+        
+        {/* Podium Top Roof Deck (Garden Deck, dark green tint, skewed back) */}
+        <polygon 
+          points={`425,${BB - PODIUM_H} 975,${BB - PODIUM_H} 975,${BB - PODIUM_H - DY_TOP} 425,${BB - PODIUM_H - DY_TOP}`} 
+          fill="#334230" stroke="#222" strokeWidth="0.5" 
+        />
+        {/* Glass Safety Railing along the top edge */}
+        <polygon 
+          points={`425,${BB - PODIUM_H} 975,${BB - PODIUM_H} 975,${BB - PODIUM_H - 12} 425,${BB - PODIUM_H - 12}`} 
+          fill="rgba(160, 210, 240, 0.25)" stroke="rgba(255, 255, 255, 0.6)" strokeWidth="0.5"
+        />
+        
+        {/* Main Base Front Block */}
+        <rect x={425} y={BB - PODIUM_H} width={550} height={PODIUM_H} fill="url(#bronzeGradient)" />
+        
+        {/* ── LEFT SECTION: Vertical Louvers ── */}
         <g>
-          <polygon points={`${l},${t} ${l-LDX},${t+LDY} ${l-LDX},${BB+LDY} ${l},${BB}`}
-            fill="#888" stroke="#555" strokeWidth="0.8" />
-          {Array.from({ length: floors }, (_, f) => {
-            const y1 = t + f * FH; const y2 = y1 + FH;
-            const hot = hotFloor !== null && Math.abs((WA[2] + hotFloor * FH) - y1) < FH / 2;
+          {/* Deep Recessed Background */}
+          <rect x={445} y={BB - PODIUM_H + 30} width={340} height={140} fill="url(#recessedDark)" />
+          {/* Vertical Gold Slats Loop */}
+          {Array.from({ length: 18 }).map((_, i) => (
+            <rect key={`louver-${i}`} x={449 + i * 19} y={BB - PODIUM_H + 30} width={6} height={140} fill="url(#goldGradient)" stroke="#777777" strokeWidth="0.5" />
+          ))}
+        </g>
+        
+        {/* ── RIGHT SECTION: Open-Air Parking Garage ── */}
+        <g>
+          {/* Deep background to simulate interior volume */}
+          <rect x={805} y={BB - PODIUM_H + 30} width={150} height={140} fill="#0A0805" />
+          {/* 4 Distinct Parking Floors */}
+          {Array.from({ length: 4 }).map((_, i) => {
+            const slabY = BB - PODIUM_H + 30 + i * 35;
             return (
-              <g key={f}>
-                <polygon
-                  points={`${l},${y1} ${l-LDX},${y1+LDY} ${l-LDX},${y2+LDY} ${l},${y2}`}
-                  fill={hot ? "#d4900a" : f % 2 === 0 ? "#7a7a7a" : "#848484"}
-                  stroke="#555" strokeWidth="0.4" style={{ transition: "fill 0.2s" }} />
-                {[[0.15, 0.45], [0.58, 0.88]].map(([ta, tb], wi) => (
-                  <polygon key={wi}
-                    points={`${l-ta*LDX},${y1+7+ta*LDY} ${l-tb*LDX},${y1+7+tb*LDY} ${l-tb*LDX},${y1+17+tb*LDY} ${l-ta*LDX},${y1+17+ta*LDY}`}
-                    fill={hot ? "rgba(255,200,60,0.4)" : "#444"} stroke="#333" strokeWidth="0.3" />
-                ))}
+              <g key={`park-${i}`}>
+                {/* Slab top face (deep perspective) */}
+                <polygon 
+                  points={`805,${slabY + 20} 955,${slabY + 20} 955,${slabY + 20 - 5} 805,${slabY + 20 - 5}`} 
+                  fill="#b0b0b0" 
+                />
+                
+                {/* Tiny Parked Car Silhouettes */}
+                {i < 3 && i % 2 === 0 && <rect x={825} y={slabY + 15} width={16} height={5} fill="#a8b2b8" rx="2" />}
+                {i < 3 && i % 2 !== 0 && <rect x={905} y={slabY + 15} width={16} height={5} fill="#cccccc" rx="2" />}
+                {i < 3 && i % 2 === 0 && <rect x={865} y={slabY + 15} width={16} height={5} fill="#3a4047" rx="2" />}
+
+                {/* Slab front face */}
+                <rect x={805} y={slabY + 20} width={150} height={15} fill="url(#goldGradient)" stroke="#777777" strokeWidth="0.5" />
               </g>
             );
           })}
-          <g style={{ opacity: 0, animation: "dropCrown 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 2s forwards", transformBox: "fill-box", transformOrigin: "bottom" }}>
-            <polygon points={`${l},${t} ${l-LDX},${t+LDY} ${l-LDX},${BB+LDY} ${l},${BB}`}
-              fill="none" stroke="#444" strokeWidth="1.1" />
-            {/* top-left face */}
-            <polygon points={`${l},${t} ${r},${t} ${r+DX},${t+DY} ${l+DX},${t+DY}`}
-              fill="#d2d2d2" stroke="#aaa" strokeWidth="0.8" />
-            {/* back-left corner top */}
-            <polygon points={`${l},${t} ${l-LDX},${t+LDY} ${l-LDX+DX},${t+LDY+DY} ${l+DX},${t+DY}`}
-              fill="#c0c0c0" stroke="#aaa" strokeWidth="0.7" />
-          </g>
         </g>
-      )}
+        
+        {/* ── GROUND LEVEL: Luxury Retail Storefronts ── */}
+        <g>
+          {/* Overall retail cutout background (warm illuminated interior) */}
+          <rect x={435} y={BB - 50} width={530} height={50} fill="url(#storeIllum)" />
+          
+          {/* Shopfronts Loop */}
+          {Array.from({ length: 10 }).map((_, i) => {
+            const shopW = 530 / 10;
+            const shopX = 435 + i * shopW;
+            return (
+              <g key={`shop-${i}`}>
+                {/* Large Glass Panel */}
+                <rect x={shopX + 2} y={BB - 46} width={shopW - 4} height={46} fill="rgba(160, 210, 240, 0.45)" stroke="rgba(255, 255, 255, 0.4)" strokeWidth="0.5" />
+                {/* Pylon Column separating shops */}
+                <rect x={shopX + shopW - 3} y={BB - 50} width={6} height={50} fill="url(#bronzeGradient)" stroke="#222" strokeWidth="0.5" />
+              </g>
+            );
+          })}
+          {/* Leftmost starting pylon */}
+          <rect x={432} y={BB - 50} width={6} height={50} fill="url(#bronzeGradient)" stroke="#222" strokeWidth="0.5" />
+        </g>
 
-      {/* floor strips */}
-      {Array.from({ length: floors }, (_, f) => {
-        const fy = t + f * FH;
-        // Convert this floor's pixel Y to a WA-relative floor index (so all wings align)
-        const waRelF = Math.floor((fy - WA[2]) / FH);
-        const hot = hotFloor !== null && waRelF === hotFloor;
-        const fill = hot ? "#F59E0B" : f % 2 === 0 ? "#ececec" : "#f4f4f4";
-        const ww = isOuter ? 26 : 30;
-        const wCount = isOuter ? 3 : 4;
-        const gap = (w - 24 - wCount * ww) / (wCount - 1);
-        const wh = Math.min(FH - 9, 13);
-        const delay = (floors - 1 - f) * 0.055; // Bottom-up delay
+        {/* Thick ground foundation line */}
+        <line x1={300} x2={1100} y1={BB} y2={BB} stroke="#222" strokeWidth={5} />
+      </g>
+
+      {/* ── TOWER WINGS (Back Recessed Wall) ── */}
+      {/* We draw the recessed interior background for both wings first so they sit behind everything */}
+      {[0, 1].map((wingIdx) => {
+        const isLeft = wingIdx === 0;
+        const l = isLeft ? L_L : R_L;
+        const r = isLeft ? L_R : R_R;
         return (
-          <g key={f} style={{ opacity: 0, animation: `popFloor 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) ${delay}s forwards`, transformBox: "fill-box", transformOrigin: "bottom" }}>
-            <rect x={l} y={fy} width={w} height={FH} fill={fill} stroke="#444" strokeWidth="0.4"
-              style={{ transition: "fill 0.2s", cursor: "pointer" }}
-              onMouseEnter={() => onFloorHover(waRelF)}
-              onMouseLeave={() => onFloorHover(null)}
-              onClick={() => onFloorClick(waRelF)} />
-            {Array.from({ length: wCount }, (_, j) => (
-              <rect key={j}
-                x={l + 12 + j * (ww + gap)} y={fy + 6}
-                width={ww} height={wh}
-                fill={hot ? "rgba(255,255,255,0.6)" : "#555"}
-                stroke={hot ? "#fff8" : "#444"} strokeWidth="0.3" rx="1"
-                style={{ pointerEvents: "none" }} />
-            ))}
-            <path d={`M ${l + 6},${fy + FH - 4} Q ${cx},${fy + FH + 2} ${r - 6},${fy + FH - 4}`}
-              fill={hot ? "rgba(245,158,11,0.25)" : "rgba(0,0,0,0.12)"}
-              stroke={hot ? "#e8960a" : "#777"} strokeWidth="0.7"
-              style={{ pointerEvents: "none" }} />
-          </g>
+          <rect key={wingIdx} x={l + 5} y={TOWER_TOP} width={r - l - 10} height={BB - PODIUM_H - TOWER_TOP} fill="#1a1816" 
+            style={{ animation: "growPillar 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards", transformBox: "fill-box", transformOrigin: "bottom" }} />
         );
       })}
 
-      {/* wing outline & structural pillars growing from ground */}
-      <rect x={l} y={t} width={w} height={BB - t} fill="none" stroke="#444" strokeWidth="1.2" 
-        style={{ animation: "growPillar 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards", transformBox: "fill-box", transformOrigin: "bottom" }} />
-      {[l, l + w / 2 - 4, r - 8].map((px, i) => (
-        <rect key={i} x={px} y={t} width={8} height={BB - t} fill="#cccccc" stroke="#aaa" strokeWidth="0.3"
-          style={{ pointerEvents: "none", animation: "growPillar 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards", transformBox: "fill-box", transformOrigin: "bottom" }} />
-      ))}
-
-      {/* crown */}
-      <g style={{ opacity: 0, animation: "dropCrown 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 1.9s forwards", transformBox: "fill-box", transformOrigin: "bottom" }}>
-        <ellipse cx={cx} cy={t - 10} rx={isOuter ? 30 : 22} ry={isOuter ? 13 : 9}
-          fill="#e0e0e0" stroke="#aaa" strokeWidth="1" />
-        <ellipse cx={cx} cy={t - 10} rx={isOuter ? 16 : 10} ry={isOuter ? 7 : 5}
-          fill="#c8c8c8" stroke="#bbb" strokeWidth="0.8" />
-        {isOuter && (
-          <>
-            <line x1={cx} y1={t - 23} x2={cx} y2={t - 10} stroke="#bbb" strokeWidth="0.8" />
-            <ellipse cx={cx} cy={t - 26} rx={8} ry={4} fill="#ddd" stroke="#bbb" strokeWidth="0.7" />
-          </>
-        )}
-
-        {/* ── TOP FACE (all wings) ── */}
-        {!sideLeft && (
-          <polygon points={`${l},${t} ${r},${t} ${r+DX},${t+DY} ${l+DX},${t+DY}`}
-            fill="#d2d2d2" stroke="#aaa" strokeWidth="0.8" />
-        )}
+      {/* ── CENTRAL CORE (Cylindrical Glass Shaft) ── */}
+      <g style={{ animation: "growPillar 2s cubic-bezier(0.25, 1, 0.5, 1) forwards", transformBox: "fill-box", transformOrigin: "bottom" }}>
+        {/* The main cylindrical glass body */}
+        <rect x={C_L} y={TOWER_TOP - DY_TOP} width={C_R - C_L} height={BB - PODIUM_H - TOWER_TOP + DY_TOP} fill="url(#cylinderGlass)" />
+        {/* Horizontal structural rings */}
+        {Array.from({ length: Math.floor(FLOORS / 2) }).map((_, i) => (
+          <line key={i} x1={C_L} y1={TOWER_TOP + (i * FH * 2)} x2={C_R} y2={TOWER_TOP + (i * FH * 2)} stroke="rgba(255,255,255,0.7)" strokeWidth={1.5} />
+        ))}
+        {/* Elevator Car (Detailed metallic block) */}
+        <g transform={`translate(0, ${TOWER_TOP + 180})`}>
+          <rect x={C_L + 12} y={0} width={(C_R - C_L) - 24} height={40} fill="url(#elevatorGold)" rx={2} stroke="#fff" strokeWidth="0.8" />
+          <line x1={C_L + 16} y1={10} x2={C_R - 16} y2={10} stroke="#555555" strokeWidth="1" />
+          <line x1={C_L + 16} y1={20} x2={C_R - 16} y2={20} stroke="#555555" strokeWidth="1" />
+          <line x1={C_L + 16} y1={30} x2={C_R - 16} y2={30} stroke="#555555" strokeWidth="1" />
+          {/* Elevator glass door */}
+          <rect x={C_L + 25} y={5} width={(C_R - C_L) - 50} height={30} fill="rgba(40, 80, 100, 0.8)" rx={1} />
+        </g>
+        
+        {/* Central Core Cap (Metallic Rounded Rectangle) */}
+        <g style={{ animation: "dropCrown 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 1.8s forwards", opacity: 0, transformBox: "fill-box", transformOrigin: "bottom" }}>
+          <rect x={C_L + 2} y={TOWER_TOP - DY_TOP - 8} width={(C_R - C_L) - 4} height={12} fill="url(#bronzeGradient)" rx="4" />
+          <rect x={C_L + 6} y={TOWER_TOP - DY_TOP - 12} width={(C_R - C_L) - 12} height={8} fill="url(#goldGradient)" rx="2" />
+        </g>
       </g>
 
-      {/* ── RIGHT SIDE FACE (Wing D only) ── */}
-      {side && (
-        <g>
-          {Array.from({ length: floors }, (_, f) => {
-            const y1 = t + f * FH; const y2 = y1 + FH;
-            const hot = hotFloor !== null && Math.abs((WA[2] + hotFloor * FH) - y1) < FH / 2;
-            const sfl = hot ? "#b87200" : f % 2 === 0 ? "#8a8a8a" : "#949494";
-            const delay = (floors - 1 - f) * 0.055;
-            return (
-              <g key={f} style={{ opacity: 0, animation: `popFloor 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) ${delay}s forwards`, transformBox: "fill-box", transformOrigin: "bottom" }}>
-                <polygon
-                  points={`${r},${y1} ${r+DX},${y1+DY} ${r+DX},${y2+DY} ${r},${y2}`}
-                  fill={sfl} stroke="#555" strokeWidth="0.4"
-                  style={{ transition: "fill 0.2s" }} />
-                {[[0.1, 0.4], [0.55, 0.85]].map(([ta, tb], wi) => (
-                  <polygon key={wi}
-                    points={`${r+ta*DX},${y1+7+ta*DY} ${r+tb*DX},${y1+7+tb*DY} ${r+tb*DX},${y1+17+tb*DY} ${r+ta*DX},${y1+17+ta*DY}`}
-                    fill={hot ? "rgba(255,210,80,0.4)" : "#555"} stroke="#444" strokeWidth="0.3" />
-                ))}
-              </g>
-            );
-          })}
-          <g style={{ opacity: 0, animation: "dropCrown 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 2s forwards", transformBox: "fill-box", transformOrigin: "bottom" }}>
-            <polygon points={`${r},${t} ${r+DX},${t+DY} ${r+DX},${BB+DY} ${r},${BB}`}
-              fill="none" stroke="#444" strokeWidth="1.1" />
+      {/* ── TOWER WINGS (Volumetric Balconies & Crowns) ── */}
+      {[0, 1].map((wingIdx) => {
+        const isLeft = wingIdx === 0;
+        const l = isLeft ? L_L : R_L;
+        const r = isLeft ? L_R : R_R;
+        const cx = (l + r) / 2;
+        
+        // Extended balcony bounds for a deep wrap-around pop beyond the building silhouette
+        const b_l = isLeft ? l - 24 : l;
+        const b_r = isLeft ? r : r + 24;
+        const b_cx = isLeft ? b_l + (b_r - b_l) * 0.6 : b_l + (b_r - b_l) * 0.4;
+        
+        const curveD = 28; // Deep rounded bulge
+        const slabYOffset = 10;
+        
+        const CF_L = l - 5;
+        const CF_R = isLeft ? C_L : r + 5;
+        const CF_CX = cx;
+        const C_DX = isLeft ? 12 : -12;
+        const C_DY = -8;
+        const C_H = 30; // Crown vertical height offset
+        
+        return (
+          <g key={wingIdx}>
+            {/* Floors Loop (3D Layered Paths) */}
+            {Array.from({ length: FLOORS }).map((_, f) => {
+              const fy = TOWER_TOP + f * FH;
+              const hot = hotFloor !== null && f === hotFloor;
+              const delay = (FLOORS - 1 - f) * 0.055; // Bottom-up stagger
+              
+              return (
+                <g key={f} style={{ opacity: 0, animation: `popFloor 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) ${delay}s forwards`, transformBox: "fill-box", transformOrigin: "bottom" }}>
+                  
+                  {/* 0. Top Balcony Ceiling (only for the very top floor, f === 0) */}
+                  {f === 0 && (
+                     <g>
+                       <path 
+                         d={`M ${b_l},${fy} Q ${b_cx},${fy + curveD} ${b_r},${fy} L ${b_r},${fy - 8} Q ${b_cx},${fy + curveD - 8} ${b_l},${fy - 8} Z`}
+                         fill="#f5f5f5"
+                       />
+                       <path 
+                         d={`M ${b_l},${fy} Q ${b_cx},${fy + curveD} ${b_r},${fy} L ${b_r},${fy - 2} Q ${b_cx},${fy + curveD - 2} ${b_l},${fy - 2} Z`}
+                         fill="#cccccc"
+                       />
+                       {Array.from({ length: 9 }).map((_, lightIdx) => {
+                         const t = (lightIdx + 1) / 10;
+                         const lx = (1-t)*(1-t)*b_l + 2*(1-t)*t*b_cx + t*t*b_r;
+                         const ly = (1-t)*(1-t)*fy + 2*(1-t)*t*(fy + curveD) + t*t*fy - 4;
+                         return <circle key={`light-${lightIdx}`} cx={lx} cy={ly} r={2.5} fill="url(#storeIllum)" />;
+                       })}
+                     </g>
+                  )}
+
+                  {/* 1. Recessed Interior Crescent (Deep shadow behind glass, bound strictly to inner pillars) */}
+                  <path 
+                    d={`M ${l},${fy - slabYOffset} Q ${cx},${fy + curveD/2 - slabYOffset} ${r},${fy - slabYOffset} L ${r},${fy - FH} L ${l},${fy - FH} Z`}
+                    fill="rgba(10, 10, 10, 0.85)"
+                  />
+                  
+                  {/* 1.5 Cast Shadow (Casts a shadow onto the floor below) */}
+                  <path 
+                    d={`M ${b_l},${fy + 3} Q ${b_cx},${fy + curveD + 3} ${b_r},${fy + 3} L ${b_r},${fy + 14} Q ${b_cx},${fy + curveD + 14} ${b_l},${fy + 14} Z`}
+                    fill="rgba(0,0,0,0.3)" filter="url(#shadowBlur)"
+                  />
+
+                  {/* INTERACTIVE 3D BALCONY GROUP (Triggered by hotFloor state) */}
+                  <g 
+                    className="balcony-floor"
+                    style={{
+                      transform: hot ? "scaleX(1.04) scaleY(1.02)" : "scale(1)",
+                      transformOrigin: isLeft ? `${r}px ${fy}px` : `${l}px ${fy}px`,
+                      transition: "transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)"
+                    }}
+                  >
+                    {/* Layer A: Underside Shadow */}
+                    <path 
+                      d={`M ${b_l},${fy + 2} Q ${b_cx},${fy + curveD + 2} ${b_r},${fy + 2} L ${b_r},${fy + 5} Q ${b_cx},${fy + curveD + 5} ${b_l},${fy + 5} Z`}
+                      fill="#555555"
+                    />
+
+                    {/* Layer B: Solid Floor Slab (3px lip) */}
+                    <path 
+                      d={`M ${b_l},${fy} Q ${b_cx},${fy + curveD} ${b_r},${fy} L ${b_r},${fy + 3} Q ${b_cx},${fy + curveD + 3} ${b_l},${fy + 3} Z`}
+                      fill="url(#goldGradient)" 
+                    />
+
+                    {/* Top Surface of Slab (Perspective depth connecting outer lip back to inner wall) */}
+                    <path 
+                      d={`M ${l},${fy - slabYOffset} Q ${cx},${fy + curveD/2 - slabYOffset} ${r},${fy - slabYOffset} L ${b_r},${fy} Q ${b_cx},${fy + curveD} ${b_l},${fy} Z`}
+                      fill="#f0f0f0" 
+                    />
+
+                    {/* Layer C: Floating Glass Railing */}
+                    <path 
+                      d={`M ${b_l + 2},${fy - FH + 10} Q ${b_cx},${fy + curveD - FH + 10} ${b_r - 2},${fy - FH + 10} L ${b_r - 2},${fy} Q ${b_cx},${fy + curveD} ${b_l + 2},${fy} Z`}
+                      fill="rgba(160, 210, 240, 0.35)"
+                    />
+                    
+                    {/* White specular highlight on the outermost curved edge */}
+                    <path 
+                      d={`M ${b_l + 2},${fy} Q ${b_cx},${fy + curveD} ${b_r - 2},${fy}`}
+                      fill="none" stroke="#fff" strokeWidth={1.2}
+                    />
+
+                    {/* Amber highlight overlay when active */}
+                    <path 
+                      d={`M ${b_l + 2},${fy - FH + 10} Q ${b_cx},${fy + curveD - FH + 10} ${b_r - 2},${fy - FH + 10} L ${b_r - 2},${fy} Q ${b_cx},${fy + curveD} ${b_l + 2},${fy} Z`}
+                      fill="#F59E0B"
+                      style={{ opacity: hot ? 0.35 : 0, transition: "opacity 0.3s" }}
+                    />
+                    
+                    {/* Invisible Hitbox for Interaction */}
+                    <path 
+                      d={`M ${b_l},${fy - FH + 5} Q ${b_cx},${fy + curveD - FH + 5} ${b_r},${fy - FH + 5} L ${b_r},${fy + 5} Q ${b_cx},${fy + curveD + 5} ${b_l},${fy + 5} Z`}
+                      fill="transparent"
+                      style={{ cursor: "pointer" }}
+                      onMouseEnter={() => onFloorHover(f)}
+                      onMouseLeave={() => onFloorHover(null)}
+                      onClick={() => onFloorClick(f)}
+                    />
+                  </g>
+
+                  {/* 6. Scattered Organic Greenery (Potted Plants) */}
+                  {!hot && (
+                    <g>
+                      <g transform={`translate(${l + 35}, ${fy + (curveD * 0.5) - slabYOffset + 2})`}><path d="M -2,-2 L 2,-2 L 1,2 L -1,2 Z" fill="#8c6230" /><circle cx={0} cy={-5} r={3} fill="#4d6f43" /><circle cx={-2} cy={-4} r={2} fill="#3a5a30" /><circle cx={2} cy={-4} r={2} fill="#5a7a4f" /></g>
+                      <g transform={`translate(${cx}, ${fy + curveD - slabYOffset + 2})`}><path d="M -3,-2 L 3,-2 L 2,2 L -2,2 Z" fill="#8c6230" /><circle cx={0} cy={-5} r={4} fill="#4d6f43" /><circle cx={-3} cy={-4} r={3} fill="#3a5a30" /><circle cx={3} cy={-4} r={3} fill="#5a7a4f" /></g>
+                      <g transform={`translate(${r - 35}, ${fy + (curveD * 0.5) - slabYOffset + 2})`}><path d="M -2,-2 L 2,-2 L 1,2 L -1,2 Z" fill="#8c6230" /><circle cx={0} cy={-5} r={3} fill="#4d6f43" /><circle cx={-2} cy={-4} r={2} fill="#3a5a30" /><circle cx={2} cy={-4} r={2} fill="#5a7a4f" /></g>
+                    </g>
+                  )}
+                </g>
+              );
+            })}
+            
+            {/* Outer structural pillars merging into crowns */}
+            <rect x={l - 5} y={TOWER_TOP} width={8} height={BB - PODIUM_H - TOWER_TOP} fill="url(#goldGradient)" stroke="#777777" strokeWidth="0.5"
+              style={{ animation: "growPillar 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards", transformBox: "fill-box", transformOrigin: "bottom" }} />
+            <rect x={r - 3} y={TOWER_TOP} width={8} height={BB - PODIUM_H - TOWER_TOP} fill="url(#goldGradient)" stroke="#777777" strokeWidth="0.5"
+              style={{ animation: "growPillar 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards", transformBox: "fill-box", transformOrigin: "bottom" }} />
+
+            {/* ── VOLUMETRIC CROWNS (Bow-tie structure with supporting columns) ── */}
+            <g style={{ opacity: 0, animation: "dropCrown 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 1.9s forwards", transformBox: "fill-box", transformOrigin: "bottom" }}>
+              
+              {/* Drop Shadow onto top floor */}
+              <path 
+                d={`M ${CF_L},${TOWER_TOP - 20} L ${CF_L},${TOWER_TOP - 55} Q ${CF_CX},${TOWER_TOP - 35} ${CF_R},${TOWER_TOP - 55} L ${CF_R},${TOWER_TOP - 20} Q ${CF_CX},${TOWER_TOP - 5} ${CF_L},${TOWER_TOP - 20} Z`}
+                fill="rgba(0,0,0,0.6)" filter="url(#shadowBlur)"
+              />
+
+              {/* Supporting Volumetric Columns */}
+              {[CF_L + 15, CF_CX - 25, CF_CX + 25, CF_R - 15].map((colX, i) => (
+                <g key={`col-${i}`}>
+                  {/* Column Body */}
+                  <rect x={isLeft ? colX : colX - 6} y={TOWER_TOP - C_H} width={6} height={C_H} fill="url(#goldGradient)" stroke="#777777" strokeWidth="0.5" />
+                  {/* Column Base/Cap */}
+                  <rect x={isLeft ? colX - 2 : colX - 8} y={TOWER_TOP - 2} width={10} height={4} fill="url(#bronzeGradient)" />
+                  <rect x={isLeft ? colX - 2 : colX - 8} y={TOWER_TOP - C_H} width={10} height={4} fill="url(#bronzeGradient)" />
+                </g>
+              ))}
+
+              {/* Thick Pergola Slats (Programmatic loop underneath the crown) */}
+              {Array.from({ length: 14 }).map((_, i) => {
+                const slatX = CF_L + 15 + i * ((CF_R - CF_L - 30) / 13);
+                const t = i / 13;
+                const yBase = (1-t)*(1-t)*(TOWER_TOP - C_H + 5) + 2*(1-t)*t*(TOWER_TOP - C_H + 20) + t*t*(TOWER_TOP - C_H + 5);
+                return (
+                  <g key={`slat-${i}`}>
+                    {/* Slat Side Face (Darker shading) */}
+                    <polygon points={`${slatX},${yBase} ${slatX + 3},${yBase - 3} ${slatX + 3},${yBase + 12} ${slatX},${yBase + 15}`} fill="#555555" />
+                    {/* Slat Front Face */}
+                    <rect x={slatX} y={yBase} width={3} height={15} fill="url(#bronzeGradient)" />
+                  </g>
+                );
+              })}
+
+              {/* Side Shading Face (Outer Edge for depth) */}
+              <path 
+                d={`M ${isLeft ? CF_L : CF_R},${TOWER_TOP - C_H + 5} L ${isLeft ? CF_L : CF_R},${TOWER_TOP - C_H - 35} L ${isLeft ? CF_L + C_DX : CF_R + C_DX},${TOWER_TOP - C_H - 35 + C_DY} L ${isLeft ? CF_L + C_DX : CF_R + C_DX},${TOWER_TOP - C_H + 5 + C_DY} Z`}
+                fill="#9c9c9c" stroke="#555555" strokeWidth="0.5"
+              />
+
+              {/* Solid Top Roof Plane (Diamond/skewed polygon for 2.5D top-down view) */}
+              <path 
+                d={`M ${CF_L},${TOWER_TOP - C_H - 35} L ${CF_L + C_DX},${TOWER_TOP - C_H - 35 + C_DY} Q ${CF_CX + C_DX},${TOWER_TOP - C_H - 15 + C_DY} ${CF_R + C_DX},${TOWER_TOP - C_H - 35 + C_DY} L ${CF_R},${TOWER_TOP - C_H - 35} Q ${CF_CX},${TOWER_TOP - C_H - 15} ${CF_L},${TOWER_TOP - C_H - 35} Z`}
+                fill="#f0f0f0" stroke="#b0b0b0" strokeWidth="0.5"
+              />
+
+              {/* Heavy Solid Crown (Front Face Bow-tie) */}
+              <path 
+                d={`M ${CF_L},${TOWER_TOP - C_H + 5} L ${CF_L},${TOWER_TOP - C_H - 35} Q ${CF_CX},${TOWER_TOP - C_H - 15} ${CF_R},${TOWER_TOP - C_H - 35} L ${CF_R},${TOWER_TOP - C_H + 5} Q ${CF_CX},${TOWER_TOP - C_H + 20} ${CF_L},${TOWER_TOP - C_H + 5} Z`}
+                fill="url(#goldGradient)" stroke="#777777" strokeWidth="1.5"
+              />
+
+            </g>
           </g>
-          {/* top face for WD */}
-          <polygon points={`${l},${t} ${r},${t} ${r+DX},${t+DY} ${l+DX},${t+DY}`}
-            fill="#d0cabe" stroke="#555" strokeWidth="0.8" />
-        </g>
-      )}
+        );
+      })}
     </g>
   );
 }
-
-
 
 export default function ProjectsPage() {
   const [hovered, setHovered] = useState<number | null>(null);
@@ -274,7 +507,7 @@ export default function ProjectsPage() {
     >
       <p className="absolute top-5 right-8 z-10 text-[11px] tracking-[0.22em] uppercase text-white/40">25 Projects</p>
 
-      <svg viewBox="0 0 1400 790" className="w-full h-full" preserveAspectRatio="xMidYMid meet"
+      <svg viewBox="0 -130 1400 920" className="w-full h-full" preserveAspectRatio="xMidYMid meet"
         onClick={() => { if (zoomed !== null) { setZoomed(null); setHovered(null); } }}
         style={{ cursor: zoomed !== null ? "zoom-out" : "default" }}
       >
@@ -366,54 +599,8 @@ export default function ProjectsPage() {
 
         {/* ── BUILDING WRAPPER ── */}
         <g>
-          {/* ── CONNECTOR SHADOW SECTIONS between wings ── */}
-        {/* Gap A-B */}
-        <rect x={WA[1]} y={WB[2]} width={WB[0]-WA[1]} height={BB-WB[2]} fill="#222" stroke="#444" strokeWidth="0.5" 
-          style={{ animation: "growPillar 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards", transformBox: "fill-box", transformOrigin: "bottom" }} />
-        {/* Gap B-C */}
-        <rect x={WB[1]} y={WC[2]} width={WC[0]-WB[1]} height={BB-WC[2]} fill="#1a1a1a" stroke="#444" strokeWidth="0.5" 
-          style={{ animation: "growPillar 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards", transformBox: "fill-box", transformOrigin: "bottom" }} />
-        {/* Gap C-D */}
-        <rect x={WC[1]} y={WD[2]} width={WD[0]-WC[1]} height={BB-WD[2]} fill="#222" stroke="#444" strokeWidth="0.5" 
-          style={{ animation: "growPillar 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards", transformBox: "fill-box", transformOrigin: "bottom" }} />
-
-        {/* ── WINGS (back-to-front order) ── */}
-        <Wing l={WB[0]} r={WB[1]} t={WB[2]} hotFloor={hf} onFloorHover={handleFloorHover} onFloorClick={handleFloorClick} />
-        <Wing l={WC[0]} r={WC[1]} t={WC[2]} hotFloor={hf} onFloorHover={handleFloorHover} onFloorClick={handleFloorClick} />
-        <Wing l={WA[0]} r={WA[1]} t={WA[2]} hotFloor={hf} sideLeft onFloorHover={handleFloorHover} onFloorClick={handleFloorClick} />
-        <Wing l={WD[0]} r={WD[1]} t={WD[2]} hotFloor={hf} side onFloorHover={handleFloorHover} onFloorClick={handleFloorClick} />
-
-        {/* ── GAP BRIDGES (fill holes between wing tops) ── */}
-        <g style={{ opacity: 0, animation: "dropCrown 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 1.9s forwards", transformBox: "fill-box", transformOrigin: "bottom" }}>
-          {/* Step-down front face: WA→connector */}
-          <rect x={WA[1]} y={WA[2]} width={WB[0]-WA[1]} height={WB[2]-WA[2]}
-            fill="#bebebe" stroke="#aaa" strokeWidth="0.6" />
-          {/* Top bridge: WA → WB */}
-          <polygon points={`${WA[1]},${WA[2]} ${WB[0]},${WB[2]} ${WB[0]+DX},${WB[2]+DY} ${WA[1]+DX},${WA[2]+DY}`}
-            fill="#cacaca" stroke="#aaa" strokeWidth="0.7" />
-
-          {/* Top bridge: WB → WC */}
-          <polygon points={`${WB[1]},${WB[2]} ${WC[0]},${WC[2]} ${WC[0]+DX},${WC[2]+DY} ${WB[1]+DX},${WB[2]+DY}`}
-            fill="#cacaca" stroke="#aaa" strokeWidth="0.7" />
-
-          {/* Step-up front face: WC→WD */}
-          <rect x={WC[1]} y={WD[2]} width={WD[0]-WC[1]} height={WC[2]-WD[2]}
-            fill="#bebebe" stroke="#aaa" strokeWidth="0.6" />
-          {/* Top bridge: WC → WD */}
-          <polygon points={`${WC[1]},${WC[2]} ${WD[0]},${WD[2]} ${WD[0]+DX},${WD[2]+DY} ${WC[1]+DX},${WC[2]+DY}`}
-            fill="#cacaca" stroke="#aaa" strokeWidth="0.7" />
+          <GoldenSkyscraper hotFloor={hf} onFloorHover={handleFloorHover} onFloorClick={handleFloorClick} />
         </g>
-
-
-        {/* ── GROUND LINE ── */}
-        <line x1={WA[0]-60} x2={WD[1]+DX+60} y1={BB} y2={BB} stroke="#888" strokeWidth="1.6" />
-        <line x1={WD[1]} x2={WD[1]+DX} y1={BB} y2={BB+DY} stroke="#888" strokeWidth="1.2" />
-        {/* Entrance */}
-        <rect x={WB[0]+15} y={BB-40} width={WC[1]-WB[0]-30} height={40} fill="#ccc" stroke="#aaa" strokeWidth="0.8" />
-        <rect x={WB[0]+22} y={BB-38} width={40} height={38} fill="#aaa" stroke="#999" strokeWidth="0.5" />
-        <rect x={WC[1]-62} y={BB-38} width={40} height={38} fill="#aaa" stroke="#999" strokeWidth="0.5" />
-        <path d={`M ${WB[0]+15},${BB-40} Q ${(WB[0]+WC[1])/2},${BB-52} ${WC[1]-15},${BB-40}`}
-          fill="none" stroke="#bbb" strokeWidth="1" />
 
         {/* ── PROJECT NODES + CALLOUTS ── */}
         {PROJECTS.map((p, i) => {
@@ -520,7 +707,6 @@ export default function ProjectsPage() {
             </g>
           );
         })}
-        </g>
         </g>
       </svg>
     </div>
