@@ -86,14 +86,18 @@ function GoldenSkyscraper({ hotFloor, onFloorHover, onFloorClick }: {
   return (
     <g>
       {/* ── CENTRAL CORE SHAFT (Rendered in Background so Podium Blocks can Overlap/Cover it) ── */}
-      <g style={{ transform: "scaleY(0)", animation: "growPillar 2s cubic-bezier(0.25, 1, 0.5, 1) 2.1s forwards", transformBox: "fill-box", transformOrigin: "bottom", pointerEvents: "none" }}>
-        {/* Main cylindrical glass shaft extending ALL the way to the ground */}
-        <rect x={C_L} y={TOWER_TOP - DY_TOP} width={C_R - C_L} height={BB - TOWER_TOP + DY_TOP} fill="url(#cylinderGlass)" />
+      <g style={{ transform: "scaleY(0)", animation: "growPillar 2s cubic-bezier(0.25, 1, 0.5, 1) 2.1s forwards", transformOrigin: "0px 730px", pointerEvents: "none" }}>
+        {/* Main cylindrical glass shaft extending ALL the way to the ground, overlapped by 4px at the top with the capping strip */}
+        <rect x={C_L} y={-32} width={C_R - C_L} height={BB + 32} fill="url(#cylinderGlass)" />
         
-        {/* Horizontal glass panel seams all the way down */}
-        {Array.from({ length: 18 }).map((_, i) => (
-          <line key={i} x1={C_L} y1={TOWER_TOP + (i * 44)} x2={C_R} y2={TOWER_TOP + (i * 44)} stroke="rgba(255,255,255,0.3)" strokeWidth={0.8} />
-        ))}
+        {/* Horizontal glass panel seams all the way down, filtered to start below the new top */}
+        {Array.from({ length: 18 }).map((_, i) => {
+          const seamY = TOWER_TOP + (i * 44);
+          if (seamY < TOWER_TOP - DY_TOP + 30) return null;
+          return (
+            <line key={i} x1={C_L} y1={seamY} x2={C_R} y2={seamY} stroke="rgba(255,255,255,0.3)" strokeWidth={0.8} />
+          );
+        })}
 
         {/* Detailed Glass Capsule Lift (Climbing the shaft, warm light inside) */}
         <g style={{ opacity: 0, animation: "climbLift 20s cubic-bezier(0.45, 0, 0.15, 1) 4.1s infinite, fadeInLift 0.6s ease-out 4.1s forwards" }}>
@@ -120,6 +124,7 @@ function GoldenSkyscraper({ hotFloor, onFloorHover, onFloorClick }: {
         {Array.from({ length: 12 }).map((_, rIdx) => {
           const f = rIdx * 3;
           const ry = TOWER_TOP + f * FH;
+          if (ry < TOWER_TOP - DY_TOP + 30) return null;
           const mid = C_L + (C_R - C_L) / 2;
           const rx_l = C_L - 3;
           const rx_r = C_R + 3;
@@ -667,14 +672,7 @@ function GoldenSkyscraper({ hotFloor, onFloorHover, onFloorClick }: {
                         stroke="#ffffff" strokeWidth={1.2} 
                       />
 
-                      {/* Center Flat Connector block (Rendered last so it overlaps the right slanted strip perfectly!) */}
-                      <rect 
-                        x={673} y={baseDeckY} 
-                        width={54} height={18} 
-                        fill="#fafafa" stroke="#555555" strokeWidth={1.5} 
-                      />
-                      <line x1={673} y1={baseDeckY} x2={727} y2={baseDeckY} stroke="#cccccc" strokeWidth={0.5} />
-                      <line x1={673} y1={baseDeckY + 18} x2={727} y2={baseDeckY + 18} stroke="#ffffff" strokeWidth={1.2} />
+
                     </>
                   )}
                 </g>
@@ -684,18 +682,15 @@ function GoldenSkyscraper({ hotFloor, onFloorHover, onFloorClick }: {
         );
       })}
 
-
-
-      {/* Central Core Cap (Flatter, elegant, metallic golden dome matching render 1:1 - rendered on top of the wing petals!) */}
-      <g style={{ opacity: 0, animation: "dropCrown 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 3.5s forwards", transformBox: "fill-box", transformOrigin: "bottom", pointerEvents: "none" }}>
-        {/* Main Semi-Circular Golden Dome sitting on top of the central glass cylinder */}
-        <path d="M 673,-62 A 27,13.5 0 0,1 727,-62 Z" fill="url(#goldGradient)" stroke="#888888" strokeWidth={0.5} />
-        {/* High-end metallic base collar ring */}
-        <rect x={C_L} y={-62} width={C_R - C_L} height={5} fill="url(#bronzeGradient)" rx={1.5} stroke="#555" strokeWidth={0.3} />
-        {/* Specular highlight sweep on the curved dome */}
-        <path d="M 685,-63.5 A 15,7.5 0 0,1 715,-63.5" fill="none" stroke="#ffffff" strokeWidth={1.2} opacity={0.6} />
-      </g>
-    </g>
+      {/* Central Core Cap (Thick curved architectural strip capping the cylinder - rendered on top of the wing petals!) */}
+      <g style={{ opacity: 0, animation: "dropCrown 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 3.5s forwards", pointerEvents: "none" }}>
+        {/* Curved capping strip sitting flat on the cylinder top at Y = -28 and arched at the top up to Y = -50 */}
+        <path d="M 671,-28 L 671,-42 A 29,8 0 0,1 729,-42 L 729,-28 Z" fill="#fafafa" stroke="#555555" strokeWidth={1.2} />
+        {/* Specular curved top highlight */}
+        <path d="M 671,-42 A 29,8 0 0,1 729,-42" fill="none" stroke="#ffffff" strokeWidth={1} />
+        {/* Bottom flat accent seam line */}
+        <line x1={671} y1={-28} x2={729} y2={-28} stroke="#cccccc" strokeWidth={0.5} />
+      </g>    </g>
   );
 }
 
@@ -793,7 +788,7 @@ export default function ProjectsPage() {
             }
             @keyframes climbLift {
               0%, 3.75%, 96.25%, 100% { transform: translateY(432px); }
-              46.25%, 53.75%          { transform: translateY(-40px); }
+              46.25%, 53.75%          { transform: translateY(-28px); }
             }
             @keyframes fadeInLift {
               0%   { opacity: 0; }
@@ -805,7 +800,7 @@ export default function ProjectsPage() {
         {/* ── PALE SKETCH SUN (Top Right) ── */}
         <g style={{ animation: "flyInSun 2.5s cubic-bezier(0.22, 1, 0.36, 1) forwards" }}>
           <g>
-            <animateTransform attributeName="transform" type="translate" values="1200,150; 1210,140; 1200,150" dur="20s" repeatCount="indefinite" />
+            <animateTransform attributeName="transform" type="translate" values="1200,-50; 1210,-60; 1200,-50" dur="20s" repeatCount="indefinite" />
             
             {/* Scale down by 1.4x (1 / 1.4 = ~0.71) */}
             <g transform="scale(0.71)">
