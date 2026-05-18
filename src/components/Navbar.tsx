@@ -42,9 +42,8 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Top Left Logo */}
       <Link href="/" className="fixed top-8 -left-2 md:-left-6 z-50 hover:opacity-70 transition-opacity">
-        <img src="/logo/uka%20logo.png" alt="Umesh Kekre & Associates" className="h-[100px] md:h-[120px] w-auto object-contain" />
+        <img src="/logo/uka%20logo.png" alt="Umesh Kekre & Associates" className="h-[130px] md:h-[156px] w-auto object-contain" />
       </Link>
 
       <button
