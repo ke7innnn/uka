@@ -10,11 +10,11 @@ export default function LoadingScreen() {
     // Lock scroll immediately while loader is showing
     document.body.style.overflow = "hidden";
 
-    // Fade out starts at 3.2s, takes 0.9s — unlock scroll after full fade (4.1s)
-    const hideTimer = setTimeout(() => setVisible(false), 3200);
+    // Fade out starts at 6.5s (3.0s pen completion + 3.5s hold), takes 0.9s — unlock scroll after full fade (7.4s)
+    const hideTimer = setTimeout(() => setVisible(false), 6500);
     const unlockTimer = setTimeout(() => {
       document.body.style.overflow = "";
-    }, 4100); // 3200ms animation + 900ms fade
+    }, 7400); // 6500ms animation + 900ms fade
 
     return () => {
       clearTimeout(hideTimer);
