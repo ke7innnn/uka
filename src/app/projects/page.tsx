@@ -86,7 +86,7 @@ function GoldenSkyscraper({ hotFloor, onFloorHover, onFloorClick }: {
   return (
     <g>
       {/* ── CENTRAL CORE SHAFT (Rendered in Background so Podium Blocks can Overlap/Cover it) ── */}
-      <g style={{ animation: "growPillar 2s cubic-bezier(0.25, 1, 0.5, 1) forwards", transformBox: "fill-box", transformOrigin: "bottom", pointerEvents: "none" }}>
+      <g style={{ transform: "scaleY(0)", animation: "growPillar 2s cubic-bezier(0.25, 1, 0.5, 1) 2.1s forwards", transformBox: "fill-box", transformOrigin: "bottom", pointerEvents: "none" }}>
         {/* Main cylindrical glass shaft extending ALL the way to the ground */}
         <rect x={C_L} y={TOWER_TOP - DY_TOP} width={C_R - C_L} height={BB - TOWER_TOP + DY_TOP} fill="url(#cylinderGlass)" />
         
@@ -96,7 +96,7 @@ function GoldenSkyscraper({ hotFloor, onFloorHover, onFloorClick }: {
         ))}
 
         {/* Detailed Glass Capsule Lift (Climbing the shaft, warm light inside) */}
-        <g style={{ animation: "climbLift 20s cubic-bezier(0.45, 0, 0.15, 1) infinite" }}>
+        <g style={{ opacity: 0, animation: "climbLift 20s cubic-bezier(0.45, 0, 0.15, 1) 4.1s infinite, fadeInLift 0.6s ease-out 4.1s forwards" }}>
           {/* Struts */}
           <rect x={C_L + 3} y={8} width={3} height={54} fill="url(#goldGradient)" rx={1} />
           <rect x={C_R - 6} y={8} width={3} height={54} fill="url(#goldGradient)" rx={1} />
@@ -195,13 +195,14 @@ function GoldenSkyscraper({ hotFloor, onFloorHover, onFloorClick }: {
       </defs>
 
                         {/* ── COMMERCIAL PODIUM BASE (Ultra-Minimalist Split-Block Design matching original render) ── */}
-      <g style={{ animation: "growPillar 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards", transformBox: "fill-box", transformOrigin: "bottom" }}>
+      <g style={{ transform: "scaleY(0)", animation: "growPillar 1.5s cubic-bezier(0.25, 1, 0.5, 1) 1.5s forwards", transformBox: "fill-box", transformOrigin: "bottom" }}>
         {/* 1. Garden Rooftops */}
         <polygon points={`425,${BB - PODIUM_H} 727,${BB - PODIUM_H} 727,${BB - PODIUM_H - DY_TOP} 425,${BB - PODIUM_H - DY_TOP}`} fill="#eaeaea" stroke="#222" strokeWidth="0.5" />
         <polygon points={`425,${BB - PODIUM_H} 727,${BB - PODIUM_H} 727,${BB - PODIUM_H - 10} 425,${BB - PODIUM_H - 10}`} fill="rgba(255, 255, 255, 0.2)" stroke="rgba(255,255,255,0.5)" strokeWidth="0.4" />
 
         <polygon points={`727,${BB - PODIUM_H} 975,${BB - PODIUM_H} 975,${BB - PODIUM_H - DY_TOP} 727,${BB - PODIUM_H - DY_TOP}`} fill="#eaeaea" stroke="#222" strokeWidth="0.5" />
         <polygon points={`727,${BB - PODIUM_H} 975,${BB - PODIUM_H} 975,${BB - PODIUM_H - 10} 727,${BB - PODIUM_H - 10}`} fill="rgba(255, 255, 255, 0.2)" stroke="rgba(255,255,255,0.5)" strokeWidth="0.4" />
+
 
         {/* 2. Slabs backing both blocks */}
         <rect x={425} y={BB - PODIUM_H} width={302} height={PODIUM_H} fill="url(#bronzeGradient)" stroke="#444" strokeWidth="0.5" />
@@ -361,7 +362,7 @@ function GoldenSkyscraper({ hotFloor, onFloorHover, onFloorClick }: {
             {Array.from({ length: FLOORS }).map((_, f) => {
               const fy = TOWER_TOP + f * FH;
               const hot = hotFloor !== null && f === hotFloor;
-              const delay = (FLOORS - 1 - f) * 0.055; // Bottom-up stagger
+              const delay = 2.1 + (FLOORS - 1 - f) * 0.05; // Bottom-up stagger
               
               // Spacing for 4 windows per floor
               const wCount = 4;
@@ -502,12 +503,12 @@ function GoldenSkyscraper({ hotFloor, onFloorHover, onFloorClick }: {
 
                         {/* Outer structural pillars merging into crowns */}
             <rect x={l - 5} y={TOWER_TOP} width={8} height={BB - PODIUM_H - TOWER_TOP} fill="url(#goldGradient)" stroke="#777777" strokeWidth="0.5"
-              style={{ animation: "growPillar 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards", transformBox: "fill-box", transformOrigin: "bottom", pointerEvents: "none" }} />
+              style={{ transform: "scaleY(0)", animation: "growPillar 1.8s cubic-bezier(0.25, 1, 0.5, 1) 2.1s forwards", transformBox: "fill-box", transformOrigin: "bottom", pointerEvents: "none" }} />
             <rect x={r - 3} y={TOWER_TOP} width={8} height={BB - PODIUM_H - TOWER_TOP} fill="url(#goldGradient)" stroke="#777777" strokeWidth="0.5"
-              style={{ animation: "growPillar 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards", transformBox: "fill-box", transformOrigin: "bottom", pointerEvents: "none" }} />
+              style={{ transform: "scaleY(0)", animation: "growPillar 1.8s cubic-bezier(0.25, 1, 0.5, 1) 2.1s forwards", transformBox: "fill-box", transformOrigin: "bottom", pointerEvents: "none" }} />
 
 {/* ── VOLUMETRIC CROWNS (Majestic Looking-Up Hollow Petals with Flush Pergola Gaps) ── */}
-            <g style={{ opacity: 0, animation: "dropCrown 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 1.9s forwards", transformBox: "fill-box", transformOrigin: "bottom", pointerEvents: "none" }}>
+            <g style={{ opacity: 0, animation: "dropCrown 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 3.6s forwards", transformBox: "fill-box", transformOrigin: "bottom", pointerEvents: "none" }}>
               
               {/* Geometry Helpers & Math Mapped dynamically */}
               {(() => {
@@ -623,7 +624,7 @@ function GoldenSkyscraper({ hotFloor, onFloorHover, onFloorClick }: {
               const b_r_right = R_R + 17;
 
               return (
-                <g>
+                <g style={{ opacity: 0, animation: "dropCrown 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 3.6s forwards", transformBox: "fill-box", transformOrigin: "bottom", pointerEvents: "none" }}>
                   {isLeft ? (
                     <>
                       {/* Left Tower Slanted Parapet Strip */}
@@ -683,8 +684,10 @@ function GoldenSkyscraper({ hotFloor, onFloorHover, onFloorClick }: {
         );
       })}
 
+
+
       {/* Central Core Cap (Flatter, elegant, metallic golden dome matching render 1:1 - rendered on top of the wing petals!) */}
-      <g style={{ animation: "dropCrown 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 1.8s forwards", opacity: 0, transformBox: "fill-box", transformOrigin: "bottom", pointerEvents: "none" }}>
+      <g style={{ opacity: 0, animation: "dropCrown 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 3.5s forwards", transformBox: "fill-box", transformOrigin: "bottom", pointerEvents: "none" }}>
         {/* Main Semi-Circular Golden Dome sitting on top of the central glass cylinder */}
         <path d="M 673,-62 A 27,13.5 0 0,1 727,-62 Z" fill="url(#goldGradient)" stroke="#888888" strokeWidth={0.5} />
         {/* High-end metallic base collar ring */}
@@ -791,6 +794,10 @@ export default function ProjectsPage() {
             @keyframes climbLift {
               0%, 3.75%, 96.25%, 100% { transform: translateY(432px); }
               46.25%, 53.75%          { transform: translateY(-40px); }
+            }
+            @keyframes fadeInLift {
+              0%   { opacity: 0; }
+              100% { opacity: 1; }
             }
           `}</style>
         </defs>
