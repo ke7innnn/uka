@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLenis } from "lenis/react";
 import { useRouter, usePathname } from "next/navigation";
@@ -23,6 +23,25 @@ export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
 
+  const [visible, setVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (isOpen) return;
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > lastScrollY && currentScrollY > 80) {
+        setVisible(false);
+      } else {
+        setVisible(true);
+      }
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY, isOpen]);
+
   const handleNavClick = (id: string) => {
     setIsOpen(false);
     
@@ -42,13 +61,24 @@ export default function Navbar() {
 
   return (
     <>
-      <Link href="/" className="fixed top-8 -left-2 md:-left-6 z-50 hover:opacity-70 transition-opacity">
+      <Link 
+        href="/" 
+        className="fixed top-8 -left-2 md:-left-6 z-50 hover:opacity-70 transition-opacity"
+        style={{
+          transform: visible ? "translateY(0)" : "translateY(-200px)",
+          transition: "transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s"
+        }}
+      >
         <img src="/logo/uka%20logo.png" alt="Umesh Kekre & Associates" className="h-[130px] md:h-[156px] w-auto object-contain" />
       </Link>
 
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="fixed top-10 md:top-12 right-8 md:right-10 z-[70] w-12 h-12 flex flex-col justify-center items-center gap-[6px] group cursor-pointer"
+        style={{
+          transform: (visible || isOpen) ? "translateY(0)" : "translateY(-100px)",
+          transition: "transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)"
+        }}
       >
         <motion.div
           animate={isOpen ? { rotate: 45, y: 7.5 } : { rotate: 0, y: 0 }}
