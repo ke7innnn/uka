@@ -12,12 +12,12 @@ const DY_TOP = 15;       // Top-face 3D depth
 
 // Left Wing
 const L_L = 495;
-const L_R = 665;
+const L_R = 673;
 // Central Core
-const C_L = 665;
-const C_R = 735;
+const C_L = 673;
+const C_R = 727;
 // Right Wing
-const R_L = 735;
+const R_L = 727;
 const R_R = 905;
 
 
@@ -85,6 +85,54 @@ function GoldenSkyscraper({ hotFloor, onFloorHover, onFloorClick }: {
 }) {
   return (
     <g>
+      {/* ── CENTRAL CORE SHAFT (Rendered in Background so Podium Blocks can Overlap/Cover it) ── */}
+      <g style={{ animation: "growPillar 2s cubic-bezier(0.25, 1, 0.5, 1) forwards", transformBox: "fill-box", transformOrigin: "bottom", pointerEvents: "none" }}>
+        {/* Main cylindrical glass shaft extending ALL the way to the ground */}
+        <rect x={C_L} y={TOWER_TOP - DY_TOP} width={C_R - C_L} height={BB - TOWER_TOP + DY_TOP} fill="url(#cylinderGlass)" />
+        
+        {/* Horizontal glass panel seams all the way down */}
+        {Array.from({ length: 18 }).map((_, i) => (
+          <line key={i} x1={C_L} y1={TOWER_TOP + (i * 44)} x2={C_R} y2={TOWER_TOP + (i * 44)} stroke="rgba(255,255,255,0.3)" strokeWidth={0.8} />
+        ))}
+
+        {/* Detailed Glass Capsule Lift (Climbing the shaft, warm light inside) */}
+        <g style={{ animation: "climbLift 20s cubic-bezier(0.45, 0, 0.15, 1) infinite" }}>
+          {/* Struts */}
+          <rect x={C_L + 3} y={8} width={3} height={54} fill="url(#goldGradient)" rx={1} />
+          <rect x={C_R - 6} y={8} width={3} height={54} fill="url(#goldGradient)" rx={1} />
+          {/* Light Glow */}
+          <rect x={C_L + 6} y={8} width={C_R - C_L - 12} height={54} fill="url(#storeIllum)" opacity={0.85} rx={2} />
+          {/* Glass Face */}
+          <rect x={C_L + 6} y={8} width={C_R - C_L - 12} height={54} fill="rgba(255, 255, 255, 0.18)" stroke="rgba(255,255,255,0.5)" strokeWidth={0.8} rx={3} />
+          {/* Center Seam */}
+          <line x1={C_L + (C_R - C_L)/2} y1={8} x2={C_L + (C_R - C_L)/2} y2={62} stroke="rgba(255,255,255,0.4)" strokeWidth={0.5} />
+          {/* Floor Plates */}
+          <line x1={C_L + 6} y1={26} x2={C_R - 6} y2={26} stroke="#222222" strokeWidth={1} />
+          <line x1={C_L + 6} y1={44} x2={C_R - 6} y2={44} stroke="#222222" strokeWidth={1} />
+          {/* Gold Caps */}
+          <path d={`M ${C_L + 2},8 Q ${C_L + (C_R-C_L)/2},16 ${C_R - 2},8 L ${C_R - 2},0 Q ${C_L + (C_R-C_L)/2},8 ${C_L + 2},0 Z`} fill="url(#goldGradient)" stroke="#777777" strokeWidth={0.4} />
+          <path d={`M ${C_L + 2},62 Q ${C_L + (C_R-C_L)/2},70 ${C_R - 2},62 L ${C_R - 2},70 Q ${C_L + (C_R-C_L)/2},78 ${C_L + 2},70 Z`} fill="url(#bronzeGradient)" stroke="#555555" strokeWidth={0.4} />
+          {/* Highlight Sweep */}
+          <path d={`M ${C_L + 8},10 Q ${C_L + 14},35 ${C_L + 8},60`} fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth={1.5} />
+        </g>
+
+        {/* 12 Volumetric Rings (wrapping cylinder completely from top to ground) */}
+        {Array.from({ length: 12 }).map((_, rIdx) => {
+          const f = rIdx * 3;
+          const ry = TOWER_TOP + f * FH;
+          const mid = C_L + (C_R - C_L) / 2;
+          const rx_l = C_L - 3;
+          const rx_r = C_R + 3;
+          const cy_d = 7;
+          return (
+            <g key={`core-ring-${rIdx}`}>
+              <path d={`M ${rx_l},${ry + 16} Q ${mid},${ry + 16 + cy_d} ${rx_r},${ry + 16} L ${rx_r},${ry + 19} Q ${mid},${ry + 19 + cy_d} ${rx_l},${ry + 19} Z`} fill="rgba(0,0,0,0.35)" />
+              <path d={`M ${rx_l},${ry} Q ${mid},${ry + cy_d} ${rx_r},${ry} L ${rx_r},${ry + 16} Q ${mid},${ry + 16 + cy_d} ${rx_l},${ry + 16} Z`} fill="url(#goldGradient)" stroke="#666666" strokeWidth={0.3} />
+              <path d={`M ${rx_l},${ry} Q ${mid},${ry + cy_d} ${rx_r},${ry} Q ${mid},${ry - 3} ${rx_l},${ry} Z`} fill="#ffebc2" opacity={0.6} />
+            </g>
+          );
+        })}
+      </g>
       <defs>
         <linearGradient id="goldGradient" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0%" stopColor="#dcdcdc" />
@@ -92,19 +140,25 @@ function GoldenSkyscraper({ hotFloor, onFloorHover, onFloorClick }: {
           <stop offset="70%" stopColor="#cfcfcf" />
           <stop offset="100%" stopColor="#ffffff" />
         </linearGradient>
+        <linearGradient id="darkPetalStripsGradient" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#303030" />
+          <stop offset="35%" stopColor="#5a5a5a" />
+          <stop offset="70%" stopColor="#444444" />
+          <stop offset="100%" stopColor="#666666" />
+        </linearGradient>
         <linearGradient id="bronzeGradient" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0%" stopColor="#a8a8a8" />
           <stop offset="50%" stopColor="#dedede" />
           <stop offset="100%" stopColor="#808080" />
         </linearGradient>
         
-        {/* Cylindrical Core Gradient: Dark edges, bright center highlight */}
+        {/* Cylindrical Core Gradient: Volumetric Smoked glass with sharp center reflection */}
         <linearGradient id="cylinderGlass" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="rgba(30, 60, 80, 0.95)" />
-          <stop offset="25%" stopColor="rgba(100, 160, 190, 0.8)" />
+          <stop offset="0%" stopColor="rgba(15, 15, 15, 0.95)" />
+          <stop offset="25%" stopColor="rgba(110, 110, 110, 0.5)" />
           <stop offset="50%" stopColor="rgba(255, 255, 255, 0.95)" />
-          <stop offset="75%" stopColor="rgba(100, 160, 190, 0.8)" />
-          <stop offset="100%" stopColor="rgba(30, 60, 80, 0.95)" />
+          <stop offset="75%" stopColor="rgba(110, 110, 110, 0.5)" />
+          <stop offset="100%" stopColor="rgba(15, 15, 15, 0.95)" />
         </linearGradient>
 
         {/* Elevator Car Gradient */}
@@ -120,206 +174,260 @@ function GoldenSkyscraper({ hotFloor, onFloorHover, onFloorClick }: {
           <stop offset="100%" stopColor="#0F0C08" />
         </linearGradient>
 
-        {/* Storefront Illuminated Interior */}
+        {/* Storefront Illuminated Interior - Minimalist White/Grey Glow */}
         <linearGradient id="storeIllum" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#FEF08A" />
-          <stop offset="100%" stopColor="#FEFCE8" />
+          <stop offset="0%" stopColor="#ffffff" />
+          <stop offset="100%" stopColor="#e5e5e5" />
         </linearGradient>
 
         <filter id="shadowBlur">
           <feGaussianBlur stdDeviation="3" />
         </filter>
+        <linearGradient id="windowGlowGradient" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#FFFBEB" />
+          <stop offset="30%" stopColor="#FCD34D" />
+          <stop offset="100%" stopColor="#D97706" />
+        </linearGradient>
+        <linearGradient id="glassGlowGradient" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="rgba(251, 191, 36, 0.8)" />
+          <stop offset="100%" stopColor="rgba(245, 158, 11, 0.2)" />
+        </linearGradient>
       </defs>
 
-      {/* ── COMMERCIAL PODIUM BASE (2.5D Volumetric) ── */}
+                        {/* ── COMMERCIAL PODIUM BASE (Ultra-Minimalist Split-Block Design matching original render) ── */}
       <g style={{ animation: "growPillar 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards", transformBox: "fill-box", transformOrigin: "bottom" }}>
+        {/* 1. Garden Rooftops */}
+        <polygon points={`425,${BB - PODIUM_H} 727,${BB - PODIUM_H} 727,${BB - PODIUM_H - DY_TOP} 425,${BB - PODIUM_H - DY_TOP}`} fill="#eaeaea" stroke="#222" strokeWidth="0.5" />
+        <polygon points={`425,${BB - PODIUM_H} 727,${BB - PODIUM_H} 727,${BB - PODIUM_H - 10} 425,${BB - PODIUM_H - 10}`} fill="rgba(255, 255, 255, 0.2)" stroke="rgba(255,255,255,0.5)" strokeWidth="0.4" />
+
+        <polygon points={`727,${BB - PODIUM_H} 975,${BB - PODIUM_H} 975,${BB - PODIUM_H - DY_TOP} 727,${BB - PODIUM_H - DY_TOP}`} fill="#eaeaea" stroke="#222" strokeWidth="0.5" />
+        <polygon points={`727,${BB - PODIUM_H} 975,${BB - PODIUM_H} 975,${BB - PODIUM_H - 10} 727,${BB - PODIUM_H - 10}`} fill="rgba(255, 255, 255, 0.2)" stroke="rgba(255,255,255,0.5)" strokeWidth="0.4" />
+
+        {/* 2. Slabs backing both blocks */}
+        <rect x={425} y={BB - PODIUM_H} width={302} height={PODIUM_H} fill="url(#bronzeGradient)" stroke="#444" strokeWidth="0.5" />
+        <rect x={727} y={BB - PODIUM_H} width={248} height={PODIUM_H} fill="url(#bronzeGradient)" stroke="#444" strokeWidth="0.5" />
+
+        {/* ── LEFT PODIUM BLOCK ── */}
         
-        {/* Podium Top Roof Deck (Garden Deck, dark green tint, skewed back) */}
-        <polygon 
-          points={`425,${BB - PODIUM_H} 975,${BB - PODIUM_H} 975,${BB - PODIUM_H - DY_TOP} 425,${BB - PODIUM_H - DY_TOP}`} 
-          fill="#334230" stroke="#222" strokeWidth="0.5" 
-        />
-        {/* Glass Safety Railing along the top edge */}
-        <polygon 
-          points={`425,${BB - PODIUM_H} 975,${BB - PODIUM_H} 975,${BB - PODIUM_H - 12} 425,${BB - PODIUM_H - 12}`} 
-          fill="rgba(160, 210, 240, 0.25)" stroke="rgba(255, 255, 255, 0.6)" strokeWidth="0.5"
-        />
-        
-        {/* Main Base Front Block */}
-        <rect x={425} y={BB - PODIUM_H} width={550} height={PODIUM_H} fill="url(#bronzeGradient)" />
-        
-        {/* ── LEFT SECTION: Vertical Louvers ── */}
+        {/* Floor 4: Massive Solid Concrete Box overlapping the Central Pole completely */}
         <g>
-          {/* Deep Recessed Background */}
-          <rect x={445} y={BB - PODIUM_H + 30} width={340} height={140} fill="url(#recessedDark)" />
-          {/* Vertical Gold Slats Loop */}
-          {Array.from({ length: 18 }).map((_, i) => (
-            <rect key={`louver-${i}`} x={449 + i * 19} y={BB - PODIUM_H + 30} width={6} height={140} fill="url(#goldGradient)" stroke="#777777" strokeWidth="0.5" />
+          <rect x={431} y={BB - PODIUM_H + 8} width={296} height={42} fill="url(#goldGradient)" stroke="#555555" strokeWidth="0.4" />
+          <line x1={431} y1={BB - PODIUM_H + 22} x2={727} y2={BB - PODIUM_H + 22} stroke="rgba(0,0,0,0.15)" strokeWidth={1} />
+          <line x1={431} y1={BB - PODIUM_H + 36} x2={727} y2={BB - PODIUM_H + 36} stroke="rgba(0,0,0,0.15)" strokeWidth={1} />
+        </g>{/* Floor 3: Wave-Slanted Louvers Parking Garage */}
+        <g>
+          <rect x={431} y={BB - PODIUM_H + 54} width={296} height={44} fill="#0d0d0d" />
+          {/* Subtle dark car silhouette */}
+          <rect x={480} y={BB - PODIUM_H + 78} width={22} height={8} fill="rgba(255,255,255,0.15)" rx={1} />
+          <rect x={560} y={BB - PODIUM_H + 78} width={22} height={8} fill="rgba(255,255,255,0.1)" rx={1} />
+          
+          {/* Minimalist wave louvers */}
+          {Array.from({ length: 20 }).map((_, i) => {
+            const lx = 437 + i * 15;
+            const lH = 40 - Math.sin((i / 15) * Math.PI) * 18;
+            return (
+              <rect key={`louver-left-${i}`} x={lx} y={BB - PODIUM_H + 54} width={4} height={lH} fill="url(#goldGradient)" stroke="#555555" strokeWidth="0.3" />
+            );
+          })}
+          {/* Solid separator strip */}
+          <rect x={431} y={BB - PODIUM_H + 98} width={296} height={6} fill="url(#goldGradient)" stroke="#555" strokeWidth="0.4" />
+        </g>
+
+        {/* Floor 2: Minimalist Terrace + Sleek Corridor */}
+        <g>
+          {/* Background */}
+          <rect x={431} y={BB - PODIUM_H + 104} width={296} height={38} fill="#121212" />
+          
+          {/* Left Terrace: grid tile lines */}
+          {Array.from({ length: 5 }).map((_, i) => (
+            <line key={`tile-${i}`} x1={431 + i * 12} y1={BB - PODIUM_H + 104} x2={431 + i * 12} y2={BB - PODIUM_H + 142} stroke="rgba(255,255,255,0.08)" strokeWidth={0.5} />
+          ))}
+          
+          {/* Right Corridor: Glass storefront with simple interior pillars */}
+          <rect x={495} y={BB - PODIUM_H + 104} width={232} height={38} fill="url(#storeIllum)" />
+          {/* Elegant internal pillars */}
+          <rect x={540} y={BB - PODIUM_H + 104} width={5} height={38} fill="#eaeaea" />
+          <rect x={605} y={BB - PODIUM_H + 104} width={5} height={38} fill="#eaeaea" />
+          <rect x={670} y={BB - PODIUM_H + 104} width={5} height={38} fill="#eaeaea" />
+          
+          {/* Glass Face overlay */}
+          <rect x={495} y={BB - PODIUM_H + 104} width={232} height={38} fill="rgba(255, 255, 255, 0.12)" stroke="rgba(255,255,255,0.4)" strokeWidth={0.5} />
+          
+          {/* Solid separator strip */}
+          <rect x={431} y={BB - PODIUM_H + 142} width={296} height={6} fill="url(#goldGradient)" stroke="#555" strokeWidth="0.4" />
+        </g>
+
+        {/* Floor 1: Sleek Double-Wide Glass Showroom Corridor */}
+        <g>
+          {/* Warm minimalist illuminated showroom backdrop */}
+          <rect x={431} y={BB - PODIUM_H + 148} width={296} height={38} fill="url(#storeIllum)" />
+          
+          {/* Simple clean structural pillars */}
+          <rect x={475} y={BB - PODIUM_H + 148} width={6} height={38} fill="#fafafa" />
+          <rect x={545} y={BB - PODIUM_H + 148} width={6} height={38} fill="#fafafa" />
+          <rect x={615} y={BB - PODIUM_H + 148} width={6} height={38} fill="#fafafa" />
+          <rect x={685} y={BB - PODIUM_H + 148} width={6} height={38} fill="#fafafa" />
+
+          {/* Large, continuous glass windows */}
+          <rect x={431} y={BB - PODIUM_H + 148} width={296} height={38} fill="rgba(255, 255, 255, 0.1)" stroke="rgba(255,255,255,0.4)" strokeWidth={0.5} />
+          
+          {/* Solid separator strip */}
+          <rect x={431} y={BB - PODIUM_H + 186} width={296} height={6} fill="url(#goldGradient)" stroke="#555" strokeWidth="0.4" />
+        </g>
+
+        {/* Floor 0: Ground Level Tall Showrooms */}
+        <g>
+          <rect x={431} y={BB - PODIUM_H + 192} width={296} height={38} fill="url(#storeIllum)" />
+          
+          {/* Clean tall glass panels */}
+          {Array.from({ length: 5 }).map((_, i) => (
+            <rect key={`ground-pane-${i}`} x={431 + i * 59.2} y={BB - PODIUM_H + 192} width={59.2} height={38} fill="rgba(255, 255, 255, 0.15)" stroke="rgba(255,255,255,0.4)" strokeWidth={0.5} />
+          ))}
+          
+          {/* High-end vertical bronze framing columns */}
+          {Array.from({ length: 6 }).map((_, i) => (
+            <rect key={`ground-col-${i}`} x={429 + i * 59.2} y={BB - PODIUM_H + 192} width={5} height={38} fill="url(#bronzeGradient)" stroke="#222" strokeWidth="0.3" />
           ))}
         </g>
-        
-        {/* ── RIGHT SECTION: Open-Air Parking Garage ── */}
-        <g>
-          {/* Deep background to simulate interior volume */}
-          <rect x={805} y={BB - PODIUM_H + 30} width={150} height={140} fill="#0A0805" />
-          {/* 4 Distinct Parking Floors */}
-          {Array.from({ length: 4 }).map((_, i) => {
-            const slabY = BB - PODIUM_H + 30 + i * 35;
-            return (
-              <g key={`park-${i}`}>
-                {/* Slab top face (deep perspective) */}
-                <polygon 
-                  points={`805,${slabY + 20} 955,${slabY + 20} 955,${slabY + 20 - 5} 805,${slabY + 20 - 5}`} 
-                  fill="#b0b0b0" 
-                />
-                
-                {/* Tiny Parked Car Silhouettes */}
-                {i < 3 && i % 2 === 0 && <rect x={825} y={slabY + 15} width={16} height={5} fill="#a8b2b8" rx="2" />}
-                {i < 3 && i % 2 !== 0 && <rect x={905} y={slabY + 15} width={16} height={5} fill="#cccccc" rx="2" />}
-                {i < 3 && i % 2 === 0 && <rect x={865} y={slabY + 15} width={16} height={5} fill="#3a4047" rx="2" />}
 
-                {/* Slab front face */}
-                <rect x={805} y={slabY + 20} width={150} height={15} fill="url(#goldGradient)" stroke="#777777" strokeWidth="0.5" />
-              </g>
-            );
-          })}
-        </g>
+        {/* ── RIGHT PODIUM BLOCK ── */}
         
-        {/* ── GROUND LEVEL: Luxury Retail Storefronts ── */}
+        {/* Floor 4, 3, 2: Open-Air Parking Garage & Horizontal Slabs */}
         <g>
-          {/* Overall retail cutout background (warm illuminated interior) */}
-          <rect x={435} y={BB - 50} width={530} height={50} fill="url(#storeIllum)" />
+          <rect x={733} y={BB - PODIUM_H + 8} width={236} height={134} fill="#0d0d0d" />
           
-          {/* Shopfronts Loop */}
-          {Array.from({ length: 10 }).map((_, i) => {
-            const shopW = 530 / 10;
-            const shopX = 435 + i * shopW;
-            return (
-              <g key={`shop-${i}`}>
-                {/* Large Glass Panel */}
-                <rect x={shopX + 2} y={BB - 46} width={shopW - 4} height={46} fill="rgba(160, 210, 240, 0.45)" stroke="rgba(255, 255, 255, 0.4)" strokeWidth="0.5" />
-                {/* Pylon Column separating shops */}
-                <rect x={shopX + shopW - 3} y={BB - 50} width={6} height={50} fill="url(#bronzeGradient)" stroke="#222" strokeWidth="0.5" />
-              </g>
-            );
-          })}
-          {/* Leftmost starting pylon */}
-          <rect x={432} y={BB - 50} width={6} height={50} fill="url(#bronzeGradient)" stroke="#222" strokeWidth="0.5" />
+          {/* Minimalist car outline silhouettes on different floors */}
+          <rect x={760} y={BB - PODIUM_H + 74} width={26} height={9} fill="rgba(255,255,255,0.2)" rx={1.5} />
+          <rect x={860} y={BB - PODIUM_H + 115} width={26} height={9} fill="rgba(255,255,255,0.15)" rx={1.5} />
+
+          {/* Clean horizontal gold slabs (strips) */}
+          <rect x={733} y={BB - PODIUM_H + 8} width={236} height={6} fill="url(#goldGradient)" stroke="#555" strokeWidth="0.4" />
+          <rect x={733} y={BB - PODIUM_H + 50} width={236} height={6} fill="url(#goldGradient)" stroke="#555" strokeWidth="0.4" />
+          <rect x={733} y={BB - PODIUM_H + 98} width={236} height={6} fill="url(#goldGradient)" stroke="#555" strokeWidth="0.4" />
+          <rect x={733} y={BB - PODIUM_H + 142} width={236} height={6} fill="url(#goldGradient)" stroke="#555" strokeWidth="0.4" />
         </g>
 
-        {/* Thick ground foundation line */}
+        {/* Floor 1: Minimalist Gallery Corridor */}
+        <g>
+          {/* Warm, clean gallery corridor backdrop */}
+          <rect x={733} y={BB - PODIUM_H + 148} width={236} height={38} fill="url(#storeIllum)" />
+          
+          {/* Elegant internal vertical pillars */}
+          <rect x={775} y={BB - PODIUM_H + 148} width={5} height={38} fill="#fafafa" />
+          <rect x={845} y={BB - PODIUM_H + 148} width={5} height={38} fill="#fafafa" />
+          <rect x={915} y={BB - PODIUM_H + 148} width={5} height={38} fill="#fafafa" />
+
+          {/* Smooth glass panel */}
+          <rect x={733} y={BB - PODIUM_H + 148} width={236} height={38} fill="rgba(255, 255, 255, 0.12)" stroke="rgba(255,255,255,0.4)" strokeWidth={0.5} />
+          
+          {/* Solid separator strip */}
+          <rect x={733} y={BB - PODIUM_H + 186} width={236} height={6} fill="url(#goldGradient)" stroke="#555" strokeWidth="0.4" />
+        </g>
+
+        {/* Floor 0: Ground Level Open Driveway supported by Piloti Columns */}
+        <g>
+          <rect x={733} y={BB - PODIUM_H + 192} width={236} height={38} fill="#151412" />
+          {/* Ceiling shadow */}
+          <rect x={733} y={BB - PODIUM_H + 192} width={236} height={6} fill="rgba(0,0,0,0.5)" filter="url(#shadowBlur)" />
+          
+          {/* Smooth, premium circular support columns (Piloti) */}
+          <rect x={765} y={BB - PODIUM_H + 192} width={10} height={38} fill="url(#bronzeGradient)" stroke="#222" strokeWidth={0.4} />
+          <rect x={845} y={BB - PODIUM_H + 192} width={10} height={38} fill="url(#bronzeGradient)" stroke="#222" strokeWidth={0.4} />
+          <rect x={925} y={BB - PODIUM_H + 192} width={10} height={38} fill="url(#bronzeGradient)" stroke="#222" strokeWidth={0.4} />
+        </g>
+
+        {/* Ground level foundation base line */}
         <line x1={300} x2={1100} y1={BB} y2={BB} stroke="#222" strokeWidth={5} />
       </g>
 
-      {/* ── TOWER WINGS (Back Recessed Wall) ── */}
-      {/* We draw the recessed interior background for both wings first so they sit behind everything */}
-      {[0, 1].map((wingIdx) => {
-        const isLeft = wingIdx === 0;
-        const l = isLeft ? L_L : R_L;
-        const r = isLeft ? L_R : R_R;
-        return (
-          <rect key={wingIdx} x={l + 5} y={TOWER_TOP} width={r - l - 10} height={BB - PODIUM_H - TOWER_TOP} fill="#1a1816" 
-            style={{ animation: "growPillar 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards", transformBox: "fill-box", transformOrigin: "bottom" }} />
-        );
-      })}
-
-      {/* ── CENTRAL CORE (Cylindrical Glass Shaft) ── */}
-      <g style={{ animation: "growPillar 2s cubic-bezier(0.25, 1, 0.5, 1) forwards", transformBox: "fill-box", transformOrigin: "bottom" }}>
-        {/* The main cylindrical glass body */}
-        <rect x={C_L} y={TOWER_TOP - DY_TOP} width={C_R - C_L} height={BB - PODIUM_H - TOWER_TOP + DY_TOP} fill="url(#cylinderGlass)" />
-        {/* Horizontal structural rings */}
-        {Array.from({ length: Math.floor(FLOORS / 2) }).map((_, i) => (
-          <line key={i} x1={C_L} y1={TOWER_TOP + (i * FH * 2)} x2={C_R} y2={TOWER_TOP + (i * FH * 2)} stroke="rgba(255,255,255,0.7)" strokeWidth={1.5} />
-        ))}
-        {/* Elevator Car (Detailed metallic block) */}
-        <g transform={`translate(0, ${TOWER_TOP + 180})`}>
-          <rect x={C_L + 12} y={0} width={(C_R - C_L) - 24} height={40} fill="url(#elevatorGold)" rx={2} stroke="#fff" strokeWidth="0.8" />
-          <line x1={C_L + 16} y1={10} x2={C_R - 16} y2={10} stroke="#555555" strokeWidth="1" />
-          <line x1={C_L + 16} y1={20} x2={C_R - 16} y2={20} stroke="#555555" strokeWidth="1" />
-          <line x1={C_L + 16} y1={30} x2={C_R - 16} y2={30} stroke="#555555" strokeWidth="1" />
-          {/* Elevator glass door */}
-          <rect x={C_L + 25} y={5} width={(C_R - C_L) - 50} height={30} fill="rgba(40, 80, 100, 0.8)" rx={1} />
-        </g>
-        
-        {/* Central Core Cap (Metallic Rounded Rectangle) */}
-        <g style={{ animation: "dropCrown 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 1.8s forwards", opacity: 0, transformBox: "fill-box", transformOrigin: "bottom" }}>
-          <rect x={C_L + 2} y={TOWER_TOP - DY_TOP - 8} width={(C_R - C_L) - 4} height={12} fill="url(#bronzeGradient)" rx="4" />
-          <rect x={C_L + 6} y={TOWER_TOP - DY_TOP - 12} width={(C_R - C_L) - 12} height={8} fill="url(#goldGradient)" rx="2" />
-        </g>
-      </g>
-
-      {/* ── TOWER WINGS (Volumetric Balconies & Crowns) ── */}
-      {[0, 1].map((wingIdx) => {
+                  {[0, 1].map((wingIdx) => {
         const isLeft = wingIdx === 0;
         const l = isLeft ? L_L : R_L;
         const r = isLeft ? L_R : R_R;
         const cx = (l + r) / 2;
         
-        // Extended balcony bounds for a deep wrap-around pop beyond the building silhouette
-        const b_l = isLeft ? l - 24 : l;
-        const b_r = isLeft ? r : r + 24;
+        // Extended balcony bounds for a deep wrap-around pop beyond the building silhouette (1.4x less wider)
+        const b_l = isLeft ? l - 17 : l;
+        const b_r = isLeft ? r : r + 17;
         const b_cx = isLeft ? b_l + (b_r - b_l) * 0.6 : b_l + (b_r - b_l) * 0.4;
         
         const curveD = 28; // Deep rounded bulge
         const slabYOffset = 10;
         
-        const CF_L = l - 5;
-        const CF_R = isLeft ? C_L : r + 5;
-        const CF_CX = cx;
-        const C_DX = isLeft ? 12 : -12;
-        const C_DY = -8;
-        const C_H = 30; // Crown vertical height offset
         
         return (
           <g key={wingIdx}>
-            {/* Floors Loop (3D Layered Paths) */}
+            {/* Floors Loop (Flat Interior Wall with Windows + Curved Popping Balconies) */}
             {Array.from({ length: FLOORS }).map((_, f) => {
               const fy = TOWER_TOP + f * FH;
               const hot = hotFloor !== null && f === hotFloor;
               const delay = (FLOORS - 1 - f) * 0.055; // Bottom-up stagger
               
+              // Spacing for 4 windows per floor
+              const wCount = 4;
+              const ww = 28;
+              const gap = ((r - l) - 24 - wCount * ww) / (wCount - 1);
+              
               return (
                 <g key={f} style={{ opacity: 0, animation: `popFloor 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) ${delay}s forwards`, transformBox: "fill-box", transformOrigin: "bottom" }}>
                   
-                  {/* 0. Top Balcony Ceiling (only for the very top floor, f === 0) */}
-                  {f === 0 && (
-                     <g>
-                       <path 
-                         d={`M ${b_l},${fy} Q ${b_cx},${fy + curveD} ${b_r},${fy} L ${b_r},${fy - 8} Q ${b_cx},${fy + curveD - 8} ${b_l},${fy - 8} Z`}
-                         fill="#f5f5f5"
-                       />
-                       <path 
-                         d={`M ${b_l},${fy} Q ${b_cx},${fy + curveD} ${b_r},${fy} L ${b_r},${fy - 2} Q ${b_cx},${fy + curveD - 2} ${b_l},${fy - 2} Z`}
-                         fill="#cccccc"
-                       />
-                       {Array.from({ length: 9 }).map((_, lightIdx) => {
-                         const t = (lightIdx + 1) / 10;
-                         const lx = (1-t)*(1-t)*b_l + 2*(1-t)*t*b_cx + t*t*b_r;
-                         const ly = (1-t)*(1-t)*fy + 2*(1-t)*t*(fy + curveD) + t*t*fy - 4;
-                         return <circle key={`light-${lightIdx}`} cx={lx} cy={ly} r={2.5} fill="url(#storeIllum)" />;
-                       })}
-                     </g>
-                  )}
+                  {/* A. Flat Interior Wall Background (Sits behind balcony, between ceiling and floor slab) */}
+                  <rect 
+                    x={l} 
+                    y={fy - FH} 
+                    width={r - l} 
+                    height={FH} 
+                    fill={f % 2 === 0 ? "#fafafa" : "#eaeaea"} 
+                  />
 
-                  {/* 1. Recessed Interior Crescent (Deep shadow behind glass, bound strictly to inner pillars) */}
+                  {/* B. Sleek Minimalist Windows (Perfect inside grid, above the concrete slab at fy - 10) */}
+                  {Array.from({ length: wCount }).map((_, j) => (
+                    <rect 
+                      key={j}
+                      x={l + 12 + j * (ww + gap)} 
+                      y={fy - FH + 6}
+                      width={ww} 
+                      height={12}
+                      fill={hot ? "url(#windowGlowGradient)" : "#333333"}
+                      rx="1.5"
+                      style={{ 
+                        pointerEvents: "none",
+                        filter: hot ? "drop-shadow(0 0 5px rgba(251, 191, 36, 0.9))" : "none",
+                        transition: "fill 0.35s ease, filter 0.35s ease"
+                      }}
+                    />
+                  ))}
+
+                  {/* D. Recessed Interior Shadow behind the balcony (Semi-transparent glaze to blend wall and glass) */}
                   <path 
                     d={`M ${l},${fy - slabYOffset} Q ${cx},${fy + curveD/2 - slabYOffset} ${r},${fy - slabYOffset} L ${r},${fy - FH} L ${l},${fy - FH} Z`}
-                    fill="rgba(10, 10, 10, 0.85)"
+                    fill="rgba(10, 10, 10, 0.18)"
                   />
                   
-                  {/* 1.5 Cast Shadow (Casts a shadow onto the floor below) */}
+                  {/* E. Cast Shadow (Casts a shadow onto the floor below) */}
                   <path 
                     d={`M ${b_l},${fy + 3} Q ${b_cx},${fy + curveD + 3} ${b_r},${fy + 3} L ${b_r},${fy + 14} Q ${b_cx},${fy + curveD + 14} ${b_l},${fy + 14} Z`}
-                    fill="rgba(0,0,0,0.3)" filter="url(#shadowBlur)"
+                    fill="rgba(0,0,0,0.15)" filter="url(#shadowBlur)"
                   />
 
-                  {/* INTERACTIVE 3D BALCONY GROUP (Triggered by hotFloor state) */}
+                  {/* F. Golden Downlight Splash (Under-balcony ambient glow on hover) */}
+                  <path 
+                    d={`M ${b_l - 12},${fy + 2} Q ${b_cx},${fy + curveD + 4} ${b_r + 12},${fy + 2} L ${b_r + 12},${fy + 16} Q ${b_cx},${fy + curveD + 18} ${b_l - 12},${fy + 16} Z`}
+                    fill="rgba(245, 158, 11, 0.45)"
+                    filter="url(#shadowBlur)"
+                    style={{ 
+                      opacity: hot ? 1 : 0, 
+                      transition: "opacity 0.35s ease" 
+                    }}
+                  />
+
+                  {/* G. INTERACTIVE 3D BALCONY GROUP (Curved popping edges) */}
                   <g 
                     className="balcony-floor"
                     style={{
-                      transform: hot ? "scaleX(1.04) scaleY(1.02)" : "scale(1)",
-                      transformOrigin: isLeft ? `${r}px ${fy}px` : `${l}px ${fy}px`,
-                      transition: "transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)"
+                      transform: hot ? "translateY(-4.5px)" : "translateY(0)",
+                      transformOrigin: "center",
+                      transition: "transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1)"
                     }}
                   >
                     {/* Layer A: Underside Shadow */}
@@ -334,7 +442,7 @@ function GoldenSkyscraper({ hotFloor, onFloorHover, onFloorClick }: {
                       fill="url(#goldGradient)" 
                     />
 
-                    {/* Top Surface of Slab (Perspective depth connecting outer lip back to inner wall) */}
+                    {/* Top Surface of Slab */}
                     <path 
                       d={`M ${l},${fy - slabYOffset} Q ${cx},${fy + curveD/2 - slabYOffset} ${r},${fy - slabYOffset} L ${b_r},${fy} Q ${b_cx},${fy + curveD} ${b_l},${fy} Z`}
                       fill="#f0f0f0" 
@@ -343,7 +451,7 @@ function GoldenSkyscraper({ hotFloor, onFloorHover, onFloorClick }: {
                     {/* Layer C: Floating Glass Railing */}
                     <path 
                       d={`M ${b_l + 2},${fy - FH + 10} Q ${b_cx},${fy + curveD - FH + 10} ${b_r - 2},${fy - FH + 10} L ${b_r - 2},${fy} Q ${b_cx},${fy + curveD} ${b_l + 2},${fy} Z`}
-                      fill="rgba(160, 210, 240, 0.35)"
+                      fill="rgba(255, 255, 255, 0.25)"
                     />
                     
                     {/* White specular highlight on the outermost curved edge */}
@@ -355,96 +463,235 @@ function GoldenSkyscraper({ hotFloor, onFloorHover, onFloorClick }: {
                     {/* Amber highlight overlay when active */}
                     <path 
                       d={`M ${b_l + 2},${fy - FH + 10} Q ${b_cx},${fy + curveD - FH + 10} ${b_r - 2},${fy - FH + 10} L ${b_r - 2},${fy} Q ${b_cx},${fy + curveD} ${b_l + 2},${fy} Z`}
-                      fill="#F59E0B"
-                      style={{ opacity: hot ? 0.35 : 0, transition: "opacity 0.3s" }}
+                      fill="url(#glassGlowGradient)"
+                      style={{ 
+                        opacity: hot ? 0.75 : 0, 
+                        filter: hot ? "drop-shadow(0 0 8px rgba(245, 158, 11, 0.8))" : "none",
+                        transition: "opacity 0.35s ease, filter 0.35s ease" 
+                      }}
                     />
-                    
-                    {/* Invisible Hitbox for Interaction */}
+
+                    {/* Golden specular highlight glow on hover */}
                     <path 
-                      d={`M ${b_l},${fy - FH + 5} Q ${b_cx},${fy + curveD - FH + 5} ${b_r},${fy - FH + 5} L ${b_r},${fy + 5} Q ${b_cx},${fy + curveD + 5} ${b_l},${fy + 5} Z`}
-                      fill="transparent"
-                      style={{ cursor: "pointer" }}
-                      onMouseEnter={() => onFloorHover(f)}
-                      onMouseLeave={() => onFloorHover(null)}
-                      onClick={() => onFloorClick(f)}
+                      d={`M ${b_l + 2},${fy} Q ${b_cx},${fy + curveD} ${b_r - 2},${fy}`}
+                      fill="none" 
+                      stroke="#FBBF24" 
+                      strokeWidth={2}
+                      style={{ 
+                        opacity: hot ? 1 : 0, 
+                        filter: "drop-shadow(0 0 5px #F59E0B)",
+                        transition: "opacity 0.35s ease" 
+                      }}
                     />
                   </g>
 
-                  {/* 6. Scattered Organic Greenery (Potted Plants) */}
-                  {!hot && (
-                    <g>
-                      <g transform={`translate(${l + 35}, ${fy + (curveD * 0.5) - slabYOffset + 2})`}><path d="M -2,-2 L 2,-2 L 1,2 L -1,2 Z" fill="#8c6230" /><circle cx={0} cy={-5} r={3} fill="#4d6f43" /><circle cx={-2} cy={-4} r={2} fill="#3a5a30" /><circle cx={2} cy={-4} r={2} fill="#5a7a4f" /></g>
-                      <g transform={`translate(${cx}, ${fy + curveD - slabYOffset + 2})`}><path d="M -3,-2 L 3,-2 L 2,2 L -2,2 Z" fill="#8c6230" /><circle cx={0} cy={-5} r={4} fill="#4d6f43" /><circle cx={-3} cy={-4} r={3} fill="#3a5a30" /><circle cx={3} cy={-4} r={3} fill="#5a7a4f" /></g>
-                      <g transform={`translate(${r - 35}, ${fy + (curveD * 0.5) - slabYOffset + 2})`}><path d="M -2,-2 L 2,-2 L 1,2 L -1,2 Z" fill="#8c6230" /><circle cx={0} cy={-5} r={3} fill="#4d6f43" /><circle cx={-2} cy={-4} r={2} fill="#3a5a30" /><circle cx={2} cy={-4} r={2} fill="#5a7a4f" /></g>
-                    </g>
-                  )}
+                  {/* H. Static Invisible Hitbox for Interaction (Placed outside the translating group to prevent jitter/stutter!) */}
+                  <path 
+                    d={`M ${b_l},${fy - FH + 5} Q ${b_cx},${fy + curveD - FH + 5} ${b_r},${fy - FH + 5} L ${b_r},${fy + 5} Q ${b_cx},${fy + curveD + 5} ${b_l},${fy + 5} Z`}
+                    fill="transparent"
+                    style={{ cursor: "pointer" }}
+                    onMouseEnter={() => onFloorHover(f)}
+                    onMouseLeave={() => onFloorHover(null)}
+                    onClick={() => onFloorClick(f)}
+                  />
                 </g>
               );
             })}
             
-            {/* Outer structural pillars merging into crowns */}
+            {/* Parapet strips removed from here to be rendered on top of volumetric crown wings below */}
+
+                        {/* Outer structural pillars merging into crowns */}
             <rect x={l - 5} y={TOWER_TOP} width={8} height={BB - PODIUM_H - TOWER_TOP} fill="url(#goldGradient)" stroke="#777777" strokeWidth="0.5"
-              style={{ animation: "growPillar 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards", transformBox: "fill-box", transformOrigin: "bottom" }} />
+              style={{ animation: "growPillar 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards", transformBox: "fill-box", transformOrigin: "bottom", pointerEvents: "none" }} />
             <rect x={r - 3} y={TOWER_TOP} width={8} height={BB - PODIUM_H - TOWER_TOP} fill="url(#goldGradient)" stroke="#777777" strokeWidth="0.5"
-              style={{ animation: "growPillar 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards", transformBox: "fill-box", transformOrigin: "bottom" }} />
+              style={{ animation: "growPillar 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards", transformBox: "fill-box", transformOrigin: "bottom", pointerEvents: "none" }} />
 
-            {/* ── VOLUMETRIC CROWNS (Bow-tie structure with supporting columns) ── */}
-            <g style={{ opacity: 0, animation: "dropCrown 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 1.9s forwards", transformBox: "fill-box", transformOrigin: "bottom" }}>
+{/* ── VOLUMETRIC CROWNS (Majestic Looking-Up Hollow Petals with Flush Pergola Gaps) ── */}
+            <g style={{ opacity: 0, animation: "dropCrown 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 1.9s forwards", transformBox: "fill-box", transformOrigin: "bottom", pointerEvents: "none" }}>
               
-              {/* Drop Shadow onto top floor */}
-              <path 
-                d={`M ${CF_L},${TOWER_TOP - 20} L ${CF_L},${TOWER_TOP - 55} Q ${CF_CX},${TOWER_TOP - 35} ${CF_R},${TOWER_TOP - 55} L ${CF_R},${TOWER_TOP - 20} Q ${CF_CX},${TOWER_TOP - 5} ${CF_L},${TOWER_TOP - 20} Z`}
-                fill="rgba(0,0,0,0.6)" filter="url(#shadowBlur)"
-              />
+              {/* Geometry Helpers & Math Mapped dynamically */}
+              {(() => {
+                // Pop-Out Footprint: Outer pops out 54px proudly, Inner has 6px overhang that curves inward (no center overlap!)
+                const cl = isLeft ? l - 54 : l - 6;
+                const cr = isLeft ? r + 6 : r + 54;
+                
+                // Concrete strip connection points (Outer and Inner)
+                const b_l = isLeft ? l - 17 : l;
+                const b_r = isLeft ? r : r + 17;
 
-              {/* Supporting Volumetric Columns */}
-              {[CF_L + 15, CF_CX - 25, CF_CX + 25, CF_R - 15].map((colX, i) => (
-                <g key={`col-${i}`}>
-                  {/* Column Body */}
-                  <rect x={isLeft ? colX : colX - 6} y={TOWER_TOP - C_H} width={6} height={C_H} fill="url(#goldGradient)" stroke="#777777" strokeWidth="0.5" />
-                  {/* Column Base/Cap */}
-                  <rect x={isLeft ? colX - 2 : colX - 8} y={TOWER_TOP - 2} width={10} height={4} fill="url(#bronzeGradient)" />
-                  <rect x={isLeft ? colX - 2 : colX - 8} y={TOWER_TOP - C_H} width={10} height={4} fill="url(#bronzeGradient)" />
-                </g>
-              ))}
+                // ASYMMETRIC PEAK: Shifted towards the outer side (left for Left, right for Right) matching original image
+                const ccx = isLeft ? cl + (cr - cl) * 0.08 : cl + (cr - cl) * 0.92;
 
-              {/* Thick Pergola Slats (Programmatic loop underneath the crown) */}
-              {Array.from({ length: 14 }).map((_, i) => {
-                const slatX = CF_L + 15 + i * ((CF_R - CF_L - 30) / 13);
-                const t = i / 13;
-                const yBase = (1-t)*(1-t)*(TOWER_TOP - C_H + 5) + 2*(1-t)*t*(TOWER_TOP - C_H + 20) + t*t*(TOWER_TOP - C_H + 5);
+                const baseDeckY = TOWER_TOP - FH + 1; // Y = -61 (perfect overlap with topmost floor, zero gap)
+
                 return (
-                  <g key={`slat-${i}`}>
-                    {/* Slat Side Face (Darker shading) */}
-                    <polygon points={`${slatX},${yBase} ${slatX + 3},${yBase - 3} ${slatX + 3},${yBase + 12} ${slatX},${yBase + 15}`} fill="#555555" />
-                    {/* Slat Front Face */}
-                    <rect x={slatX} y={yBase} width={3} height={15} fill="url(#bronzeGradient)" />
+                  <g>
+                    {(() => {
+                      const f_y0 = isLeft ? baseDeckY - 15 : baseDeckY;
+                      const f_y1 = baseDeckY - 77;
+                      const f_y2 = isLeft ? baseDeckY : baseDeckY - 15;
+
+                      const singleCurvePath = isLeft
+                        ? `M ${b_l},${baseDeckY - 15 + 18} Q ${cl - 14},${(f_y0 + baseDeckY - 15 + 18) / 2} ${cl},${f_y0} Q ${ccx},${f_y1} ${cr},${f_y2} Q ${cr - 4},${(f_y2 + baseDeckY - 3) / 2} ${b_r},${baseDeckY - 3}`
+                        : `M ${b_l},${baseDeckY - 3} Q ${cl + 4},${(f_y0 + baseDeckY - 3) / 2} ${cl},${f_y0} Q ${ccx},${f_y1} ${cr},${f_y2} Q ${cr + 14},${(f_y2 + baseDeckY - 15 + 18) / 2} ${b_r},${baseDeckY - 15 + 18}`;
+                      const clipId = `clip-petal-${isLeft ? 'left' : 'right'}`;
+
+                      return (
+                        <g>
+                           <defs>
+                             <clipPath id={clipId}>
+                               <path d={
+                                 isLeft
+                                   ? singleCurvePath + ` L ${b_r},${baseDeckY} L ${b_l},${baseDeckY - 15} Z`
+                                   : singleCurvePath + ` L ${b_r},${baseDeckY - 15} L ${b_l},${baseDeckY} Z`
+                               } />
+                             </clipPath>
+                           </defs>
+
+                          {/* 1. Slanting Louver Deck (Clipped to stay perfectly aligned, filled with no gaps) */}
+                          <g clipPath={`url(#${clipId})`}>
+                            {Array.from({ length: 52 }).map((_, i) => {
+                              const t = i / 51;
+                              // Distribute starting X coordinates widely to cover the entire clipped region under the slant (no black gaps at the corners)
+                              const x_top = b_l - 250 + t * (b_r - b_l + 500);
+                              const y_top = baseDeckY - 200; // Start high above the peak
+                              
+                              // Diagonal slant slope mirroring each other perfectly (Left goes down-left, Right goes down-right)
+                              const x_bottom = isLeft ? x_top - 150 : x_top + 150;
+                              const y_bottom = baseDeckY + 100; // End low below the deck
+                              
+                              return (
+                                <g key={`slant-strip-group-${i}`}>
+                                  {/* 1. Deep Black Outer Outline Border */}
+                                  <line
+                                    x1={x_top}
+                                    y1={y_top}
+                                    x2={x_bottom}
+                                    y2={y_bottom}
+                                    stroke="#000000"
+                                    strokeWidth={14}
+                                    strokeLinecap="butt"
+                                  />
+                                  {/* 2. Original Rich Silver-Gold Inner Louver Strip */}
+                                  <line
+                                    x1={x_top}
+                                    y1={y_top}
+                                    x2={x_bottom}
+                                    y2={y_bottom}
+                                    stroke="url(#goldGradient)"
+                                    strokeWidth={11} // Slightly narrower to leave a crisp 1.5px outline on each side!
+                                    strokeLinecap="butt"
+                                  />
+                                </g>
+                              );
+                            })}
+                          </g>
+
+                          {/* 2. Single Continuous Crown Curve (A bold, elegant sweeping outline representing the entire shape of the wing crown) */}
+                          {/* Elegant solid gray outline on both outer and inner sides */}
+                          <path 
+                            d={singleCurvePath}
+                            fill="none"
+                            stroke="#555555"
+                            strokeWidth={11.5}
+                            strokeLinecap="butt"
+                            strokeLinejoin="round"
+                          />
+                          {/* Main sharp white crown curve */}
+                          <path 
+                            d={singleCurvePath}
+                            fill="none"
+                            stroke="#ffffff"
+                            strokeWidth={7.5}
+                            strokeLinecap="butt"
+                            strokeLinejoin="round"
+                          />
+                        </g>
+                      );
+                    })()}
                   </g>
                 );
-              })}
-
-              {/* Side Shading Face (Outer Edge for depth) */}
-              <path 
-                d={`M ${isLeft ? CF_L : CF_R},${TOWER_TOP - C_H + 5} L ${isLeft ? CF_L : CF_R},${TOWER_TOP - C_H - 35} L ${isLeft ? CF_L + C_DX : CF_R + C_DX},${TOWER_TOP - C_H - 35 + C_DY} L ${isLeft ? CF_L + C_DX : CF_R + C_DX},${TOWER_TOP - C_H + 5 + C_DY} Z`}
-                fill="#9c9c9c" stroke="#555555" strokeWidth="0.5"
-              />
-
-              {/* Solid Top Roof Plane (Diamond/skewed polygon for 2.5D top-down view) */}
-              <path 
-                d={`M ${CF_L},${TOWER_TOP - C_H - 35} L ${CF_L + C_DX},${TOWER_TOP - C_H - 35 + C_DY} Q ${CF_CX + C_DX},${TOWER_TOP - C_H - 15 + C_DY} ${CF_R + C_DX},${TOWER_TOP - C_H - 35 + C_DY} L ${CF_R},${TOWER_TOP - C_H - 35} Q ${CF_CX},${TOWER_TOP - C_H - 15} ${CF_L},${TOWER_TOP - C_H - 35} Z`}
-                fill="#f0f0f0" stroke="#b0b0b0" strokeWidth="0.5"
-              />
-
-              {/* Heavy Solid Crown (Front Face Bow-tie) */}
-              <path 
-                d={`M ${CF_L},${TOWER_TOP - C_H + 5} L ${CF_L},${TOWER_TOP - C_H - 35} Q ${CF_CX},${TOWER_TOP - C_H - 15} ${CF_R},${TOWER_TOP - C_H - 35} L ${CF_R},${TOWER_TOP - C_H + 5} Q ${CF_CX},${TOWER_TOP - C_H + 20} ${CF_L},${TOWER_TOP - C_H + 5} Z`}
-                fill="url(#goldGradient)" stroke="#777777" strokeWidth="1.5"
-              />
-
+              })()}
             </g>
+
+            {/* ── CORRESPONDING SLANTED HORIZONTAL PARAPET STRIP (Rendered on top of the louvers to be fully visible on both sides) ── */}
+            {(() => {
+              const baseDeckY = TOWER_TOP - FH + 1; // Y = -61
+              const b_l_left = L_L - 17;
+              const b_r_left = L_R;
+              const b_l_right = R_L;
+              const b_r_right = R_R + 17;
+
+              return (
+                <g>
+                  {isLeft ? (
+                    <>
+                      {/* Left Tower Slanted Parapet Strip */}
+                      <path 
+                        d={`M ${b_l_left},${baseDeckY - 15} L ${b_r_left},${baseDeckY} L ${b_r_left},${baseDeckY + 18} L ${b_l_left},${baseDeckY - 15 + 18} Z`}
+                        fill="#fafafa"
+                        stroke="#555555"
+                        strokeWidth={1.5}
+                      />
+                      {/* Crisp slanted highlight lines on Left strip */}
+                      <line 
+                        x1={b_l_left} y1={baseDeckY - 15} 
+                        x2={b_r_left} y2={baseDeckY} 
+                        stroke="#cccccc" strokeWidth={0.5} 
+                      />
+                      <line 
+                        x1={b_l_left} y1={baseDeckY - 15 + 18} 
+                        x2={b_r_left} y2={baseDeckY + 18} 
+                        stroke="#ffffff" strokeWidth={1.2} 
+                      />
+                    </>
+                  ) : (
+                    <>
+                      {/* Right Tower Slanted Parapet Strip */}
+                      <path 
+                        d={`M ${b_l_right},${baseDeckY} L ${b_r_right},${baseDeckY - 15} L ${b_r_right},${baseDeckY - 15 + 18} L ${b_l_right},${baseDeckY + 18} Z`}
+                        fill="#fafafa"
+                        stroke="#555555"
+                        strokeWidth={1.5}
+                      />
+                      {/* Crisp slanted highlight lines on Right strip */}
+                      <line 
+                        x1={b_l_right} y1={baseDeckY} 
+                        x2={b_r_right} y2={baseDeckY - 15} 
+                        stroke="#cccccc" strokeWidth={0.5} 
+                      />
+                      <line 
+                        x1={b_l_right} y1={baseDeckY + 18} 
+                        x2={b_r_right} y2={baseDeckY - 15 + 18} 
+                        stroke="#ffffff" strokeWidth={1.2} 
+                      />
+
+                      {/* Center Flat Connector block (Rendered last so it overlaps the right slanted strip perfectly!) */}
+                      <rect 
+                        x={673} y={baseDeckY} 
+                        width={54} height={18} 
+                        fill="#fafafa" stroke="#555555" strokeWidth={1.5} 
+                      />
+                      <line x1={673} y1={baseDeckY} x2={727} y2={baseDeckY} stroke="#cccccc" strokeWidth={0.5} />
+                      <line x1={673} y1={baseDeckY + 18} x2={727} y2={baseDeckY + 18} stroke="#ffffff" strokeWidth={1.2} />
+                    </>
+                  )}
+                </g>
+              );
+            })()}
           </g>
         );
       })}
+
+      {/* Central Core Cap (Flatter, elegant, metallic golden dome matching render 1:1 - rendered on top of the wing petals!) */}
+      <g style={{ animation: "dropCrown 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 1.8s forwards", opacity: 0, transformBox: "fill-box", transformOrigin: "bottom", pointerEvents: "none" }}>
+        {/* Main Semi-Circular Golden Dome sitting on top of the central glass cylinder */}
+        <path d="M 673,-62 A 27,13.5 0 0,1 727,-62 Z" fill="url(#goldGradient)" stroke="#888888" strokeWidth={0.5} />
+        {/* High-end metallic base collar ring */}
+        <rect x={C_L} y={-62} width={C_R - C_L} height={5} fill="url(#bronzeGradient)" rx={1.5} stroke="#555" strokeWidth={0.3} />
+        {/* Specular highlight sweep on the curved dome */}
+        <path d="M 685,-63.5 A 15,7.5 0 0,1 715,-63.5" fill="none" stroke="#ffffff" strokeWidth={1.2} opacity={0.6} />
+      </g>
     </g>
   );
 }
@@ -502,7 +749,7 @@ export default function ProjectsPage() {
     >
       <p className="absolute top-5 right-8 z-10 text-[11px] tracking-[0.22em] uppercase text-white/40">25 Projects</p>
 
-      <svg viewBox="0 -130 1400 920" className="w-full h-full" preserveAspectRatio="xMidYMid meet"
+      <svg viewBox="0 -180 1400 970" className="w-full h-full" preserveAspectRatio="xMidYMid meet"
         onClick={() => { if (zoomed !== null) { setZoomed(null); setHovered(null); } }}
         style={{ cursor: zoomed !== null ? "zoom-out" : "default" }}
       >
@@ -540,6 +787,10 @@ export default function ProjectsPage() {
             @keyframes flyInSun {
               0%   { opacity: 0; transform: translate(400px, -100px); }
               100% { opacity: 1; transform: translate(0px, 0px); }
+            }
+            @keyframes climbLift {
+              0%, 3.75%, 96.25%, 100% { transform: translateY(432px); }
+              46.25%, 53.75%          { transform: translateY(-40px); }
             }
           `}</style>
         </defs>
