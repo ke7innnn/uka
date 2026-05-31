@@ -8,12 +8,13 @@ import Link from "next/link";
 
 const navLinks = [
   { id: "/", num: "", title: "Home" },
-  { id: "/projects", num: "1.", title: "Projects" },
-  { id: "#concert-organist", num: "2.", title: "The Architect" },
-  { id: "#recording-artist", num: "3.", title: "Architect" },
-  { id: "#organ-professor", num: "4.", title: "About Umesh Kekre" },
-  { id: "#author-composer", num: "5.", title: "Architect & Designer" },
-  { id: "#goodies-contact", num: "6.", title: "Resources & Contact" },
+  { id: "/projects", num: "1.", title: "Projects 1" },
+  { id: "/projects-2", num: "2.", title: "Projects 2" },
+  { id: "#concert-organist", num: "3.", title: "The Architect" },
+  { id: "#recording-artist", num: "4.", title: "Architect" },
+  { id: "#organ-professor", num: "5.", title: "About Umesh Kekre" },
+  { id: "#author-composer", num: "6.", title: "Architect & Designer" },
+  { id: "#goodies-contact", num: "7.", title: "Resources & Contact" },
 ];
 
 export default function Navbar() {
