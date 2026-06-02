@@ -84,28 +84,26 @@ export default function ProjectsPage() {
 
 
 
-  // Calculate zoom transform origin to center horizontally on the building and vertically on the floor
-  let zoomX = 700;
-  let zoomY = 305;
+  // Calculate camera translation to center horizontally on the building and vertically on the active floor
   let translateX = 0;
   let translateY = 0;
   if (zoomed !== null) {
     const p = PROJECTS[zoomed];
-    zoomY = p.nodeY;
+    let targetX = 700;
+    const targetY = p.nodeY;
     
     if (activeCard !== null && activeCard === zoomed) {
       const isL = p.side === "L";
       const activeScale = 0.50; // Keep the larger premium scale
       const cardWidth = 193 * activeScale;
       const cardX = isL ? 520 - cardWidth : 880; // Positioned far away to the left/right to prevent any building overlap
-      zoomX = cardX + cardWidth / 2; // Center on the expanded active card horizontally
-    } else {
-      zoomX = 700; // Center on the building
+      targetX = cardX + cardWidth / 2; // Center on the expanded active card horizontally
     }
 
-    // Translate the floor to the exact center of the 1400x970 viewBox (center Y is 305)
-    translateX = 700 - zoomX;
-    translateY = 305 - zoomY;
+    // Mathematical translation based on a completely fixed transform-origin at the viewbox center (700, 305)
+    // This guarantees rock-solid transitions without browser origin shearing artifacts.
+    translateX = (700 - targetX) * ZOOM_SCALE;
+    translateY = (305 - targetY) * ZOOM_SCALE;
   }
 
   return (
@@ -119,8 +117,7 @@ export default function ProjectsPage() {
           animate={{
             transform: zoomed !== null 
               ? `translate(${translateX}px, ${translateY}px) scale(${ZOOM_SCALE})` 
-              : "translate(0px, 0px) scale(1)",
-            transformOrigin: `${zoomX}px ${zoomY}px`
+              : "translate(0px, 0px) scale(1)"
           }}
           transition={{
             type: "spring",
@@ -130,7 +127,10 @@ export default function ProjectsPage() {
           }}
           onAnimationStart={() => setIsScrolling(true)}
           onAnimationComplete={() => setIsScrolling(false)}
-          style={{ willChange: "transform" }}
+          style={{ 
+            transformOrigin: "700px 305px",
+            willChange: "transform" 
+          }}
         >
 
         {/* ── ANIMATED SKY BIRDS ── */}
