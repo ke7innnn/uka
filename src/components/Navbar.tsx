@@ -60,17 +60,23 @@ export default function Navbar() {
     }, 500);
   };
 
+  const isWhiteBgPage = pathname && (pathname.startsWith("/projects-2/") || pathname.startsWith("/projects/"));
+
   return (
     <>
       <Link 
         href="/" 
-        className="fixed top-8 -left-2 md:-left-6 z-50 hover:opacity-70 transition-opacity"
+        className="fixed top-8 left-8 md:left-12 z-50 hover:opacity-70 transition-opacity"
         style={{
           transform: visible ? "translateY(0)" : "translateY(-200px)",
           transition: "transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s"
         }}
       >
-        <img src="/logo/uka%20logo.png" alt="Umesh Kekre & Associates" className="h-[130px] md:h-[156px] w-auto object-contain" />
+        <img 
+          src={isWhiteBgPage ? "/logo%20new/black%20logo.png" : "/logo%20new/white%20logo.png"} 
+          alt="Umesh Kekre & Associates" 
+          className="h-[60px] md:h-[75px] w-auto object-contain" 
+        />
       </Link>
 
       <button

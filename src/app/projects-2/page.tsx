@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { PROJECTS_DATA } from "@/lib/projectsData";
 
 /* ── Building geometry (Golden Skyscraper 2.5D Volumetric) ─────────────────────────── */
 const BB = 730;          // ground line
@@ -9,40 +10,15 @@ const FLOORS = 25;       // Number of tower floors
 const PODIUM_H = 220;    // podium height
 const TOWER_TOP = BB - PODIUM_H - (FLOORS * FH); // 730 - 220 - 550 = -40
 
-
-const RAW = [
-  {id:1, title:"The Courtyard House",  cat:"Residential",   slug:"courtyard-house",    side:"L"},
-  {id:2, title:"Lakeside Villa",        cat:"Residential",   slug:"lakeside-villa",     side:"R"},
-  {id:3, title:"Urban Townhouses",      cat:"Residential",   slug:"urban-townhouses",   side:"L"},
-  {id:4, title:"Minimalist Loft",       cat:"Interior",      slug:"minimalist-loft",    side:"R"},
-  {id:5, title:"Executive Boardroom",   cat:"Interior",      slug:"executive-boardroom",side:"L"},
-  {id:6, title:"Luxury Penthouse",      cat:"Interior",      slug:"luxury-penthouse",   side:"R"},
-  {id:7, title:"Artisan Coffee Shop",   cat:"Interior",      slug:"artisan-coffee-shop",side:"L"},
-  {id:8, title:"The Grand Atrium",      cat:"Commercial",    slug:"grand-atrium",       side:"R"},
-  {id:9, title:"Retail Galleria",       cat:"Commercial",    slug:"retail-galleria",    side:"L"},
-  {id:10,title:"Mixed-Use Complex",     cat:"Commercial",    slug:"mixed-use-complex",  side:"R"},
-  {id:11,title:"Urban Market Space",    cat:"Commercial",    slug:"urban-market-space", side:"L"},
-  {id:12,title:"Tech Hub HQ",           cat:"Corporate",     slug:"tech-hub-hq",        side:"R"},
-  {id:13,title:"Financial Tower",       cat:"Corporate",     slug:"financial-tower",    side:"L"},
-  {id:14,title:"Creative Agency Hub",   cat:"Corporate",     slug:"creative-agency-hub",side:"R"},
-  {id:15,title:"Boutique Hotel",        cat:"Hospitality",   slug:"boutique-hotel",     side:"L"},
-  {id:16,title:"Mountain Resort",       cat:"Hospitality",   slug:"mountain-resort",    side:"R"},
-  {id:17,title:"City Center Suites",    cat:"Hospitality",   slug:"city-center-suites", side:"L"},
-  {id:18,title:"Heritage Inn",          cat:"Hospitality",   slug:"heritage-inn",       side:"R"},
-  {id:19,title:"National Library",      cat:"Institutional", slug:"national-library",   side:"L"},
-  {id:20,title:"University Campus",     cat:"Institutional", slug:"university-campus",  side:"R"},
-  {id:21,title:"Modern Art Museum",     cat:"Institutional", slug:"modern-art-museum",  side:"L"},
-  {id:22,title:"Urban Park Revival",    cat:"Landscape",     slug:"urban-park-revival", side:"R"},
-  {id:23,title:"Coastal Promenade",     cat:"Landscape",     slug:"coastal-promenade",  side:"L"},
-  {id:24,title:"Botanical Gardens",     cat:"Landscape",     slug:"botanical-gardens",  side:"R"},
-  {id:25,title:"Future City Plan",      cat:"Visualisation", slug:"future-city-plan",   side:"L"},
-];
+// Premium Zoom & Card scale configurations
+const ZOOM_SCALE = 4.2;   // Increased zoom-in level from 3.8 to 4.2 (10.5% more zoom for extreme closeups)
+const CARD_SCALE = 0.31;  // Adjusted card local scale to make them smaller and fit the black space perfectly
 
 
 const IMAGE_TOP_Y = -15; // Set exactly at the last residential floor balcony
 const IMAGE_BOTTOM_Y = 465; // Set exactly at the first residential floor balcony above podium
-const PROJECTS = RAW.map((p, i) => {
-  const baseY = IMAGE_TOP_Y + (i / (RAW.length - 1)) * (IMAGE_BOTTOM_Y - IMAGE_TOP_Y);
+const PROJECTS = PROJECTS_DATA.map((p, i) => {
+  const baseY = IMAGE_TOP_Y + (i / (PROJECTS_DATA.length - 1)) * (IMAGE_BOTTOM_Y - IMAGE_TOP_Y);
   const floorIdx = Math.min(Math.floor((baseY - TOWER_TOP) / FH), FLOORS - 1);
   const isL = p.side === "L";
   return {
@@ -51,22 +27,6 @@ const PROJECTS = RAW.map((p, i) => {
     nodeY: baseY,
   };
 });
-
-const PHOTO_IDS = [
-  "1600585154340-be6161a56a0c","1600596542815-ffad4c1539a9",
-  "1600607687939-ce8a6c25118c","1486406146926-c627a92ad1ab",
-  "1545324418-cc1a3fa10c00","1512917774080-9991f1c4c750",
-  "1558618666-fcd25c85cd64","1449824913935-59a10b8d2000",
-  "1580587771525-78b9dba3b914","1497366216548-37526070297c",
-  "1497366754035-f200586c4a16","1497366811353-6870744d04b2",
-  "1431576901776-e539bd916ba2","1486325212027-8081e485255e",
-  "1519999482648-25049ddd37b1","1478476868527-bb19f5d68b37",
-  "1494145904049-0dca59b4bbad","1505843490701-d60d2f08ee02",
-  "1568605114967-8130f3a36994","1464082354059-0e3d0cfd76cf",
-  "1479839672679-a46cb5e2d4bc","1470723272604-efd9a2e5776a",
-  "1513584684374-8bab748fbf90","1415796994537-5ee154fc4e80",
-  "1507003211169-0a1dd7228f2d"
-];
 
 export default function ProjectsPage() {
   const [hovered, setHovered] = useState<number | null>(null);
@@ -91,7 +51,7 @@ export default function ProjectsPage() {
     if (zoomed === null) return;
     
     const now = Date.now();
-    if (now - lastScrollTimeRef.current < 280) return; // Smooth scroll pacing (280ms)
+    if (now - lastScrollTimeRef.current < 160) return; // Fluid, responsive scroll pacing (160ms)
 
     if (e.deltaY > 0) {
       // Scroll down: Go to next floor (larger index)
@@ -133,10 +93,10 @@ export default function ProjectsPage() {
     
     if (activeCard !== null && activeCard === zoomed) {
       const isL = p.side === "L";
-      const endX = isL ? p.nodeX - 110 : p.nodeX + 110;
-      const cardWidth = 193 * 0.7;
-      const cardX = isL ? endX - cardWidth : endX;
-      zoomX = cardX + cardWidth / 2; // Center on the card horizontally
+      const activeScale = 0.50; // Keep the larger premium scale
+      const cardWidth = 193 * activeScale;
+      const cardX = isL ? 520 - cardWidth : 880; // Positioned far away to the left/right to prevent any building overlap
+      zoomX = cardX + cardWidth / 2; // Center on the expanded active card horizontally
     } else {
       zoomX = 700; // Center on the building
     }
@@ -154,9 +114,9 @@ export default function ProjectsPage() {
         style={{ cursor: "default" }}
       >
         <g style={{
-          transition: "transform 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform-origin 0.8s cubic-bezier(0.22, 1, 0.36, 1)",
+          transition: "transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform-origin 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
           transformOrigin: `${zoomX}px ${zoomY}px`,
-          transform: zoomed !== null ? `translate(${translateX}px, ${translateY}px) scale(2.5)` : "translate(0px, 0px) scale(1)",
+          transform: zoomed !== null ? `translate(${translateX}px, ${translateY}px) scale(${ZOOM_SCALE})` : "translate(0px, 0px) scale(1)",
           willChange: "transform"
         }}>
 
@@ -238,17 +198,21 @@ export default function ProjectsPage() {
           const isH = hovered === i || activeCard === i;
           const isL = p.side === "L";
           const nx = p.nodeX, ny = p.nodeY;
-          const midX = isL ? nx - 30 : nx + 30;
-          const endX = isL ? nx - 110 : nx + 110;
-          const cardWidth = 193 * 0.7;
-          const cardX = isL ? endX - cardWidth : endX;
-          let cardY = ny - 40;
+          
+          // Dynamic scaling: active card is significantly larger and pushed way far to left/right to prevent any overlap
+          const currentScale = activeCard === i ? 0.50 : CARD_SCALE;
+          const currentWidth = 193 * currentScale;
+          const currentHeight = 232 * currentScale;
+          
+          const cardX = isL ? (activeCard === i ? 520 - currentWidth : 596 - currentWidth) : (activeCard === i ? 880 : 804);
+          const endX = isL ? cardX + currentWidth : cardX;
+          const midX = nx + (endX - nx) / 2;
+          let cardY = activeCard === i ? ny - 65 : ny - 40;
           let lineEndY = ny + (isL ? -4 : 4);
           
           // If card goes past the bottom frame, shift it up and angle the line
-          const cardHeight = 232 * 0.7;
-          if (cardY + cardHeight > 760) {
-            cardY = 760 - cardHeight;
+          if (cardY + currentHeight > 760) {
+            cardY = 760 - currentHeight;
             lineEndY = cardY + 25;
           }
 
@@ -288,7 +252,7 @@ export default function ProjectsPage() {
 
               {/* hover card in pure SVG to fix Safari zoom bugs */}
               {isH && (
-                <g transform={`translate(${cardX}, ${cardY}) scale(0.7)`}>
+                <g transform={`translate(${cardX}, ${cardY}) scale(${currentScale})`}>
                   {/* Outer border & shadow (simulated) */}
                   <rect x="0" y="0" width="193" height="232" fill="#0d0d0d" stroke="#2a2a2a" strokeWidth="1" rx="3" />
                   
@@ -297,7 +261,7 @@ export default function ProjectsPage() {
                     <rect x="1" y="1" width="191" height="112" rx="2" />
                   </clipPath>
                   <image 
-                    href={`https://images.unsplash.com/photo-${PHOTO_IDS[i % 25]}?q=80&w=400&auto=format&fit=crop`} 
+                    href={p.heroImage} 
                     x="1" y="1" width="191" height="112" 
                     preserveAspectRatio="xMidYMid slice" 
                     clipPath={`url(#clip-img-${p.id})`}
