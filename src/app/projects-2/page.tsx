@@ -135,7 +135,11 @@ export default function ProjectsPage() {
       clearTimeout(scrollingTimer);
       if (isCurrentlyScrolling) {
         setIsScrolling(true);
-        scrollingTimer = setTimeout(() => setIsScrolling(false), 150);
+        if (svgGroupRef.current) svgGroupRef.current.style.pointerEvents = "none";
+        scrollingTimer = setTimeout(() => {
+          setIsScrolling(false);
+          if (svgGroupRef.current) svgGroupRef.current.style.pointerEvents = "auto";
+        }, 150);
       }
 
       rafId.current = requestAnimationFrame(tick);
@@ -294,7 +298,8 @@ export default function ProjectsPage() {
 
         {/* ── PROJECT FLOORS LAYER (Bottom Z-Index) ── */}
         {PROJECTS.map((p, i) => {
-          const isCentered = isZoomed && activeIndex === i;
+          const isHoveringAny = hovered !== null || activeCard !== null;
+          const isCentered = isZoomed && activeIndex === i && !isHoveringAny; // auto-glow center, but suppress if manually hovering
           const isH = hovered === i || activeCard === i;
           const isFloorHighlighted = isH || isCentered;
           const nx = p.nodeX, ny = p.nodeY;
