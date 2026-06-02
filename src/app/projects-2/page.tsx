@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { PROJECTS_DATA } from "@/lib/projectsData";
 import { motion, AnimatePresence } from "framer-motion";
@@ -37,6 +37,8 @@ export default function ProjectsPage() {
   const [isZoomed, setIsZoomed] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const router = useRouter();
+  const targetScrollYRef = useRef<number | null>(null);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     // 1. Let the premium page curtain wipe up for 1.8s
@@ -58,10 +60,30 @@ export default function ProjectsPage() {
   // Continuous window scroll tracking
   useEffect(() => {
     const handleScroll = () => {
-      setScrollY(window.scrollY);
+      const currentScroll = window.scrollY;
+      setScrollY(currentScroll);
+      
+      // If we are NOT performing a programmatic click-to-pin scroll, unpin cards on scroll
+      if (targetScrollYRef.current === null) {
+        setActiveCard(prev => prev !== null ? null : null);
+      }
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Listen to manual user wheel/touch events to immediately cancel programmatic tracking
+  useEffect(() => {
+    const handleUserCancel = () => {
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+      targetScrollYRef.current = null;
+    };
+    window.addEventListener("wheel", handleUserCancel, { passive: true });
+    window.addEventListener("touchstart", handleUserCancel, { passive: true });
+    return () => {
+      window.removeEventListener("wheel", handleUserCancel);
+      window.removeEventListener("touchstart", handleUserCancel);
+    };
   }, []);
 
   // Calculate fractional scroll percent (0 to 1) running from top of the page to bottom
@@ -81,12 +103,7 @@ export default function ProjectsPage() {
   // Interpolate camera targetY continuously between top and bottom residential floor boundaries
   const targetY = IMAGE_TOP_Y + pct * (IMAGE_BOTTOM_Y - IMAGE_TOP_Y);
 
-  // Find which project is currently closest to the centered focus targetY in real-time
-  const activeIndex = PROJECTS.reduce((closest, p, idx) => {
-    const dist = Math.abs(p.nodeY - targetY);
-    const closestDist = Math.abs(PROJECTS[closest].nodeY - targetY);
-    return dist < closestDist ? idx : closest;
-  }, 0);
+  // activeIndex auto-glow is removed to ensure floors only highlight on physical mouse hover or click
 
   // Calculate smooth 2D translations
   let translateX = 0;
@@ -231,10 +248,8 @@ export default function ProjectsPage() {
 
         {/* ── PROJECT NODES + CALLOUTS (Static DOM order with CSS zIndex for flawless hover layers) ── */}
         {PROJECTS.map((p, i) => {
-          const isHoveringAny = hovered !== null || activeCard !== null;
-          
-          // The floor path glows if hovered, pinned, or if it is the center index and nothing else is hovered/pinned
-          const isFloorHighlighted = hovered === i || activeCard === i || (isZoomed && activeIndex === i && !isHoveringAny);
+          // The floor path glows ONLY if hovered or clicked/pinned
+          const isFloorHighlighted = hovered === i || activeCard === i;
           
           // The card and callout line are ONLY visible on hover or pin (never auto-shown)
           const isCardVisible = hovered === i || activeCard === i;
@@ -273,6 +288,18 @@ export default function ProjectsPage() {
                 e.stopPropagation();
                 const projectPct = (p.nodeY - IMAGE_TOP_Y) / (IMAGE_BOTTOM_Y - IMAGE_TOP_Y);
                 const targetScrollY = projectPct * scrollRange.maxScroll;
+                
+                // Track programmatic scroll target to bypass scroll listener reset
+                targetScrollYRef.current = Math.round(targetScrollY);
+                
+                // Clear any previous programmatic timeout
+                if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+                
+                // Bypass scroll unpin tracking for 1000ms (smooth scroll animation window)
+                scrollTimeoutRef.current = setTimeout(() => {
+                  targetScrollYRef.current = null;
+                }, 1000);
+                
                 window.scrollTo({ top: targetScrollY, behavior: "smooth" });
                 setActiveCard(activeCard === i ? null : i); // toggle click-to-pin
               }}>
