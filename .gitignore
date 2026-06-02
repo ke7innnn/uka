@@ -34,3 +34,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Large assets and design formats
+**/*.psd
+**/*.mp4
+**/*.mov
+**/*.zip
+
