@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { PROJECTS_DATA } from "@/lib/projectsData";
 import { motion, AnimatePresence } from "framer-motion";
@@ -31,13 +31,12 @@ const PROJECTS = PROJECTS_DATA.map((p, i) => {
 
 export default function ProjectsPage() {
   const [hovered, setHovered] = useState<number | null>(null);
-  const [zoomed, setZoomed] = useState<number | null>(null);
   const [activeCard, setActiveCard] = useState<number | null>(null);
   const [isScrolling, setIsScrolling] = useState(false);
   const [pageTransitionDone, setPageTransitionDone] = useState(false);
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
   const router = useRouter();
-
-  const lastScrollTimeRef = useRef(0);
 
   useEffect(() => {
     // 1. Let the premium page curtain wipe up for 1.8s
@@ -45,9 +44,9 @@ export default function ProjectsPage() {
       setPageTransitionDone(true);
     }, 1800);
 
-    // 2. Once the curtain is fully wiped and the roots-up building rise finishes (3.0s rise), zoom in to floor 0!
+    // 2. Once the curtain is fully wiped and the roots-up building rise finishes (3.0s rise), zoom in smoothly!
     const zoomTimer = setTimeout(() => {
-      setZoomed(0);
+      setIsZoomed(true);
     }, 4800); // 1800ms curtain + 3000ms construction rise
 
     return () => {
@@ -56,74 +55,55 @@ export default function ProjectsPage() {
     };
   }, []);
 
-  // Enable scroll-controlled navigation through the 25 floors when zoomed in
-  const handleWheel = (e: React.WheelEvent) => {
-    if (zoomed === null) return;
-    
-    const now = Date.now();
-    if (now - lastScrollTimeRef.current < 160) return; // Fluid, responsive scroll pacing (160ms)
+  // Continuous window scroll tracking
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
-    if (e.deltaY > 0) {
-      // Scroll down: Go to next floor (larger index)
-      setZoomed(prev => {
-        if (prev === null) return 0;
-        const next = prev + 1;
-        if (next < PROJECTS.length) {
-          lastScrollTimeRef.current = now;
-          setActiveCard(null);
-          return next;
-        }
-        return prev;
-      });
-    } else if (e.deltaY < 0) {
-      // Scroll up: Go to previous floor (smaller index)
-      setZoomed(prev => {
-        if (prev === null) return 0;
-        const next = prev - 1;
-        if (next >= 0) {
-          lastScrollTimeRef.current = now;
-          setActiveCard(null);
-          return next;
-        }
-        return prev;
-      });
-    }
-  };
+  // Calculate fractional scroll percent (0 to 1) running from top of the page to bottom
+  const [scrollRange, setScrollRange] = useState({ maxScroll: 1 });
+  useEffect(() => {
+    const updateRange = () => {
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      setScrollRange({ maxScroll: maxScroll || 1 });
+    };
+    updateRange();
+    window.addEventListener("resize", updateRange);
+    return () => window.removeEventListener("resize", updateRange);
+  }, [pageTransitionDone]); // Recalculate once DOM renders fully
 
+  const pct = Math.min(Math.max(scrollY / scrollRange.maxScroll, 0), 1);
 
+  // Interpolate camera targetY continuously between top and bottom residential floor boundaries
+  const targetY = IMAGE_TOP_Y + pct * (IMAGE_BOTTOM_Y - IMAGE_TOP_Y);
 
-  // Calculate camera translation to center horizontally on the building and vertically on the active floor
-  let translateX = 0;
-  let translateY = 0;
-  if (zoomed !== null) {
-    const p = PROJECTS[zoomed];
-    let targetX = 700;
-    const targetY = p.nodeY;
-    
-    if (activeCard !== null && activeCard === zoomed) {
-      const isL = p.side === "L";
-      const activeScale = 0.50; // Keep the larger premium scale
-      const cardWidth = 193 * activeScale;
-      const cardX = isL ? 520 - cardWidth : 880; // Positioned far away to the left/right to prevent any building overlap
-      targetX = cardX + cardWidth / 2; // Center on the expanded active card horizontally
-    }
+  // Find which project is currently closest to the centered focus targetY in real-time
+  const activeIndex = PROJECTS.reduce((closest, p, idx) => {
+    const dist = Math.abs(p.nodeY - targetY);
+    const closestDist = Math.abs(PROJECTS[closest].nodeY - targetY);
+    return dist < closestDist ? idx : closest;
+  }, 0);
 
-    // Mathematical translation based on a completely fixed transform-origin at the viewbox center (700, 305)
-    // This guarantees rock-solid transitions without browser origin shearing artifacts.
-    translateX = (700 - targetX) * ZOOM_SCALE;
-    translateY = (305 - targetY) * ZOOM_SCALE;
-  }
+  // Calculate smooth 2D translations
+  const translateX = 0; // Keep the skyscraper perfectly centered horizontally
+  const translateY = isZoomed ? (305 - targetY) * ZOOM_SCALE : 0;
 
   return (
-    <div className="w-screen h-screen overflow-hidden bg-[#050505]" onWheel={handleWheel}>
-      <p className="absolute top-5 right-8 z-10 text-[11px] tracking-[0.22em] uppercase text-white/40">25 Projects</p>
+    <div className="w-screen h-[350vh] bg-[#050505]">
+      {/* Sticky container that keeps the SVG viewport locked to the screen */}
+      <div className="sticky top-0 w-screen h-screen overflow-hidden">
+        <p className="absolute top-5 right-8 z-10 text-[11px] tracking-[0.22em] uppercase text-white/40">25 Projects</p>
 
-      <svg viewBox="0 -180 1400 970" className="w-full h-full" preserveAspectRatio="xMidYMid meet"
-        style={{ cursor: "default" }}
-      >
+        <svg viewBox="0 -180 1400 970" className="w-full h-full" preserveAspectRatio="xMidYMid meet"
+          style={{ cursor: "default" }}
+        >
         <motion.g
           animate={{
-            transform: zoomed !== null 
+            transform: isZoomed 
               ? `translate(${translateX}px, ${translateY}px) scale(${ZOOM_SCALE})` 
               : "translate(0px, 0px) scale(1)"
           }}
@@ -243,19 +223,21 @@ export default function ProjectsPage() {
 
         {/* ── PROJECT NODES + CALLOUTS ── */}
         {PROJECTS.map((p, i) => {
-          const isH = hovered === i || activeCard === i;
+          const isCentered = isZoomed && activeIndex === i;
+          const isH = hovered === i || isCentered || activeCard === i;
           const isL = p.side === "L";
           const nx = p.nodeX, ny = p.nodeY;
           
           // Dynamic scaling: active card is significantly larger and pushed way far to left/right to prevent any overlap
-          const currentScale = activeCard === i ? 0.50 : CARD_SCALE;
+          const isHighlighted = isCentered || activeCard === i;
+          const currentScale = isHighlighted ? 0.50 : CARD_SCALE;
           const currentWidth = 193 * currentScale;
           const currentHeight = 232 * currentScale;
           
-          const cardX = isL ? (activeCard === i ? 520 - currentWidth : 596 - currentWidth) : (activeCard === i ? 880 : 804);
+          const cardX = isL ? (isHighlighted ? 520 - currentWidth : 596 - currentWidth) : (isHighlighted ? 880 : 804);
           const endX = isL ? cardX + currentWidth : cardX;
           const midX = nx + (endX - nx) / 2;
-          let cardY = activeCard === i ? ny - 65 : ny - 40;
+          let cardY = isHighlighted ? ny - 65 : ny - 40;
           let lineEndY = ny + (isL ? -4 : 4);
           
           // If card goes past the bottom frame, shift it up and angle the line
@@ -270,7 +252,9 @@ export default function ProjectsPage() {
               onMouseLeave={() => { setHovered(null); }}
               onClick={(e) => {
                 e.stopPropagation();
-                setZoomed(i);
+                const projectPct = (p.nodeY - IMAGE_TOP_Y) / (IMAGE_BOTTOM_Y - IMAGE_TOP_Y);
+                const targetScrollY = projectPct * scrollRange.maxScroll;
+                window.scrollTo({ top: targetScrollY, behavior: "smooth" });
                 setActiveCard(i);
               }}>
 
@@ -378,6 +362,7 @@ export default function ProjectsPage() {
           }}
         />
       </svg>
+      </div>{/* /sticky */}
 
       {/* ── LUXURY PAGE ENTRANCE TRANSITION ── */}
       <AnimatePresence>
