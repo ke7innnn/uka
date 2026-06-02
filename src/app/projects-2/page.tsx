@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { PROJECTS_DATA } from "@/lib/projectsData";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 /* ── Building geometry (Golden Skyscraper 2.5D Volumetric) ─────────────────────────── */
 const BB = 730;          // ground line
@@ -34,18 +34,26 @@ export default function ProjectsPage() {
   const [zoomed, setZoomed] = useState<number | null>(null);
   const [activeCard, setActiveCard] = useState<number | null>(null);
   const [isScrolling, setIsScrolling] = useState(false);
+  const [pageTransitionDone, setPageTransitionDone] = useState(false);
   const router = useRouter();
 
   const lastScrollTimeRef = useRef(0);
 
-  // Auto-zoom to the top floor (project index 0) after the bottom-to-top reveal completes (3.2 seconds)
   useEffect(() => {
-    // Initial animation sequence:
-    // After the 3s wipeUp animation finishes, snap to the top floor
-    const timer = setTimeout(() => {
+    // 1. Let the premium page curtain wipe up for 1.8s
+    const curtainTimer = setTimeout(() => {
+      setPageTransitionDone(true);
+    }, 1800);
+
+    // 2. Once the curtain is fully wiped and the roots-up building rise finishes (3.0s rise), zoom in to floor 0!
+    const zoomTimer = setTimeout(() => {
       setZoomed(0);
-    }, 3200);
-    return () => clearTimeout(timer);
+    }, 4800); // 1800ms curtain + 3000ms construction rise
+
+    return () => {
+      clearTimeout(curtainTimer);
+      clearTimeout(zoomTimer);
+    };
   }, []);
 
   // Enable scroll-controlled navigation through the 25 floors when zoomed in
@@ -212,8 +220,12 @@ export default function ProjectsPage() {
           `}</style>
         </defs>
 
-        {/* ── BUILDING IMAGE (Holographic Time-Lapse Materialization) ── */}
-        <g style={{ animation: "constructionTimeLapse 3s cubic-bezier(0.25, 1, 0.5, 1) forwards" }}>
+        {/* ── BUILDING IMAGE (Holographic Time-Lapse Materialization from Roots) ── */}
+        <g style={{ 
+          animation: pageTransitionDone 
+            ? "constructionTimeLapse 3.0s cubic-bezier(0.25, 1, 0.5, 1) forwards" 
+            : "none"
+        }}>
           <image 
             href="/building/building.png" 
             x="300" y="-245" 
@@ -223,32 +235,8 @@ export default function ProjectsPage() {
               filter: isScrolling ? "none" : "url(#premium-4k-filter)", 
               imageRendering: "high-quality" as "auto", 
               transform: "translateZ(0)",
-              transition: "filter 0.35s cubic-bezier(0.16, 1, 0.3, 1)"
-            }}
-          />
-        </g>
-
-        {/* ── HIGH-TECH LASER SCANNING BEAM (Construction Time-Lapse Spark) ── */}
-        <g style={{
-          animation: "riseBeam 3s cubic-bezier(0.25, 1, 0.5, 1) forwards",
-          pointerEvents: "none"
-        }}>
-          {/* Main Laser Beam Line */}
-          <line 
-            x1="520" x2="880" y1="0" y2="0" 
-            stroke="#F59E0B" 
-            style={{
-              filter: "drop-shadow(0 0 4px #F59E0B) drop-shadow(0 0 10px #D97706)",
-              animation: "pulseBeam 0.1s infinite alternate"
-            }}
-          />
-          {/* Subtle Horizontal Spark Flare */}
-          <ellipse 
-            cx="700" cy="0" rx="180" ry="1.5" 
-            fill="#ffffff" 
-            style={{
-              filter: "blur(1.5px) drop-shadow(0 0 3px #F59E0B)",
-              animation: "sparkBeam 0.07s infinite alternate"
+              transition: "filter 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
+              clipPath: pageTransitionDone ? "none" : "inset(100% 0 0 0)"
             }}
           />
         </g>
@@ -390,6 +378,36 @@ export default function ProjectsPage() {
           }}
         />
       </svg>
+
+      {/* ── LUXURY PAGE ENTRANCE TRANSITION ── */}
+      <AnimatePresence>
+        {!pageTransitionDone && (
+          <motion.div
+            initial={{ clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)" }}
+            exit={{ clipPath: "polygon(0 0, 100% 0, 100% 0, 0 0)" }}
+            transition={{ duration: 0.9, ease: [0.76, 0, 0.24, 1] }}
+            className="fixed inset-0 z-[80] bg-[#050505] flex flex-col items-center justify-center text-white"
+          >
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.25, duration: 0.6, ease: "easeOut" }}
+              className="flex flex-col items-center text-center"
+            >
+              <h2 
+                className="text-4xl md:text-5xl font-serif tracking-[0.25em] uppercase text-white/90"
+                style={{ fontFamily: "var(--font-cormorant), serif" }}
+              >
+                UKA
+              </h2>
+              <div className="w-16 h-[1px] bg-white/20 my-4" />
+              <p className="text-[10px] md:text-[11px] font-sans tracking-[0.45em] uppercase text-white/45">
+                Umesh Kekre &amp; Associates
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
