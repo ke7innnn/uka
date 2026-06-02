@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { PROJECTS_DATA } from "@/lib/projectsData";
 import { motion, AnimatePresence } from "framer-motion";
@@ -35,133 +35,70 @@ export default function ProjectsPage() {
   const [isScrolling, setIsScrolling] = useState(false);
   const [pageTransitionDone, setPageTransitionDone] = useState(false);
   const [isZoomed, setIsZoomed] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
   const router = useRouter();
 
-  // ── LENIS SCROLL INTEGRATION (zero React re-renders during scroll) ──────
-  // We store scroll-derived values in refs and drive the SVG transform
-  // directly via DOM style mutations inside rAF — bypassing React entirely.
-  const svgGroupRef = useRef<SVGGElement>(null);
-  const lenisScrollY = useRef(0);        // raw Lenis-smoothed scrollY
-  const rafId = useRef<number>(0);
-  const maxScrollRef = useRef(1);
-  const isZoomedRef = useRef(false);     // mirror of isZoomed for rAF closure
-  const [activeIndex, setActiveIndex] = useState(0); // updated cheaply only when floor changes
-  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  const handleMouseEnter = (i: number) => {
-    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
-    setHovered(i);
-  };
-
-  const handleMouseLeave = () => {
-    hoverTimeoutRef.current = setTimeout(() => setHovered(null), 100);
-  };
-
   useEffect(() => {
-    // 1. Curtain wipe
-    const curtainTimer = setTimeout(() => setPageTransitionDone(true), 1800);
-    // 2. Spring zoom-in after rise finishes
+    // 1. Let the premium page curtain wipe up for 1.8s
+    const curtainTimer = setTimeout(() => {
+      setPageTransitionDone(true);
+    }, 1800);
+
+    // 2. Once the curtain is fully wiped and the roots-up building rise finishes (3.0s rise), zoom in smoothly!
     const zoomTimer = setTimeout(() => {
       setIsZoomed(true);
-      isZoomedRef.current = true;
-    }, 4800);
-    return () => { clearTimeout(curtainTimer); clearTimeout(zoomTimer); };
+    }, 4800); // 1800ms curtain + 3000ms construction rise
+
+    return () => {
+      clearTimeout(curtainTimer);
+      clearTimeout(zoomTimer);
+    };
   }, []);
 
-  // Keep maxScroll in sync (no state needed — just a ref)
+  // Continuous window scroll tracking
   useEffect(() => {
-    const update = () => {
-      maxScrollRef.current = Math.max(
-        document.documentElement.scrollHeight - window.innerHeight,
-        1
-      );
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
     };
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, [pageTransitionDone]);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
-  // Lenis scroll → direct DOM mutation rAF loop
+  // Calculate fractional scroll percent (0 to 1) running from top of the page to bottom
+  const [scrollRange, setScrollRange] = useState({ maxScroll: 1 });
   useEffect(() => {
-    // Dynamically import Lenis so we always get the singleton that
-    // LenisProvider already initialised and registered on the window.
-    // We listen to the global 'scroll' event that Lenis emits (it fires
-    // exactly once per rAF tick with the momentum-smoothed value).
-    let prevActiveIndex = 0;
-    let scrollingTimer: ReturnType<typeof setTimeout>;
-    let lastScrollY = -1;
-
-    const onLenisScroll = ({ scroll }: { scroll: number }) => {
-      lenisScrollY.current = scroll;
+    const updateRange = () => {
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      setScrollRange({ maxScroll: maxScroll || 1 });
     };
+    updateRange();
+    window.addEventListener("resize", updateRange);
+    return () => window.removeEventListener("resize", updateRange);
+  }, [pageTransitionDone]); // Recalculate once DOM renders fully
 
-    // The rAF loop reads the ref and mutates the SVG transform directly —
-    // no setState, no React diffing, locked to 60/120fps GPU compositor.
-    const tick = () => {
-      // Prefer the Lenis-smoothed value (set by LenisProvider each RAF tick)
-      // Fall back to raw scrollY if Lenis hasn't fired yet (first frame)
-      const smoothScrollY =
-        (window as typeof window & { __lenisScrollY?: number }).__lenisScrollY
-        ?? window.scrollY;
-      lenisScrollY.current = smoothScrollY;
+  const pct = Math.min(Math.max(scrollY / scrollRange.maxScroll, 0), 1);
 
-      const pct = Math.min(Math.max(smoothScrollY / maxScrollRef.current, 0), 1);
-      const tY = IMAGE_TOP_Y + pct * (IMAGE_BOTTOM_Y - IMAGE_TOP_Y);
+  // Interpolate camera targetY continuously between top and bottom residential floor boundaries
+  const targetY = IMAGE_TOP_Y + pct * (IMAGE_BOTTOM_Y - IMAGE_TOP_Y);
 
-      if (svgGroupRef.current) {
-        if (isZoomedRef.current) {
-          const ty = (305 - tY) * ZOOM_SCALE;
-          svgGroupRef.current.style.transform =
-            `translate(0px, ${ty}px) scale(${ZOOM_SCALE})`;
-        } else {
-          // Keep any in-progress Framer spring for zoom-in intact
-        }
-      }
+  // Find which project is currently closest to the centered focus targetY in real-time
+  const activeIndex = PROJECTS.reduce((closest, p, idx) => {
+    const dist = Math.abs(p.nodeY - targetY);
+    const closestDist = Math.abs(PROJECTS[closest].nodeY - targetY);
+    return dist < closestDist ? idx : closest;
+  }, 0);
 
-      // Cheaply update activeIndex only when the nearest floor changes
-      const newIdx = PROJECTS.reduce((best, p, idx) => {
-        return Math.abs(p.nodeY - tY) < Math.abs(PROJECTS[best].nodeY - tY) ? idx : best;
-      }, 0);
-      if (newIdx !== prevActiveIndex) {
-        prevActiveIndex = newIdx;
-        setActiveIndex(newIdx);
-      }
-
-      // Detect if we are actually scrolling by comparing previous frame
-      const isCurrentlyScrolling = Math.abs(smoothScrollY - lastScrollY) > 0.1;
-      lastScrollY = smoothScrollY;
-
-      // Debounced isScrolling for SVG filter toggle
-      clearTimeout(scrollingTimer);
-      if (isCurrentlyScrolling) {
-        setIsScrolling(true);
-        if (svgGroupRef.current) svgGroupRef.current.style.pointerEvents = "none";
-        scrollingTimer = setTimeout(() => {
-          setIsScrolling(false);
-          if (svgGroupRef.current) svgGroupRef.current.style.pointerEvents = "auto";
-        }, 150);
-      }
-
-      rafId.current = requestAnimationFrame(tick);
-    };
-
-    // Hook into Lenis via the global scroll event it dispatches
-    window.addEventListener("lenis-scroll" as never, onLenisScroll as never);
-    // Also hook native scroll as fallback (Lenis still fires scroll on window)
-    const onScroll = () => { lenisScrollY.current = window.scrollY; };
-    window.addEventListener("scroll", onScroll, { passive: true });
-
-    rafId.current = requestAnimationFrame(tick);
-    return () => {
-      cancelAnimationFrame(rafId.current);
-      window.removeEventListener("lenis-scroll" as never, onLenisScroll as never);
-      window.removeEventListener("scroll", onScroll);
-      clearTimeout(scrollingTimer);
-    };
-  }, [pageTransitionDone]);
-
-  // Derive translateY for Framer spring (only used during the initial zoom-in animation)
-  const translateY = isZoomed ? (305 - IMAGE_TOP_Y) * ZOOM_SCALE : 0;
+  // Calculate smooth 2D translations
+  let translateX = 0;
+  if (isZoomed && activeCard !== null) {
+    const p = PROJECTS[activeCard];
+    const isL = p.side === "L";
+    const cardWidth = 193 * 0.50; // Active card has scale 0.50
+    const cardX = isL ? 520 - cardWidth : 880;
+    const zoomX = cardX + cardWidth / 2;
+    translateX = (700 - zoomX) * ZOOM_SCALE;
+  }
+  const translateY = isZoomed ? (305 - targetY) * ZOOM_SCALE : 0;
 
   return (
     <div className="w-screen h-[350vh] bg-[#050505]">
@@ -173,26 +110,22 @@ export default function ProjectsPage() {
           style={{ cursor: "default" }}
         >
         <motion.g
-          ref={svgGroupRef}
           animate={{
-            transform: isZoomed
-              ? `translate(0px, ${translateY}px) scale(${ZOOM_SCALE})`
+            transform: isZoomed 
+              ? `translate(${translateX}px, ${translateY}px) scale(${ZOOM_SCALE})` 
               : "translate(0px, 0px) scale(1)"
           }}
           transition={{
             type: "spring",
-            stiffness: 85,
-            damping: 20,
-            mass: 0.8
+            stiffness: 90,
+            damping: 18,
+            mass: 0.75
           }}
-          onAnimationComplete={() => {
-            // Once Framer finishes the zoom-in spring, the rAF loop takes
-            // over smooth scroll-linked updates directly on the DOM node.
-            setIsScrolling(false);
-          }}
-          style={{
+          onAnimationStart={() => setIsScrolling(true)}
+          onAnimationComplete={() => setIsScrolling(false)}
+          style={{ 
             transformOrigin: "700px 305px",
-            willChange: "transform"
+            willChange: "transform" 
           }}
         >
 
@@ -296,25 +229,54 @@ export default function ProjectsPage() {
           />
         </g>
 
-        {/* ── PROJECT FLOORS LAYER (Bottom Z-Index) ── */}
+        {/* ── PROJECT NODES + CALLOUTS (Static DOM order with CSS zIndex for flawless hover layers) ── */}
         {PROJECTS.map((p, i) => {
           const isHoveringAny = hovered !== null || activeCard !== null;
-          const isCentered = isZoomed && activeIndex === i && !isHoveringAny; // auto-glow center, but suppress if manually hovering
-          const isH = hovered === i || activeCard === i;
-          const isFloorHighlighted = isH || isCentered;
+          
+          // The floor path glows if hovered, pinned, or if it is the center index and nothing else is hovered/pinned
+          const isFloorHighlighted = hovered === i || activeCard === i || (isZoomed && activeIndex === i && !isHoveringAny);
+          
+          // The card and callout line are ONLY visible on hover or pin (never auto-shown)
+          const isCardVisible = hovered === i || activeCard === i;
+          
+          const isL = p.side === "L";
           const nx = p.nodeX, ny = p.nodeY;
+          
+          // Dynamic scaling: active card is significantly larger and pushed way far to left/right to prevent any overlap
+          const isHighlighted = activeCard === i;
+          const currentScale = isHighlighted ? 0.50 : CARD_SCALE;
+          const currentWidth = 193 * currentScale;
+          const currentHeight = 232 * currentScale;
+          
+          const cardX = isL ? (isHighlighted ? 520 - currentWidth : 596 - currentWidth) : (isHighlighted ? 880 : 804);
+          const endX = isL ? cardX + currentWidth : cardX;
+          const midX = nx + (endX - nx) / 2;
+          let cardY = isHighlighted ? ny - 65 : ny - 40;
+          let lineEndY = ny + (isL ? -4 : 4);
+          
+          // If card goes past the bottom frame, shift it up and angle the line
+          if (cardY + currentHeight > 760) {
+            cardY = 760 - currentHeight;
+            lineEndY = cardY + 25;
+          }
 
           return (
-            <g key={`floor-${p.id}`} style={{ cursor: "pointer" }}
-              onMouseEnter={() => handleMouseEnter(i)}
-              onMouseLeave={handleMouseLeave}
+            <g key={p.id} 
+              style={{ 
+                cursor: "pointer", 
+                zIndex: isFloorHighlighted ? 50 : 1, 
+                position: "relative" 
+              }}
+              onMouseEnter={() => { setHovered(i); }}
+              onMouseLeave={() => { setHovered(null); }}
               onClick={(e) => {
                 e.stopPropagation();
                 const projectPct = (p.nodeY - IMAGE_TOP_Y) / (IMAGE_BOTTOM_Y - IMAGE_TOP_Y);
-                const targetScrollY = projectPct * maxScrollRef.current;
+                const targetScrollY = projectPct * scrollRange.maxScroll;
                 window.scrollTo({ top: targetScrollY, behavior: "smooth" });
-                setActiveCard(activeCard === i ? null : i); // toggle
+                setActiveCard(activeCard === i ? null : i); // toggle click-to-pin
               }}>
+
               {/* floor hover overlay (3D Curved V-Shape Perspective Path covering the WHOLE floor) */}
               <path 
                 d={`M 588,${ny - 12} Q 634,${ny} 680,${ny + 6} Q 700,${ny + 9} 720,${ny + 6} Q 774,${ny} 828,${ny - 12} L 828,${ny + 8} Q 774,${ny + 20} 720,${ny + 26} Q 700,${ny + 29} 680,${ny + 26} Q 634,${ny + 20} 588,${ny + 8} Z`}
@@ -331,77 +293,43 @@ export default function ProjectsPage() {
                   transformBox: "fill-box", 
                   transformOrigin: "center" 
                 }} />
-            </g>
-          );
-        })}
 
-        {/* ── PROJECT CARDS LAYER (Top Z-Index) ── */}
-        {PROJECTS.map((p, i) => {
-          const isH = hovered === i || activeCard === i;
-          if (!isH) return null; // only render active/hovered cards to keep DOM light
-
-          const isL = p.side === "L";
-          const nx = p.nodeX, ny = p.nodeY;
-          const isHighlighted = activeCard === i;
-          const currentScale = isHighlighted ? 0.50 : CARD_SCALE;
-          const currentWidth = 193 * currentScale;
-          const currentHeight = 232 * currentScale;
-          
-          const cardX = isL ? (isHighlighted ? 520 - currentWidth : 596 - currentWidth) : (isHighlighted ? 880 : 804);
-          const endX = isL ? cardX + currentWidth : cardX;
-          const midX = nx + (endX - nx) / 2;
-          let cardY = isHighlighted ? ny - 65 : ny - 40;
-          let lineEndY = ny + (isL ? -4 : 4);
-          
-          if (cardY + currentHeight > 760) {
-            cardY = 760 - currentHeight;
-            lineEndY = cardY + 25;
-          }
-
-          return (
-            <g key={`card-${p.id}`} style={{ cursor: "pointer" }}
-              onMouseEnter={() => handleMouseEnter(i)}
-              onMouseLeave={handleMouseLeave}
-              onClick={(e) => {
-                e.stopPropagation();
-                const projectPct = (p.nodeY - IMAGE_TOP_Y) / (IMAGE_BOTTOM_Y - IMAGE_TOP_Y);
-                const targetScrollY = projectPct * maxScrollRef.current;
-                window.scrollTo({ top: targetScrollY, behavior: "smooth" });
-                setActiveCard(activeCard === i ? null : i); // toggle
-              }}>
-              
-              {/* callout line and invisible hover bridge */}
-              <g>
-                <polyline
-                  points={`${nx},${ny + 3.5} ${endX},${lineEndY}`}
-                  fill="none" stroke="transparent" strokeWidth="80" 
-                  style={{ pointerEvents: "all" }}
-                />
+              {/* callout line */}
+              {isCardVisible && (
                 <polyline
                   points={`${nx},${ny + 3.5} ${midX},${ny + 3.5 + (isL ? -4 : 4)} ${endX},${lineEndY}`}
                   fill="none" stroke="#ddd" strokeWidth="0.9" />
-              </g>
+              )}
 
               {/* hover card in pure SVG to fix Safari zoom bugs */}
-              <g transform={`translate(${cardX}, ${cardY}) scale(${currentScale})`}>
-                <rect x="0" y="0" width="193" height="232" fill="#0d0d0d" stroke="#2a2a2a" strokeWidth="1" rx="3" />
-                
-                <clipPath id={`clip-img-${p.id}`}>
-                  <rect x="1" y="1" width="191" height="112" rx="2" />
-                </clipPath>
-                <image 
-                  href={p.heroImage} 
-                  x="1" y="1" width="191" height="112" 
-                  preserveAspectRatio="xMidYMid slice" 
-                  clipPath={`url(#clip-img-${p.id})`}
-                />
-                
-                <rect x="1" y="50" width="191" height="63" fill="url(#card-fade)" />
-                <text x="12" y="85" fill="#ddd" fontSize="7" fontFamily="'Inter', sans-serif" letterSpacing="0.1em">{p.cat.toUpperCase()}</text>
-                <text x="12" y="103" fill="#fff" fontSize="13" fontWeight="600" fontFamily="'Inter', sans-serif" letterSpacing="-0.01em">{p.title}</text>
-                
-                <rect x="1" y="113" width="191" height="118" fill="#fcfcfc" rx="2" />
-                <rect x="1" y="113" width="191" height="10" fill="#fcfcfc" />
+              {isCardVisible && (
+                <g transform={`translate(${cardX}, ${cardY}) scale(${currentScale})`}>
+                  {/* Outer border & shadow (simulated) */}
+                  <rect x="0" y="0" width="193" height="232" fill="#0d0d0d" stroke="#2a2a2a" strokeWidth="1" rx="3" />
+                  
+                  {/* Image in the empty space (dark top) */}
+                  <clipPath id={`clip-img-${p.id}`}>
+                    <rect x="1" y="1" width="191" height="112" rx="2" />
+                  </clipPath>
+                  <image 
+                    href={p.heroImage} 
+                    x="1" y="1" width="191" height="112" 
+                    preserveAspectRatio="xMidYMid slice" 
+                    clipPath={`url(#clip-img-${p.id})`}
+                  />
+                  
+                  {/* Fade overlay so text is readable */}
+                  <rect x="1" y="50" width="191" height="63" fill="url(#card-fade)" />
+                  
+                  {/* Category text */}
+                  <text x="12" y="85" fill="#ddd" fontSize="7" fontFamily="'Inter', sans-serif" letterSpacing="0.1em">{p.cat.toUpperCase()}</text>
+                  
+                  {/* Title */}
+                  <text x="12" y="103" fill="#fff" fontSize="13" fontWeight="600" fontFamily="'Inter', sans-serif" letterSpacing="-0.01em">{p.title}</text>
+                  
+                  {/* Light bottom */}
+                  <rect x="1" y="113" width="191" height="118" fill="#fcfcfc" rx="2" />
+                  <rect x="1" y="113" width="191" height="10" fill="#fcfcfc" /> {/* square top corners */}
                   
                   {/* Metadata Type */}
                   <text x="16" y="138" fill="#888" fontSize="6.5" fontFamily="'Inter', sans-serif" letterSpacing="0.1em">TYPE</text>
@@ -427,6 +355,7 @@ export default function ProjectsPage() {
                   {/* Invisible click target for the CTA */}
                   <rect x="110" y="200" width="80" height="30" fill="transparent" style={{ cursor: "pointer" }} onClick={(e) => { e.stopPropagation(); router.push(`/projects-2/${p.slug}`); }} />
                 </g>
+              )}
             </g>
           );
         })}

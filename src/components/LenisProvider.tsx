@@ -21,6 +21,11 @@ export default function LenisProvider({ children }: { children: React.ReactNode 
 
     // ── KEY FIX: keep GSAP ScrollTrigger in sync with Lenis ──────────────
     lenis.on("scroll", ScrollTrigger.update);
+    // Expose Lenis-smoothed scroll position globally so any page's rAF
+    // loop can read it without needing to import the Lenis instance.
+    lenis.on("scroll", ({ scroll }: { scroll: number }) => {
+      (window as typeof window & { __lenisScrollY: number }).__lenisScrollY = scroll;
+    });
 
     gsap.ticker.add((time) => {
       lenis.raf(time * 1000);
