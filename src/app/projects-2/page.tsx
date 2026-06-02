@@ -46,6 +46,16 @@ export default function ProjectsPage() {
   const maxScrollRef = useRef(1);
   const isZoomedRef = useRef(false);     // mirror of isZoomed for rAF closure
   const [activeIndex, setActiveIndex] = useState(0); // updated cheaply only when floor changes
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleMouseEnter = (i: number) => {
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+    setHovered(i);
+  };
+
+  const handleMouseLeave = () => {
+    hoverTimeoutRef.current = setTimeout(() => setHovered(null), 100);
+  };
 
   useEffect(() => {
     // 1. Curtain wipe
@@ -282,38 +292,17 @@ export default function ProjectsPage() {
           />
         </g>
 
-        {/* ── PROJECT NODES + CALLOUTS ── */}
+        {/* ── PROJECT FLOORS LAYER (Bottom Z-Index) ── */}
         {PROJECTS.map((p, i) => {
-          const isCentered = isZoomed && activeIndex === i; // floor glow only
-          // Card is only shown on hover or click — NOT auto-shown by isCentered
-          // (prevents ghost card appearing at viewport edge when zoomed)
+          const isCentered = isZoomed && activeIndex === i;
           const isH = hovered === i || activeCard === i;
           const isFloorHighlighted = isH || isCentered;
-          const isL = p.side === "L";
           const nx = p.nodeX, ny = p.nodeY;
 
-          // Dynamic scaling: active card is significantly larger
-          const isHighlighted = activeCard === i;
-          const currentScale = isHighlighted ? 0.50 : CARD_SCALE;
-          const currentWidth = 193 * currentScale;
-          const currentHeight = 232 * currentScale;
-          
-          const cardX = isL ? (isHighlighted ? 520 - currentWidth : 596 - currentWidth) : (isHighlighted ? 880 : 804);
-          const endX = isL ? cardX + currentWidth : cardX;
-          const midX = nx + (endX - nx) / 2;
-          let cardY = isHighlighted ? ny - 65 : ny - 40;
-          let lineEndY = ny + (isL ? -4 : 4);
-          
-          // If card goes past the bottom frame, shift it up and angle the line
-          if (cardY + currentHeight > 760) {
-            cardY = 760 - currentHeight;
-            lineEndY = cardY + 25;
-          }
-
           return (
-            <g key={p.id} style={{ cursor: "pointer" }}
-              onMouseEnter={() => { setHovered(i); }}
-              onMouseLeave={() => { setHovered(null); }}
+            <g key={`floor-${p.id}`} style={{ cursor: "pointer" }}
+              onMouseEnter={() => handleMouseEnter(i)}
+              onMouseLeave={handleMouseLeave}
               onClick={(e) => {
                 e.stopPropagation();
                 const projectPct = (p.nodeY - IMAGE_TOP_Y) / (IMAGE_BOTTOM_Y - IMAGE_TOP_Y);
@@ -321,7 +310,6 @@ export default function ProjectsPage() {
                 window.scrollTo({ top: targetScrollY, behavior: "smooth" });
                 setActiveCard(activeCard === i ? null : i); // toggle
               }}>
-
               {/* floor hover overlay (3D Curved V-Shape Perspective Path covering the WHOLE floor) */}
               <path 
                 d={`M 588,${ny - 12} Q 634,${ny} 680,${ny + 6} Q 700,${ny + 9} 720,${ny + 6} Q 774,${ny} 828,${ny - 12} L 828,${ny + 8} Q 774,${ny + 20} 720,${ny + 26} Q 700,${ny + 29} 680,${ny + 26} Q 634,${ny + 20} 588,${ny + 8} Z`}
@@ -338,51 +326,77 @@ export default function ProjectsPage() {
                   transformBox: "fill-box", 
                   transformOrigin: "center" 
                 }} />
+            </g>
+          );
+        })}
 
+        {/* ── PROJECT CARDS LAYER (Top Z-Index) ── */}
+        {PROJECTS.map((p, i) => {
+          const isH = hovered === i || activeCard === i;
+          if (!isH) return null; // only render active/hovered cards to keep DOM light
+
+          const isL = p.side === "L";
+          const nx = p.nodeX, ny = p.nodeY;
+          const isHighlighted = activeCard === i;
+          const currentScale = isHighlighted ? 0.50 : CARD_SCALE;
+          const currentWidth = 193 * currentScale;
+          const currentHeight = 232 * currentScale;
+          
+          const cardX = isL ? (isHighlighted ? 520 - currentWidth : 596 - currentWidth) : (isHighlighted ? 880 : 804);
+          const endX = isL ? cardX + currentWidth : cardX;
+          const midX = nx + (endX - nx) / 2;
+          let cardY = isHighlighted ? ny - 65 : ny - 40;
+          let lineEndY = ny + (isL ? -4 : 4);
+          
+          if (cardY + currentHeight > 760) {
+            cardY = 760 - currentHeight;
+            lineEndY = cardY + 25;
+          }
+
+          return (
+            <g key={`card-${p.id}`} style={{ cursor: "pointer" }}
+              onMouseEnter={() => handleMouseEnter(i)}
+              onMouseLeave={handleMouseLeave}
+              onClick={(e) => {
+                e.stopPropagation();
+                const projectPct = (p.nodeY - IMAGE_TOP_Y) / (IMAGE_BOTTOM_Y - IMAGE_TOP_Y);
+                const targetScrollY = projectPct * maxScrollRef.current;
+                window.scrollTo({ top: targetScrollY, behavior: "smooth" });
+                setActiveCard(activeCard === i ? null : i); // toggle
+              }}>
+              
               {/* callout line and invisible hover bridge */}
-              {isH && (
-                <g>
-                  {/* Invisible bridge to prevent hover flicker when cursor moves to card */}
-                  <polyline
-                    points={`${nx},${ny + 3.5} ${endX},${lineEndY}`}
-                    fill="none" stroke="transparent" strokeWidth="80" 
-                    style={{ pointerEvents: "all" }}
-                  />
-                  <polyline
-                    points={`${nx},${ny + 3.5} ${midX},${ny + 3.5 + (isL ? -4 : 4)} ${endX},${lineEndY}`}
-                    fill="none" stroke="#ddd" strokeWidth="0.9" />
-                </g>
-              )}
+              <g>
+                <polyline
+                  points={`${nx},${ny + 3.5} ${endX},${lineEndY}`}
+                  fill="none" stroke="transparent" strokeWidth="80" 
+                  style={{ pointerEvents: "all" }}
+                />
+                <polyline
+                  points={`${nx},${ny + 3.5} ${midX},${ny + 3.5 + (isL ? -4 : 4)} ${endX},${lineEndY}`}
+                  fill="none" stroke="#ddd" strokeWidth="0.9" />
+              </g>
 
               {/* hover card in pure SVG to fix Safari zoom bugs */}
-              {isH && (
-                <g transform={`translate(${cardX}, ${cardY}) scale(${currentScale})`}>
-                  {/* Outer border & shadow (simulated) */}
-                  <rect x="0" y="0" width="193" height="232" fill="#0d0d0d" stroke="#2a2a2a" strokeWidth="1" rx="3" />
-                  
-                  {/* Image in the empty space (dark top) */}
-                  <clipPath id={`clip-img-${p.id}`}>
-                    <rect x="1" y="1" width="191" height="112" rx="2" />
-                  </clipPath>
-                  <image 
-                    href={p.heroImage} 
-                    x="1" y="1" width="191" height="112" 
-                    preserveAspectRatio="xMidYMid slice" 
-                    clipPath={`url(#clip-img-${p.id})`}
-                  />
-                  
-                  {/* Fade overlay so text is readable */}
-                  <rect x="1" y="50" width="191" height="63" fill="url(#card-fade)" />
-                  
-                  {/* Category text */}
-                  <text x="12" y="85" fill="#ddd" fontSize="7" fontFamily="'Inter', sans-serif" letterSpacing="0.1em">{p.cat.toUpperCase()}</text>
-                  
-                  {/* Title */}
-                  <text x="12" y="103" fill="#fff" fontSize="13" fontWeight="600" fontFamily="'Inter', sans-serif" letterSpacing="-0.01em">{p.title}</text>
-                  
-                  {/* Light bottom */}
-                  <rect x="1" y="113" width="191" height="118" fill="#fcfcfc" rx="2" />
-                  <rect x="1" y="113" width="191" height="10" fill="#fcfcfc" /> {/* square top corners */}
+              <g transform={`translate(${cardX}, ${cardY}) scale(${currentScale})`}>
+                <rect x="0" y="0" width="193" height="232" fill="#0d0d0d" stroke="#2a2a2a" strokeWidth="1" rx="3" />
+                
+                <clipPath id={`clip-img-${p.id}`}>
+                  <rect x="1" y="1" width="191" height="112" rx="2" />
+                </clipPath>
+                <image 
+                  href={p.heroImage} 
+                  x="1" y="1" width="191" height="112" 
+                  preserveAspectRatio="xMidYMid slice" 
+                  clipPath={`url(#clip-img-${p.id})`}
+                />
+                
+                <rect x="1" y="50" width="191" height="63" fill="url(#card-fade)" />
+                <text x="12" y="85" fill="#ddd" fontSize="7" fontFamily="'Inter', sans-serif" letterSpacing="0.1em">{p.cat.toUpperCase()}</text>
+                <text x="12" y="103" fill="#fff" fontSize="13" fontWeight="600" fontFamily="'Inter', sans-serif" letterSpacing="-0.01em">{p.title}</text>
+                
+                <rect x="1" y="113" width="191" height="118" fill="#fcfcfc" rx="2" />
+                <rect x="1" y="113" width="191" height="10" fill="#fcfcfc" />
                   
                   {/* Metadata Type */}
                   <text x="16" y="138" fill="#888" fontSize="6.5" fontFamily="'Inter', sans-serif" letterSpacing="0.1em">TYPE</text>
@@ -408,7 +422,6 @@ export default function ProjectsPage() {
                   {/* Invisible click target for the CTA */}
                   <rect x="110" y="200" width="80" height="30" fill="transparent" style={{ cursor: "pointer" }} onClick={(e) => { e.stopPropagation(); router.push(`/projects-2/${p.slug}`); }} />
                 </g>
-              )}
             </g>
           );
         })}
