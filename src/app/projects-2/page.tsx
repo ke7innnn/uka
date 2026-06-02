@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { PROJECTS_DATA } from "@/lib/projectsData";
+import { motion } from "framer-motion";
 
 /* ── Building geometry (Golden Skyscraper 2.5D Volumetric) ─────────────────────────── */
 const BB = 730;          // ground line
@@ -32,6 +33,7 @@ export default function ProjectsPage() {
   const [hovered, setHovered] = useState<number | null>(null);
   const [zoomed, setZoomed] = useState<number | null>(null);
   const [activeCard, setActiveCard] = useState<number | null>(null);
+  const [isScrolling, setIsScrolling] = useState(false);
   const router = useRouter();
 
   const lastScrollTimeRef = useRef(0);
@@ -113,12 +115,23 @@ export default function ProjectsPage() {
       <svg viewBox="0 -180 1400 970" className="w-full h-full" preserveAspectRatio="xMidYMid meet"
         style={{ cursor: "default" }}
       >
-        <g style={{
-          transition: "transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform-origin 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
-          transformOrigin: `${zoomX}px ${zoomY}px`,
-          transform: zoomed !== null ? `translate(${translateX}px, ${translateY}px) scale(${ZOOM_SCALE})` : "translate(0px, 0px) scale(1)",
-          willChange: "transform"
-        }}>
+        <motion.g
+          animate={{
+            transform: zoomed !== null 
+              ? `translate(${translateX}px, ${translateY}px) scale(${ZOOM_SCALE})` 
+              : "translate(0px, 0px) scale(1)",
+            transformOrigin: `${zoomX}px ${zoomY}px`
+          }}
+          transition={{
+            type: "spring",
+            stiffness: 90,
+            damping: 18,
+            mass: 0.75
+          }}
+          onAnimationStart={() => setIsScrolling(true)}
+          onAnimationComplete={() => setIsScrolling(false)}
+          style={{ willChange: "transform" }}
+        >
 
         {/* ── ANIMATED SKY BIRDS ── */}
         <defs>
@@ -186,9 +199,10 @@ export default function ProjectsPage() {
             width="800" height="1100" 
             preserveAspectRatio="xMidYMid meet" 
             style={{ 
-              filter: "url(#premium-4k-filter)", 
+              filter: isScrolling ? "none" : "url(#premium-4k-filter)", 
               imageRendering: "high-quality" as "auto", 
-              transform: "translateZ(0)" 
+              transform: "translateZ(0)",
+              transition: "filter 0.35s cubic-bezier(0.16, 1, 0.3, 1)"
             }}
           />
         </g>
@@ -308,7 +322,7 @@ export default function ProjectsPage() {
             </g>
           );
         })}
-        </g>
+        </motion.g>
 
         {/* Full-screen anti-aliasing soft overlay */}
         <rect 
@@ -322,8 +336,12 @@ export default function ProjectsPage() {
         <rect 
           x="-500" y="-500" 
           width="2400" height="2000" 
-          filter="url(#grain-filter)" 
-          style={{ pointerEvents: "none" }}
+          filter={isScrolling ? "none" : "url(#grain-filter)"} 
+          style={{ 
+            pointerEvents: "none",
+            opacity: isScrolling ? 0 : 1,
+            transition: "opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1)"
+          }}
         />
       </svg>
     </div>
