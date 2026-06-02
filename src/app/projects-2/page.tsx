@@ -79,6 +79,7 @@ export default function ProjectsPage() {
     // exactly once per rAF tick with the momentum-smoothed value).
     let prevActiveIndex = 0;
     let scrollingTimer: ReturnType<typeof setTimeout>;
+    let lastScrollY = -1;
 
     const onLenisScroll = ({ scroll }: { scroll: number }) => {
       lenisScrollY.current = scroll;
@@ -116,11 +117,15 @@ export default function ProjectsPage() {
         setActiveIndex(newIdx);
       }
 
+      // Detect if we are actually scrolling by comparing previous frame
+      const isCurrentlyScrolling = Math.abs(smoothScrollY - lastScrollY) > 0.1;
+      lastScrollY = smoothScrollY;
+
       // Debounced isScrolling for SVG filter toggle
       clearTimeout(scrollingTimer);
-      if (lenisScrollY.current !== 0) {
+      if (isCurrentlyScrolling) {
         setIsScrolling(true);
-        scrollingTimer = setTimeout(() => setIsScrolling(false), 120);
+        scrollingTimer = setTimeout(() => setIsScrolling(false), 150);
       }
 
       rafId.current = requestAnimationFrame(tick);
@@ -334,11 +339,19 @@ export default function ProjectsPage() {
                   transformOrigin: "center" 
                 }} />
 
-              {/* callout line */}
+              {/* callout line and invisible hover bridge */}
               {isH && (
-                <polyline
-                  points={`${nx},${ny + 3.5} ${midX},${ny + 3.5 + (isL ? -4 : 4)} ${endX},${lineEndY}`}
-                  fill="none" stroke="#ddd" strokeWidth="0.9" />
+                <g>
+                  {/* Invisible bridge to prevent hover flicker when cursor moves to card */}
+                  <polyline
+                    points={`${nx},${ny + 3.5} ${endX},${lineEndY}`}
+                    fill="none" stroke="transparent" strokeWidth="80" 
+                    style={{ pointerEvents: "all" }}
+                  />
+                  <polyline
+                    points={`${nx},${ny + 3.5} ${midX},${ny + 3.5 + (isL ? -4 : 4)} ${endX},${lineEndY}`}
+                    fill="none" stroke="#ddd" strokeWidth="0.9" />
+                </g>
               )}
 
               {/* hover card in pure SVG to fix Safari zoom bugs */}
