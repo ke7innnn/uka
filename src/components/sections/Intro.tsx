@@ -1,8 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
-import { PROJECTS_DATA } from "@/lib/projectsData";
+import { motion, AnimatePresence } from "framer-motion";
+import { PROJECTS_DATA, Project } from "@/lib/projectsData";
 
 const quotes = [
   { text: "A master of spatial harmony and sustainable design.", author: "Architectural Digest" },
@@ -12,8 +13,26 @@ const quotes = [
 
 const bioText = "Umesh Kekre is a visionary architect and principal designer at Umesh Kekre & Associates. With over two decades of experience in shaping environments, he leads a practice dedicated to innovative, sustainable, and context-driven design. His portfolio spans residential, commercial, and institutional projects, each characterized by a profound respect for materials, natural light, and the human experience.";
 
+// Target coordinates for blasting 3 cards from the center stack
+const blastPositions3 = [
+  { x: -280, y: -40, rotate: -12 },  // Left card
+  { x: 0,    y: -80,  rotate: 4 },    // Center card
+  { x: 280,  y: -40,  rotate: 12 },   // Right card
+];
+
 export default function Intro() {
-  const images = PROJECTS_DATA.filter(p => !p.isComingSoon).map(p => p.heroImage);
+  const [blastedProject, setBlastedProject] = useState<Project | null>(null);
+  
+  const activeProjects = PROJECTS_DATA.filter(p => !p.isComingSoon);
+
+  // Take up to 3 images from the clicked project to show in the blast
+  const blastImages = blastedProject 
+    ? [
+        blastedProject.heroImage,
+        blastedProject.images[1] || blastedProject.heroImage,
+        blastedProject.images[2] || blastedProject.heroImage
+      ]
+    : [];
 
   return (
     <div className="horizontal-section w-full min-h-screen flex-shrink-0 bg-black flex flex-col md:flex-row relative pb-[calc(20vh+20px)] md:pb-[calc(30vh+20px)]">
@@ -75,13 +94,91 @@ export default function Intro() {
       {/* Marquee Strip */}
       <div className="absolute bottom-0 left-0 w-full h-[20vh] md:h-[30vh] overflow-hidden flex bg-black z-20">
         <div className="animate-marquee flex h-full min-w-max">
-          {[...images, ...images].map((src, i) => (
-            <div key={i} className="h-full aspect-[4/3] relative border-r-4 border-black shrink-0 grayscale hover:grayscale-0 transition-all duration-500">
-              <Image src={src} alt="Slider image" fill unoptimized className="object-cover" />
+          {[...activeProjects, ...activeProjects].map((p, i) => (
+            <div 
+              key={i} 
+              onClick={() => setBlastedProject(p)}
+              className="h-full aspect-[4/3] relative border-r-4 border-black shrink-0 grayscale hover:grayscale-0 transition-all duration-500 cursor-pointer"
+            >
+              <Image src={p.heroImage} alt={p.title} fill unoptimized className="object-cover" />
             </div>
           ))}
         </div>
       </div>
+
+      {/* ── 3-CARD PROJECT PHOTO BLAST OVERLAY ── */}
+      <AnimatePresence>
+        {blastedProject && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center backdrop-blur-md"
+            onClick={() => setBlastedProject(null)} // Click background to close
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setBlastedProject(null)}
+              className="absolute top-8 right-8 text-white/50 hover:text-white text-xs uppercase tracking-widest font-sans transition-colors z-[120] border border-white/20 rounded-full px-4 py-2 bg-black/40"
+            >
+              Close [X]
+            </button>
+
+            {/* Floating Title of the Blasted Project */}
+            <div className="absolute top-20 left-1/2 -translate-x-1/2 text-center pointer-events-none z-[110] w-full px-4">
+              <h2 className="font-serif text-3xl md:text-5xl text-white mb-2 drop-shadow-md">
+                {blastedProject.title}
+              </h2>
+              <p className="font-sans text-[10px] uppercase tracking-widest text-[#F59E0B]">
+                Drag cards to explore  ·  Click anywhere to exit
+              </p>
+            </div>
+
+            {/* Stacked Cards Container */}
+            <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
+              {blastImages.map((src, idx) => {
+                const pos = blastPositions3[idx];
+                return (
+                  <motion.div
+                    key={`${blastedProject.id}-card-${idx}`}
+                    initial={{ opacity: 0, scale: 0.1, x: 0, y: 0, rotate: 0 }}
+                    animate={{
+                      opacity: 1,
+                      scale: 1,
+                      x: pos.x,
+                      y: pos.y,
+                      rotate: pos.rotate,
+                      transition: {
+                        delay: idx * 0.15,
+                        type: "spring",
+                        stiffness: 85,
+                        damping: 13,
+                      },
+                    }}
+                    exit={{ opacity: 0, scale: 0.05, x: 0, y: 0, rotate: 0 }}
+                    drag
+                    dragConstraints={{ left: -450, right: 450, top: -250, bottom: 250 }}
+                    dragElastic={0.12}
+                    whileDrag={{ scale: 1.08, zIndex: 150, cursor: "grabbing" }}
+                    whileHover={{ scale: 1.04, cursor: "grab" }}
+                    onClick={(e) => e.stopPropagation()} // Prevent background closing when clicking a card
+                    className="absolute w-44 h-56 md:w-56 md:h-72 shadow-2xl rounded-2xl overflow-hidden bg-gray-900 border border-white/20"
+                    style={{ zIndex: idx + 10 }}
+                  >
+                    <Image
+                      src={src}
+                      alt={`${blastedProject.title} image ${idx + 1}`}
+                      fill
+                      unoptimized
+                      className="object-cover pointer-events-none"
+                    />
+                  </motion.div>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
