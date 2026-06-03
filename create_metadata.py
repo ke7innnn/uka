@@ -16,20 +16,20 @@ TOWER_SLOTS = [
     {"title": "IDBI Commercial Hub", "folder": "idbi", "cat": "Commercial", "side": "L", "indices": (0, [1, 2])},
     {"title": "Karari Heights", "folder": "karari heights (Yamuna Satkar)", "cat": "Residential", "side": "R", "indices": (0, [1, 2, 3])},
     {"title": "Mulgaon Residency", "folder": "mulgaon", "cat": "Residential", "side": "L", "indices": (0, [1, 2])},
-    {"title": "New Narmada Satyam (Wing A)", "folder": "new narmada satyam", "cat": "Residential", "side": "R", "indices": (0, [1, 2, 3])},
+    {"title": "New Narmada Satyam", "folder": "new narmada satyam", "cat": "Residential", "side": "R", "indices": (0, [1, 2, 3])},
     {"title": "Shani Mandir Plaza", "folder": "shani mandir", "cat": "Commercial", "side": "L", "indices": (0, [1, 2, 3, 4])},
     {"title": "Vishal View", "folder": "vishal view", "cat": "Residential", "side": "R", "indices": (0, [1, 2, 3, 4])},
-    {"title": "Yashawant Kasturi (Wing A)", "folder": "yashawant kasturi", "cat": "Residential", "side": "L", "indices": (0, [1, 2, 3, 5])},
+    {"title": "Yashawant Kasturi", "folder": "yashawant kasturi", "cat": "Residential", "side": "L", "indices": (0, [1, 2, 3, 5])},
     {"title": "Narangi Residency", "folder": "Renders Images/naringi 2", "cat": "Residential", "side": "R", "indices": (0, [1, 2])},
     {"title": "Chandresh Heights", "folder": "chandresh ", "cat": "Residential", "side": "L", "indices": (1, [2, 0]), "isComingSoon": True},
-    {"title": "New Narmada Satyam (Wing B)", "folder": "new narmada satyam", "cat": "Residential", "side": "R", "indices": (4, [5, 6]), "isComingSoon": True},
+    {"title": "New Narmada Satyam", "folder": "new narmada satyam", "cat": "Residential", "side": "R", "indices": (4, [5, 6]), "isComingSoon": True},
     {"title": "IDBI Corporate Suites", "folder": "idbi", "cat": "Corporate", "side": "L", "indices": (3, [4, 1]), "isComingSoon": True},
-    {"title": "Yashawant Kasturi (Wing B)", "folder": "yashawant kasturi", "cat": "Residential", "side": "R", "indices": (4, [6, 7, 8]), "isComingSoon": True},
+    {"title": "Yashawant Kasturi", "folder": "yashawant kasturi", "cat": "Residential", "side": "R", "indices": (4, [6, 7, 8]), "isComingSoon": True},
     {"title": "Parnaka Plaza", "folder": "Parnaka", "cat": "Residential", "side": "L", "indices": (6, [7, 8, 9]), "isComingSoon": True},
-    {"title": "Arunoday Phase 2", "folder": "Arunoday", "cat": "Residential", "side": "R", "indices": (1, [2, 0]), "isComingSoon": True},
-    {"title": "Mulgaon Phase 2", "folder": "mulgaon", "cat": "Residential", "side": "L", "indices": (3, [1, 2]), "isComingSoon": True},
-    {"title": "Happy Villa (Wing B)", "folder": "happy villa", "cat": "Residential", "side": "R", "indices": (3, [1, 2]), "isComingSoon": True},
-    {"title": "Gurudarshan Phase 2", "folder": "Gurudarshan", "cat": "Residential", "side": "L", "indices": (1, [2, 0]), "isComingSoon": True}
+    {"title": "Arunoday", "folder": "Arunoday", "cat": "Residential", "side": "R", "indices": (1, [2, 0]), "isComingSoon": True},
+    {"title": "Mulgaon", "folder": "mulgaon", "cat": "Residential", "side": "L", "indices": (3, [1, 2]), "isComingSoon": True},
+    {"title": "Happy Villa", "folder": "happy villa", "cat": "Residential", "side": "R", "indices": (3, [1, 2]), "isComingSoon": True},
+    {"title": "Gurudarshan", "folder": "Gurudarshan", "cat": "Residential", "side": "L", "indices": (1, [2, 0]), "isComingSoon": True}
 ]
 
 def make_slug(title):
@@ -40,6 +40,8 @@ def scan_folder_images(folder_name):
     imgs = []
     if os.path.exists(path):
         for root, dirs, files in os.walk(path):
+            if "color option" in root:
+                continue
             for f in sorted(files):
                 if f.lower().endswith(('.png', '.jpg', '.jpeg', '.webp')):
                     if not f.startswith('.') and 'thumb' not in f.lower():

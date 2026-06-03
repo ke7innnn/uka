@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import gsap from "gsap";
@@ -87,16 +88,20 @@ export default function TitularOrganist() {
           ))}
         </h2>
 
-        <motion.a
-          href="#"
+        <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 1, delay: 0.8 }}
           viewport={{ once: true }}
-          className="font-sans text-xs uppercase tracking-widest border-b border-white/30 pb-1 self-start hover:border-white transition-colors"
+          className="self-start"
         >
-          Visit project page of Umesh →
-        </motion.a>
+          <Link
+            href="/projects"
+            className="font-sans text-xs uppercase tracking-widest border-b border-white/30 pb-1 hover:border-white transition-colors"
+          >
+            Visit project page of Umesh →
+          </Link>
+        </motion.div>
       </div>
 
       <div className="flex-1 grid grid-cols-2 grid-rows-2 h-1/2 md:h-full mt-12 md:mt-0">

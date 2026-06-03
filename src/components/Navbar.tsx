@@ -8,13 +8,9 @@ import Link from "next/link";
 
 const navLinks = [
   { id: "/", num: "", title: "Home" },
-  { id: "/projects", num: "1.", title: "Projects 1" },
-  { id: "/projects-2", num: "2.", title: "Projects 2" },
-  { id: "#concert-organist", num: "3.", title: "The Architect" },
-  { id: "#recording-artist", num: "4.", title: "Architect" },
-  { id: "#organ-professor", num: "5.", title: "About Umesh Kekre" },
-  { id: "#author-composer", num: "6.", title: "Architect & Designer" },
-  { id: "#goodies-contact", num: "7.", title: "Resources & Contact" },
+  { id: "/projects", num: "1.", title: "Projects" },
+  { id: "#organ-professor", num: "2.", title: "About Umesh Kekre" },
+  { id: "#goodies-contact", num: "3.", title: "Resources & Contact" },
 ];
 
 export default function Navbar() {
@@ -60,13 +56,13 @@ export default function Navbar() {
     }, 500);
   };
 
-  const isWhiteBgPage = pathname && (pathname.startsWith("/projects-2/") || pathname.startsWith("/projects/"));
+  const isWhiteBgPage = pathname && pathname.startsWith("/projects/");
 
   return (
     <>
       <Link 
         href="/" 
-        className="fixed top-8 left-8 md:left-12 z-50 hover:opacity-70 transition-opacity"
+        className="fixed top-8 left-4 md:left-6 z-50 hover:opacity-70 transition-opacity"
         style={{
           transform: visible ? "translateY(0)" : "translateY(-200px)",
           transition: "transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s"
@@ -75,7 +71,7 @@ export default function Navbar() {
         <img 
           src={isWhiteBgPage ? "/logo%20new/black%20logo.png" : "/logo%20new/white%20logo.png"} 
           alt="Umesh Kekre & Associates" 
-          className="h-[60px] md:h-[75px] w-auto object-contain" 
+          className="h-[90px] md:h-[112px] w-auto object-contain" 
         />
       </Link>
 

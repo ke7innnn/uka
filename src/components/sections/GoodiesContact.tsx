@@ -92,14 +92,14 @@ export default function GoodiesContact() {
           </div>
 
           <motion.a
-            href="mailto:info@umeshkekre.com"
+            href="mailto:umesh.s.kekre@gmail.com"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             transition={{ duration: 1, delay: 1 }}
             viewport={{ once: true }}
             className="font-sans text-lg md:text-2xl border-b border-white pb-1 hover:text-gray-400 hover:border-gray-400 transition-colors"
           >
-            info[at]umeshkekre.com
+            umesh.s.kekre@gmail.com
           </motion.a>
         </div>
 

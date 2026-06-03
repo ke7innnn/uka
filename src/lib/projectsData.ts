@@ -273,23 +273,20 @@ export const PROJECTS_DATA: Project[] = [
   },
   {
     "id": 12,
-    "title": "New Narmada Satyam (Wing A)",
+    "title": "New Narmada Satyam",
     "cat": "Residential",
-    "slug": "new-narmada-satyam-wing-a",
+    "slug": "new-narmada-satyam",
     "side": "R",
     "heroImage": "/project photos/photos and video/new narmada satyam/1.jpg",
     "gallery": [
       "/project photos/photos and video/new narmada satyam/2.jpg",
       "/project photos/photos and video/new narmada satyam/Bird Eye View A _01.jpg.jpeg",
-      "/project photos/photos and video/new narmada satyam/Bird Eye View A copy.jpg.jpeg"
+      "/project photos/photos and video/new narmada satyam/WhatsApp Image 2025-03-10 at 9.05.14 AM.jpg.jpeg"
     ],
     "images": [
       "/project photos/photos and video/new narmada satyam/1.jpg",
       "/project photos/photos and video/new narmada satyam/2.jpg",
       "/project photos/photos and video/new narmada satyam/Bird Eye View A _01.jpg.jpeg",
-      "/project photos/photos and video/new narmada satyam/Bird Eye View A copy.jpg.jpeg",
-      "/project photos/photos and video/new narmada satyam/WhatsApp Image 2025-03-10 at 9.05.14 AM (1).jpg.jpeg",
-      "/project photos/photos and video/new narmada satyam/WhatsApp Image 2025-03-10 at 9.05.14 AM (2).jpg.jpeg",
       "/project photos/photos and video/new narmada satyam/WhatsApp Image 2025-03-10 at 9.05.14 AM.jpg.jpeg"
     ],
     "location": "Mumbai, India",
@@ -349,36 +346,22 @@ export const PROJECTS_DATA: Project[] = [
   },
   {
     "id": 15,
-    "title": "Yashawant Kasturi (Wing A)",
+    "title": "Yashawant Kasturi",
     "cat": "Residential",
-    "slug": "yashawant-kasturi-wing-a",
+    "slug": "yashawant-kasturi",
     "side": "L",
     "heroImage": "/project photos/photos and video/yashawant kasturi/Back Side View B.jpg.jpeg",
     "gallery": [
       "/project photos/photos and video/yashawant kasturi/Bird Eye View Night_01.jpg.jpeg",
       "/project photos/photos and video/yashawant kasturi/Day view_A__02.jpg.jpeg",
       "/project photos/photos and video/yashawant kasturi/Night View A.jpg.jpeg",
-      "/project photos/photos and video/yashawant kasturi/sky grey front.jpg"
+      "/project photos/photos and video/yashawant kasturi/Bird Eye View Night_01.jpg.jpeg"
     ],
     "images": [
       "/project photos/photos and video/yashawant kasturi/Back Side View B.jpg.jpeg",
       "/project photos/photos and video/yashawant kasturi/Bird Eye View Night_01.jpg.jpeg",
       "/project photos/photos and video/yashawant kasturi/Day view_A__02.jpg.jpeg",
-      "/project photos/photos and video/yashawant kasturi/Night View A.jpg.jpeg",
-      "/project photos/photos and video/yashawant kasturi/sky grey back view.jpg",
-      "/project photos/photos and video/yashawant kasturi/sky grey front.jpg",
-      "/project photos/photos and video/yashawant kasturi/sky grey night.jpg",
-      "/project photos/photos and video/yashawant kasturi/sky grey worm eye.jpg",
-      "/project photos/photos and video/yashawant kasturi/sky grey.jpg",
-      "/project photos/photos and video/yashawant kasturi/color option/dark brown (luxury style).jpg",
-      "/project photos/photos and video/yashawant kasturi/color option/dark brown night (luxury style).jpg",
-      "/project photos/photos and video/yashawant kasturi/color option/light grey (modern premium).jpg",
-      "/project photos/photos and video/yashawant kasturi/color option/light grey night (modern premium).jpg",
-      "/project photos/photos and video/yashawant kasturi/color option/sage green (Trending Shade).jpg",
-      "/project photos/photos and video/yashawant kasturi/color option/sage green night (Trending Shade ).jpg",
-      "/project photos/photos and video/yashawant kasturi/color option/sky grey (Simple Elegant).jpg",
-      "/project photos/photos and video/yashawant kasturi/color option/sky grey night (Simple Elegant).jpg",
-      "/project photos/photos and video/yashawant kasturi/color option/sky grey night bird view.jpg"
+      "/project photos/photos and video/yashawant kasturi/Night View A.jpg.jpeg"
     ],
     "location": "Mumbai, India",
     "year": "2024",
@@ -432,22 +415,19 @@ export const PROJECTS_DATA: Project[] = [
   },
   {
     "id": 18,
-    "title": "New Narmada Satyam (Wing B)",
+    "title": "New Narmada Satyam",
     "cat": "Residential",
-    "slug": "new-narmada-satyam-wing-b",
+    "slug": "new-narmada-satyam",
     "side": "R",
-    "heroImage": "/project photos/photos and video/new narmada satyam/WhatsApp Image 2025-03-10 at 9.05.14 AM (1).jpg.jpeg",
+    "heroImage": "/project photos/photos and video/new narmada satyam/1.jpg",
     "gallery": [
-      "/project photos/photos and video/new narmada satyam/WhatsApp Image 2025-03-10 at 9.05.14 AM (2).jpg.jpeg",
-      "/project photos/photos and video/new narmada satyam/WhatsApp Image 2025-03-10 at 9.05.14 AM.jpg.jpeg"
+      "/project photos/photos and video/new narmada satyam/2.jpg",
+      "/project photos/photos and video/new narmada satyam/Bird Eye View A _01.jpg.jpeg"
     ],
     "images": [
       "/project photos/photos and video/new narmada satyam/1.jpg",
       "/project photos/photos and video/new narmada satyam/2.jpg",
       "/project photos/photos and video/new narmada satyam/Bird Eye View A _01.jpg.jpeg",
-      "/project photos/photos and video/new narmada satyam/Bird Eye View A copy.jpg.jpeg",
-      "/project photos/photos and video/new narmada satyam/WhatsApp Image 2025-03-10 at 9.05.14 AM (1).jpg.jpeg",
-      "/project photos/photos and video/new narmada satyam/WhatsApp Image 2025-03-10 at 9.05.14 AM (2).jpg.jpeg",
       "/project photos/photos and video/new narmada satyam/WhatsApp Image 2025-03-10 at 9.05.14 AM.jpg.jpeg"
     ],
     "location": "Mumbai, India",
@@ -482,35 +462,21 @@ export const PROJECTS_DATA: Project[] = [
   },
   {
     "id": 20,
-    "title": "Yashawant Kasturi (Wing B)",
+    "title": "Yashawant Kasturi",
     "cat": "Residential",
-    "slug": "yashawant-kasturi-wing-b",
+    "slug": "yashawant-kasturi",
     "side": "R",
-    "heroImage": "/project photos/photos and video/yashawant kasturi/sky grey back view.jpg",
+    "heroImage": "/project photos/photos and video/yashawant kasturi/Back Side View B.jpg.jpeg",
     "gallery": [
-      "/project photos/photos and video/yashawant kasturi/sky grey night.jpg",
-      "/project photos/photos and video/yashawant kasturi/sky grey worm eye.jpg",
-      "/project photos/photos and video/yashawant kasturi/sky grey.jpg"
+      "/project photos/photos and video/yashawant kasturi/Day view_A__02.jpg.jpeg",
+      "/project photos/photos and video/yashawant kasturi/Night View A.jpg.jpeg",
+      "/project photos/photos and video/yashawant kasturi/Back Side View B.jpg.jpeg"
     ],
     "images": [
       "/project photos/photos and video/yashawant kasturi/Back Side View B.jpg.jpeg",
       "/project photos/photos and video/yashawant kasturi/Bird Eye View Night_01.jpg.jpeg",
       "/project photos/photos and video/yashawant kasturi/Day view_A__02.jpg.jpeg",
-      "/project photos/photos and video/yashawant kasturi/Night View A.jpg.jpeg",
-      "/project photos/photos and video/yashawant kasturi/sky grey back view.jpg",
-      "/project photos/photos and video/yashawant kasturi/sky grey front.jpg",
-      "/project photos/photos and video/yashawant kasturi/sky grey night.jpg",
-      "/project photos/photos and video/yashawant kasturi/sky grey worm eye.jpg",
-      "/project photos/photos and video/yashawant kasturi/sky grey.jpg",
-      "/project photos/photos and video/yashawant kasturi/color option/dark brown (luxury style).jpg",
-      "/project photos/photos and video/yashawant kasturi/color option/dark brown night (luxury style).jpg",
-      "/project photos/photos and video/yashawant kasturi/color option/light grey (modern premium).jpg",
-      "/project photos/photos and video/yashawant kasturi/color option/light grey night (modern premium).jpg",
-      "/project photos/photos and video/yashawant kasturi/color option/sage green (Trending Shade).jpg",
-      "/project photos/photos and video/yashawant kasturi/color option/sage green night (Trending Shade ).jpg",
-      "/project photos/photos and video/yashawant kasturi/color option/sky grey (Simple Elegant).jpg",
-      "/project photos/photos and video/yashawant kasturi/color option/sky grey night (Simple Elegant).jpg",
-      "/project photos/photos and video/yashawant kasturi/color option/sky grey night bird view.jpg"
+      "/project photos/photos and video/yashawant kasturi/Night View A.jpg.jpeg"
     ],
     "location": "Mumbai, India",
     "year": "2024",
@@ -559,9 +525,9 @@ export const PROJECTS_DATA: Project[] = [
   },
   {
     "id": 22,
-    "title": "Arunoday Phase 2",
+    "title": "Arunoday",
     "cat": "Residential",
-    "slug": "arunoday-phase-2",
+    "slug": "arunoday",
     "side": "R",
     "heroImage": "/project photos/photos and video/Arunoday/arunoday 1/2.jpg",
     "gallery": [
@@ -581,9 +547,9 @@ export const PROJECTS_DATA: Project[] = [
   },
   {
     "id": 23,
-    "title": "Mulgaon Phase 2",
+    "title": "Mulgaon",
     "cat": "Residential",
-    "slug": "mulgaon-phase-2",
+    "slug": "mulgaon",
     "side": "L",
     "heroImage": "/project photos/photos and video/mulgaon/Worm Eye View.jpg (3).jpeg",
     "gallery": [
@@ -604,9 +570,9 @@ export const PROJECTS_DATA: Project[] = [
   },
   {
     "id": 24,
-    "title": "Happy Villa (Wing B)",
+    "title": "Happy Villa",
     "cat": "Residential",
-    "slug": "happy-villa-wing-b",
+    "slug": "happy-villa",
     "side": "R",
     "heroImage": "/project photos/photos and video/happy villa/draft 03.jpg.jpeg",
     "gallery": [
@@ -627,9 +593,9 @@ export const PROJECTS_DATA: Project[] = [
   },
   {
     "id": 25,
-    "title": "Gurudarshan Phase 2",
+    "title": "Gurudarshan",
     "cat": "Residential",
-    "slug": "gurudarshan-phase-2",
+    "slug": "gurudarshan",
     "side": "L",
     "heroImage": "/project photos/photos and video/Gurudarshan/guru/2.jpg",
     "gallery": [
