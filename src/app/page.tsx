@@ -1,7 +1,6 @@
 
 import Hero from "@/components/sections/Hero";
 import Intro from "@/components/sections/Intro";
-import ConcertOrganist from "@/components/sections/ConcertOrganist";
 import InteractiveDots from "@/components/sections/InteractiveDots";
 import RecordingArtist from "@/components/sections/RecordingArtist";
 import TitularOrganist from "@/components/sections/TitularOrganist";
@@ -18,7 +17,6 @@ export default function Home() {
         <Hero />
 
         <Intro />
-        <ConcertOrganist />
         <InteractiveDots />
         <RecordingArtist />
         <TitularOrganist />
