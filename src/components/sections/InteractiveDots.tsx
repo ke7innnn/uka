@@ -6,15 +6,9 @@ import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 
-const images = [
-  "/loop photos/img1.jpeg",
-  "/loop photos/img2.jpeg",
-  "/loop photos/img3.jpeg",
-  "/loop photos/img4.jpeg",
-  "/loop photos/img5.jpeg",
-  "/loop photos/img6.jpeg",
-  "/loop photos/img7.jpeg",
-];
+import { PROJECTS_DATA } from "@/lib/projectsData";
+
+const images = PROJECTS_DATA.filter(p => !p.isComingSoon).map(p => p.heroImage);
 
 // Positions tuned to stay well inside the viewport on all screens
 const blastPositions = [

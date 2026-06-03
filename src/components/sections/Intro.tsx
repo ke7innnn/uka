@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { PROJECTS_DATA } from "@/lib/projectsData";
 
 const quotes = [
   { text: "A master of spatial harmony and sustainable design.", author: "Architectural Digest" },
@@ -12,15 +13,7 @@ const quotes = [
 const bioText = "Umesh Kekre is a visionary architect and principal designer at Umesh Kekre & Associates. With over two decades of experience in shaping environments, he leads a practice dedicated to innovative, sustainable, and context-driven design. His portfolio spans residential, commercial, and institutional projects, each characterized by a profound respect for materials, natural light, and the human experience.";
 
 export default function Intro() {
-  const images = [
-    "/loop photos/img1.jpeg",
-    "/loop photos/img2.jpeg",
-    "/loop photos/img3.jpeg",
-    "/loop photos/img4.jpeg",
-    "/loop photos/img5.jpeg",
-    "/loop photos/img6.jpeg",
-    "/loop photos/img7.jpeg",
-  ];
+  const images = PROJECTS_DATA.filter(p => !p.isComingSoon).map(p => p.heroImage);
 
   return (
     <div className="horizontal-section w-full min-h-screen flex-shrink-0 bg-black flex flex-col md:flex-row relative pb-[calc(20vh+20px)] md:pb-[calc(30vh+20px)]">
