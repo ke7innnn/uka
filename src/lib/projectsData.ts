@@ -12,6 +12,7 @@ export interface Project {
   year: string;
   area: string;
   status: string;
+  isComingSoon?: boolean;
 }
 
 export const PROJECTS_DATA: Project[] = [
@@ -386,35 +387,21 @@ export const PROJECTS_DATA: Project[] = [
   },
   {
     "id": 16,
-    "title": "Parnaka Heights",
+    "title": "Narangi Residency",
     "cat": "Residential",
-    "slug": "parnaka-heights",
+    "slug": "narangi-residency",
     "side": "R",
-    "heroImage": "/project photos/photos and video/Parnaka/3.jpg",
+    "heroImage": "/project photos/photos and video/Renders Images/naringi 2/Back Side View_Narangi.jpg.jpeg",
     "gallery": [
-      "/project photos/photos and video/Parnaka/4.jpg",
-      "/project photos/photos and video/Parnaka/5.jpg"
+      "/project photos/photos and video/Renders Images/naringi 2/IMG_1366.JPG.jpeg",
+      "/project photos/photos and video/Renders Images/naringi 2/IMG_1367.JPG.jpeg"
     ],
     "images": [
-      "/project photos/photos and video/Parnaka/1.jpg",
-      "/project photos/photos and video/Parnaka/10.jpg",
-      "/project photos/photos and video/Parnaka/2.jpg",
-      "/project photos/photos and video/Parnaka/3.jpg",
-      "/project photos/photos and video/Parnaka/4.jpg",
-      "/project photos/photos and video/Parnaka/5.jpg",
-      "/project photos/photos and video/Parnaka/6.jpg",
-      "/project photos/photos and video/Parnaka/7.jpg",
-      "/project photos/photos and video/Parnaka/8.jpg",
-      "/project photos/photos and video/Parnaka/9.jpg",
-      "/project photos/photos and video/Parnaka/WhatsApp Image 2026-03-24 at 13.05.14.jpeg",
-      "/project photos/photos and video/Parnaka/WhatsApp Image 2026-03-24 at 13.16.51 (1).jpeg",
-      "/project photos/photos and video/Parnaka/WhatsApp Image 2026-03-24 at 13.16.51 (2).jpeg",
-      "/project photos/photos and video/Parnaka/WhatsApp Image 2026-03-24 at 13.16.51.jpeg",
-      "/project photos/photos and video/Parnaka/WhatsApp Image 2026-03-24 at 13.48.01 (1).jpeg",
-      "/project photos/photos and video/Parnaka/WhatsApp Image 2026-03-24 at 13.48.01.jpeg",
-      "/project photos/photos and video/Parnaka/WhatsApp Image 2026-03-24 at 13.48.28 (1).jpeg",
-      "/project photos/photos and video/Parnaka/WhatsApp Image 2026-03-24 at 13.48.28 (2).jpeg",
-      "/project photos/photos and video/Parnaka/WhatsApp Image 2026-03-24 at 13.48.28.jpeg"
+      "/project photos/photos and video/Renders Images/naringi 2/Back Side View_Narangi.jpg.jpeg",
+      "/project photos/photos and video/Renders Images/naringi 2/IMG_1366.JPG.jpeg",
+      "/project photos/photos and video/Renders Images/naringi 2/IMG_1367.JPG.jpeg",
+      "/project photos/photos and video/Renders Images/naringi 2/IMG_1368.JPG.jpeg",
+      "/project photos/photos and video/Renders Images/naringi 2/IMG_1369.JPG.jpeg"
     ],
     "location": "Mumbai, India",
     "year": "2024",
@@ -440,7 +427,8 @@ export const PROJECTS_DATA: Project[] = [
     "location": "Mumbai, India",
     "year": "2024",
     "area": "15,000 sq.ft",
-    "status": "Completed"
+    "status": "Completed",
+    "isComingSoon": true
   },
   {
     "id": 18,
@@ -465,7 +453,8 @@ export const PROJECTS_DATA: Project[] = [
     "location": "Mumbai, India",
     "year": "2024",
     "area": "15,000 sq.ft",
-    "status": "Completed"
+    "status": "Completed",
+    "isComingSoon": true
   },
   {
     "id": 19,
@@ -488,7 +477,8 @@ export const PROJECTS_DATA: Project[] = [
     "location": "Mumbai, India",
     "year": "2024",
     "area": "15,000 sq.ft",
-    "status": "Completed"
+    "status": "Completed",
+    "isComingSoon": true
   },
   {
     "id": 20,
@@ -525,7 +515,8 @@ export const PROJECTS_DATA: Project[] = [
     "location": "Mumbai, India",
     "year": "2024",
     "area": "15,000 sq.ft",
-    "status": "Completed"
+    "status": "Completed",
+    "isComingSoon": true
   },
   {
     "id": 21,
@@ -563,7 +554,8 @@ export const PROJECTS_DATA: Project[] = [
     "location": "Mumbai, India",
     "year": "2024",
     "area": "15,000 sq.ft",
-    "status": "Completed"
+    "status": "Completed",
+    "isComingSoon": true
   },
   {
     "id": 22,
@@ -584,7 +576,8 @@ export const PROJECTS_DATA: Project[] = [
     "location": "Mumbai, India",
     "year": "2024",
     "area": "15,000 sq.ft",
-    "status": "Completed"
+    "status": "Completed",
+    "isComingSoon": true
   },
   {
     "id": 23,
@@ -606,7 +599,8 @@ export const PROJECTS_DATA: Project[] = [
     "location": "Mumbai, India",
     "year": "2024",
     "area": "15,000 sq.ft",
-    "status": "Completed"
+    "status": "Completed",
+    "isComingSoon": true
   },
   {
     "id": 24,
@@ -628,7 +622,8 @@ export const PROJECTS_DATA: Project[] = [
     "location": "Mumbai, India",
     "year": "2024",
     "area": "15,000 sq.ft",
-    "status": "Completed"
+    "status": "Completed",
+    "isComingSoon": true
   },
   {
     "id": 25,
@@ -649,6 +644,7 @@ export const PROJECTS_DATA: Project[] = [
     "location": "Mumbai, India",
     "year": "2024",
     "area": "15,000 sq.ft",
-    "status": "Completed"
+    "status": "Completed",
+    "isComingSoon": true
   }
 ];

@@ -16,7 +16,7 @@ export default function ProjectDetail() {
   const slug = params.slug as string;
 
   const project = PROJECTS_DATA.find(p => p.slug === slug);
-  if (!project) {
+  if (!project || project.isComingSoon) {
     notFound();
   }
 

@@ -349,10 +349,14 @@ export default function ProjectsPage() {
                   <rect x="1" y="50" width="191" height="63" fill="url(#card-fade)" />
                   
                   {/* Category text */}
-                  <text x="12" y="85" fill="#ddd" fontSize="7" fontFamily="'Inter', sans-serif" letterSpacing="0.1em">{p.cat.toUpperCase()}</text>
+                  <text x="12" y="85" fill="#ddd" fontSize="7" fontFamily="'Inter', sans-serif" letterSpacing="0.1em">
+                    {p.isComingSoon ? "FUTURE PHASE" : p.cat.toUpperCase()}
+                  </text>
                   
                   {/* Title */}
-                  <text x="12" y="103" fill="#fff" fontSize="13" fontWeight="600" fontFamily="'Inter', sans-serif" letterSpacing="-0.01em">{p.title}</text>
+                  <text x="12" y="103" fill="#fff" fontSize="13" fontWeight="600" fontFamily="'Inter', sans-serif" letterSpacing="-0.01em">
+                    {p.isComingSoon ? "Coming Soon" : p.title}
+                  </text>
                   
                   {/* Light bottom */}
                   <rect x="1" y="113" width="191" height="118" fill="#fcfcfc" rx="2" />
@@ -360,27 +364,39 @@ export default function ProjectsPage() {
                   
                   {/* Metadata Type */}
                   <text x="16" y="138" fill="#888" fontSize="6.5" fontFamily="'Inter', sans-serif" letterSpacing="0.1em">TYPE</text>
-                  <text x="16" y="152" fill="#111" fontSize="10" fontWeight="600" fontFamily="'Inter', sans-serif">{p.cat}</text>
+                  <text x="16" y="152" fill="#111" fontSize="10" fontWeight="600" fontFamily="'Inter', sans-serif">
+                    {p.isComingSoon ? "Upcoming" : p.cat}
+                  </text>
                   
                   {/* Metadata Location */}
                   <text x="100" y="138" fill="#888" fontSize="6.5" fontFamily="'Inter', sans-serif" letterSpacing="0.1em">LOCATION</text>
-                  <text x="100" y="152" fill="#111" fontSize="10" fontWeight="600" fontFamily="'Inter', sans-serif">Mumbai</text>
+                  <text x="100" y="152" fill="#111" fontSize="10" fontWeight="600" fontFamily="'Inter', sans-serif">
+                    {p.isComingSoon ? "—" : "Mumbai"}
+                  </text>
                   
                   {/* Divider line */}
                   <line x1="16" y1="166" x2="177" y2="166" stroke="#eaeaea" strokeWidth="1" />
                   
                   {/* Tags */}
-                  <text x="16" y="184" fill="#666" fontSize="7.5" fontFamily="'Inter', sans-serif"># {p.cat}  ·  # Architecture</text>
+                  <text x="16" y="184" fill="#666" fontSize="7.5" fontFamily="'Inter', sans-serif">
+                    {p.isComingSoon ? "# ComingSoon  ·  # UKA" : `# ${p.cat}  ·  # Architecture`}
+                  </text>
                   
                   {/* Footer: Status */}
-                  <circle cx="18" cy="214" r="2.5" fill="#22c55e" />
-                  <text x="25" y="216.5" fill="#555" fontSize="7.5" fontFamily="'Inter', sans-serif">Completed</text>
+                  <circle cx="18" cy="214" r="2.5" fill={p.isComingSoon ? "#f59e0b" : "#22c55e"} />
+                  <text x="25" y="216.5" fill="#555" fontSize="7.5" fontFamily="'Inter', sans-serif">
+                    {p.isComingSoon ? "In Pipeline" : "Completed"}
+                  </text>
                   
                   {/* Footer: View project */}
-                  <text x="177" y="217" fill="#F59E0B" fontSize="8" fontWeight="600" fontFamily="'Inter', sans-serif" textAnchor="end" style={{ cursor: "pointer" }} onClick={(e) => { e.stopPropagation(); router.push(`/projects-2/${p.slug}`); }}>View project →</text>
+                  {!p.isComingSoon && (
+                    <text x="177" y="217" fill="#F59E0B" fontSize="8" fontWeight="600" fontFamily="'Inter', sans-serif" textAnchor="end" style={{ cursor: "pointer" }} onClick={(e) => { e.stopPropagation(); router.push(`/projects-2/${p.slug}`); }}>View project →</text>
+                  )}
                   
                   {/* Invisible click target for the CTA */}
-                  <rect x="110" y="200" width="80" height="30" fill="transparent" style={{ cursor: "pointer" }} onClick={(e) => { e.stopPropagation(); router.push(`/projects-2/${p.slug}`); }} />
+                  {!p.isComingSoon && (
+                    <rect x="110" y="200" width="80" height="30" fill="transparent" style={{ cursor: "pointer" }} onClick={(e) => { e.stopPropagation(); router.push(`/projects-2/${p.slug}`); }} />
+                  )}
                 </g>
               )}
             </g>
