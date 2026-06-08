@@ -6,8 +6,32 @@ import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import ParallaxImage from "../ParallaxImage";
 import { motion } from "framer-motion";
 
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.032,
+    }
+  }
+};
+
+const wordVariants = {
+  hidden: {
+    opacity: 0,
+    y: 18,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.7,
+      ease: [0.25, 1, 0.5, 1] as const,
+    }
+  }
+};
+
 export default function AuthorComposer() {
-  const title = "Architect and Designer".split("");
+  const words = "Architect and Designer".split(" ");
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -64,33 +88,50 @@ export default function AuthorComposer() {
       />
 
       <div className="flex-1 flex flex-col justify-center px-8 md:pl-32 md:pr-16 z-10">
-        <div className="mb-12 overflow-visible flex flex-wrap gap-x-2 md:gap-x-4">
-          {title.map((char, i) => (
-            <span
-              key={i}
-              className="jumble-letter font-serif text-4xl md:text-7xl tracking-[0.2em] md:tracking-[0.4em] uppercase inline-block"
-            >
-              {char === " " ? "\u00A0" : char}
+        <div className="mb-12 overflow-visible flex flex-wrap gap-x-4 md:gap-x-6 gap-y-3">
+          {words.map((word, wordIdx) => (
+            <span key={wordIdx} className="inline-block whitespace-nowrap">
+              {word.split("").map((char, charIdx) => (
+                <span
+                  key={charIdx}
+                  className="jumble-letter font-serif text-4xl md:text-7xl tracking-[0.05em] md:tracking-[0.1em] uppercase inline-block"
+                >
+                  {char}
+                </span>
+              ))}
             </span>
           ))}
         </div>
 
         <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          transition={{ duration: 1 }}
-          viewport={{ once: true }}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.15 }}
+          variants={containerVariants}
           className="max-w-xl"
         >
-          <p className="font-sans text-sm md:text-base leading-relaxed text-gray-300 mb-8 italic">
-            &quot;Architecture should speak of its time and place, but yearn for timelessness.&quot; — Frank Gehry. A principle that guides my writing and discourse on the built environment.
+          <p className="font-serif italic text-xl md:text-3xl text-white mb-2 leading-snug">
+            &ldquo;
+            {"Humble beginnings and proud endings!".split(" ").map((word, wi) => (
+              <motion.span
+                key={wi}
+                variants={wordVariants}
+                whileHover={{ y: -4, color: "#e2c97e", transition: { duration: 0.4 } }}
+                className="inline-block mr-[0.22em] cursor-default"
+              >
+                {word}
+              </motion.span>
+            ))}
+            &rdquo;
           </p>
-          <a
-            href="#"
-            className="font-sans text-xs uppercase tracking-widest border-b border-white/30 pb-1 hover:border-white transition-colors"
+          <motion.p
+            variants={wordVariants}
+            className="font-sans text-xs uppercase tracking-widest text-gray-500 transition-all duration-300 hover:tracking-[0.25em] hover:text-[#e2c97e] cursor-default w-fit mb-8"
           >
-            Read Articles →
-          </a>
+            — UMESH KEKRE
+          </motion.p>
+
+
         </motion.div>
       </div>
 
@@ -106,15 +147,20 @@ export default function AuthorComposer() {
           viewport={{ once: true }}
           className="max-w-xl self-end md:self-auto"
         >
-          <p className="font-sans text-sm md:text-base leading-relaxed text-gray-300 mb-8">
-            As an architectural thinker, Umesh Kekre shares his research and design philosophies freely through essays and open-source design modules. He believes that good design principles should be accessible to everyone.
-          </p>
-          <a
-            href="#"
-            className="font-sans text-xs uppercase tracking-widest border-b border-white/30 pb-1 hover:border-white transition-colors"
+          <motion.p
+            whileHover={{ y: -2, color: "#ffffff" }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className="font-serif italic text-lg md:text-2xl text-white mb-3 leading-relaxed cursor-default"
+            style={{ fontFamily: "var(--font-playfair), serif" }}
           >
-            Read Essays →
-          </a>
+            &ldquo;Every client is a reminder that someone believes in your vision&rdquo;
+          </motion.p>
+          <motion.p
+            className="font-sans text-[10px] md:text-xs uppercase tracking-widest text-gray-500 cursor-default mb-8 w-fit hover:text-[#e2c97e] transition-colors duration-300"
+          >
+            — Umesh Kekre
+          </motion.p>
+
         </motion.div>
       </div>
     </div>

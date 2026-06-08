@@ -5,13 +5,34 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { PROJECTS_DATA, Project } from "@/lib/projectsData";
 
-const quotes = [
-  { text: "A master of spatial harmony and sustainable design.", author: "Architectural Digest" },
-  { text: "His spaces don't just exist; they breathe and evolve with their inhabitants.", author: "Design Today" },
-  { text: "An immensely talented architect reshaping modern urban landscapes.", author: "The Blueprint" },
-];
+const quoteText = "Design begins when mind silences and spaces speak!!";
+const quoteAuthor = "Umesh Kekre";
 
-const bioText = "Umesh Kekre is a visionary architect and principal designer at Umesh Kekre & Associates. With over two decades of experience in shaping environments, he leads a practice dedicated to innovative, sustainable, and context-driven design. His portfolio spans residential, commercial, and institutional projects, each characterized by a profound respect for materials, natural light, and the human experience.";
+const bioText = "Umesh Kekre is a rising visionary architect. With over one decade of experience in shaping environments, he leads a practice dedicated to innovative, sustainable, and context-driven design. His portfolio spans residential, commercial, and institutional projects, each characterized by a profound respect for materials, natural light, and the human experience.";
+
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.032,
+    }
+  }
+};
+
+const wordVariants = {
+  hidden: {
+    opacity: 0,
+    y: 18,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.7,
+      ease: [0.25, 1, 0.5, 1] as const,
+    }
+  }
+};
 
 // Target coordinates for blasting 3 cards from the center stack
 const blastPositions3 = [
@@ -45,52 +66,56 @@ export default function Intro() {
         {/* ── Left: bio ── */}
         <div className="flex-1 flex flex-col justify-center px-8 md:px-32 py-4 max-w-3xl">
           <motion.p
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
-            viewport={{ once: true, margin: "-100px" }}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.15 }}
+            variants={containerVariants}
             className="text-lg md:text-2xl leading-relaxed text-gray-300"
             style={{ fontFamily: "var(--font-playfair), serif" }}
           >
             {bioText.split(" ").map((word, i) => (
-              <span
+              <motion.span
                 key={i}
-                className="inline-block mr-[0.25em] transition-all duration-[400ms] ease-out hover:-translate-y-[3px] hover:text-[#e2c97e]"
+                variants={wordVariants}
+                whileHover={{ y: -3, color: "#e2c97e", transition: { duration: 0.4 } }}
+                className="inline-block mr-[0.25em] cursor-default"
               >
                 {word}
-              </span>
+              </motion.span>
             ))}
           </motion.p>
         </div>
 
         {/* ── Right: quotes ── */}
-        <div className="flex-1 flex flex-col justify-center px-8 md:px-20 gap-6 md:gap-12 pb-4 md:pb-0">
-          {quotes.map((quote, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 1, delay: i * 0.2 }}
-              viewport={{ once: true }}
-              className={`flex flex-col ${i === 1 ? "md:ml-16" : ""}`}
+        <div className="flex-1 flex flex-col justify-center px-8 md:px-32 pb-4 md:pb-0 max-w-3xl">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.15 }}
+            variants={containerVariants}
+            className="flex flex-col"
+          >
+            <p className="font-serif italic text-xl md:text-3xl text-white mb-2 leading-snug">
+              &ldquo;
+              {quoteText.split(" ").map((word, wi) => (
+                <motion.span
+                  key={wi}
+                  variants={wordVariants}
+                  whileHover={{ y: -4, color: "#e2c97e", transition: { duration: 0.4 } }}
+                  className="inline-block mr-[0.22em] cursor-default"
+                >
+                  {word}
+                </motion.span>
+              ))}
+              &rdquo;
+            </p>
+            <motion.p
+              variants={wordVariants}
+              className="font-sans text-xs uppercase tracking-widest text-gray-500 transition-all duration-300 hover:tracking-[0.25em] hover:text-[#e2c97e] cursor-default w-fit"
             >
-              <p className="font-serif italic text-xl md:text-3xl text-white mb-1 leading-snug">
-                &quot;
-                {quote.text.split(" ").map((word, wi) => (
-                  <span
-                    key={wi}
-                    className="inline-block mr-[0.22em] transition-all duration-[400ms] ease-out hover:-translate-y-[4px] hover:text-[#e2c97e]"
-                  >
-                    {word}
-                  </span>
-                ))}
-                &quot;
-              </p>
-              <p className="font-sans text-xs uppercase tracking-widest text-gray-500 transition-all duration-300 hover:tracking-[0.25em] hover:text-[#e2c97e] cursor-default w-fit">
-                — {quote.author}
-              </p>
-            </motion.div>
-          ))}
+              — {quoteAuthor}
+            </motion.p>
+          </motion.div>
         </div>
       </div>
 

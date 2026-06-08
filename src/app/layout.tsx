@@ -24,7 +24,7 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   title: "Umesh Kekre & Associates | Architect",
-  description: "Visionary architect and principal designer at Umesh Kekre & Associates.",
+  description: "Rising visionary architect at Umesh Kekre & Associates.",
 };
 
 export default function RootLayout({

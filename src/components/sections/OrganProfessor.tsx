@@ -7,25 +7,22 @@ import ParallaxImage from "../ParallaxImage";
 import { motion } from "framer-motion";
 
 export default function OrganProfessor() {
-  const title = "About Umesh Kekre".split("");
+  const words = "About Umesh Kekre".split(" ");
   const containerRef = useRef<HTMLDivElement>(null);
-  
-  const currentInterns = [
-    "Guy-Baptiste Jaccottet (Junior Architect)",
-    "Loïc Burki (Design Intern)",
-    "Corentin d'Andrès (Junior Architect)",
-    "Anastasia Dukhareva (Design Intern)",
-    "Basil Herold (Design Intern)",
-    "Émile Sécheret (Draftsman)",
-    "Hadrien Fournier (Design Intern)",
+
+  const teamMembers = [
+    "Liasoning heads - Mr. Nihal Gharat (B.A.L.L.B) and Mr. Vijay Palkar (B.A.L.L.B)",
+    "Structural engineering and Site Assistance - Mr. Crystal Nadar (B.E.Civil) and team",
+    "3D visualisation team - Mr. Alpesh Bari and Mr. Chirag Moolya",
+    "Designing heads and Co-Architect - Mr. Uday Arekar and Ms. Tanvi Vichare (B.Arch)",
   ];
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
     if (!containerRef.current) return;
-    
+
     const letters = containerRef.current.querySelectorAll('.jumble-letter');
-    
+
     gsap.set(letters, {
       opacity: 0,
       x: () => (Math.random() - 0.5) * 400,
@@ -64,18 +61,22 @@ export default function OrganProfessor() {
         4.
       </div>
 
-      <div className="w-full md:w-1/2 h-1/2 md:h-full relative overflow-hidden">
+      <div className="w-full md:w-1/2 h-1/2 md:h-full relative overflow-hidden p-8 md:p-16 lg:p-24">
         <ParallaxImage src="/main umesh folder/umesh.jpeg" alt="Umesh Kekre" className="w-full h-full" />
       </div>
 
       <div className="w-full md:w-1/2 flex flex-col justify-center px-8 md:px-24 h-1/2 md:h-full z-10 bg-black/80 md:bg-transparent">
-        <div className="mb-12 overflow-visible flex flex-wrap gap-x-2 md:gap-x-4">
-          {title.map((char, i) => (
-            <span
-              key={i}
-              className="jumble-letter font-serif text-4xl md:text-7xl tracking-[0.2em] md:tracking-[0.4em] uppercase inline-block"
-            >
-              {char === " " ? "\u00A0" : char}
+        <div className="mb-12 overflow-visible flex flex-wrap gap-x-4 md:gap-x-6 gap-y-3">
+          {words.map((word, wordIdx) => (
+            <span key={wordIdx} className="inline-block whitespace-nowrap">
+              {word.split("").map((char, charIdx) => (
+                <span
+                  key={charIdx}
+                  className="jumble-letter font-serif text-4xl md:text-7xl tracking-[0.05em] md:tracking-[0.1em] uppercase inline-block"
+                >
+                  {char}
+                </span>
+              ))}
             </span>
           ))}
         </div>
@@ -92,9 +93,9 @@ export default function OrganProfessor() {
 
         <div className="flex flex-col md:flex-row gap-8 md:gap-16">
           <div>
-            <h3 className="font-sans text-xs uppercase tracking-widest text-gray-500 mb-6 border-b border-gray-800 pb-2">Current Interns</h3>
+            <h3 className="font-sans text-xs uppercase tracking-widest text-gray-500 mb-6 border-b border-gray-800 pb-2">Our Team</h3>
             <ul className="flex flex-col gap-3">
-              {currentInterns.map((student, i) => (
+              {teamMembers.map((member, i) => (
                 <motion.li
                   key={i}
                   initial={{ opacity: 0, x: -10 }}
@@ -103,27 +104,10 @@ export default function OrganProfessor() {
                   viewport={{ once: true }}
                   className="font-sans text-xs text-gray-300"
                 >
-                  {student}
+                  {member}
                 </motion.li>
               ))}
             </ul>
-          </div>
-          
-          <div className="flex flex-col items-start justify-end mt-8 md:mt-0">
-            <h3 className="font-sans text-xs uppercase tracking-widest text-gray-500 mb-6 border-b border-gray-800 pb-2 w-full">Alumni</h3>
-            <p className="font-sans text-xs text-gray-400 italic mb-8">View complete list online</p>
-            <motion.a
-              href="#"
-              target="_blank"
-              rel="noopener noreferrer"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ duration: 1 }}
-              viewport={{ once: true }}
-              className="px-6 py-3 border border-white/30 rounded-full font-sans text-xs uppercase tracking-widest hover:bg-white hover:text-black transition-colors inline-block"
-            >
-              University Link →
-            </motion.a>
           </div>
         </div>
       </div>
