@@ -30,7 +30,7 @@ export default function LoadingScreen() {
       tl.set(penRef.current, {
         left: "0%",
         top: "100%",
-        yPercent: -100, y: 19, // perfectly align nib with the underline
+        yPercent: -100, y: "0.95vw", // perfectly align nib with the underline
         rotation: -18,
         opacity: 0,
       });
@@ -66,7 +66,7 @@ export default function LoadingScreen() {
  
       // 4. Pen lifts (Y translation moves up ~8px) and rotates slightly back
       tl.to(penRef.current, {
-        yPercent: -100, y: 11,
+        yPercent: -100, y: "0.58vw",
         rotation: -10,
         duration: 0.15,
         ease: "power1.out",
@@ -77,7 +77,7 @@ export default function LoadingScreen() {
         left: "80%",
         top: "100%",
         x: "0",
-        yPercent: -100, y: 0,
+        yPercent: -100, y: "0vw",
         rotation: 0,
         duration: 0.6,
         ease: "power2.inOut",
@@ -107,23 +107,23 @@ export default function LoadingScreen() {
           transition={{ duration: 0.9, ease: "easeInOut" }}
           className="fixed inset-0 z-[100] bg-black flex items-center justify-center"
         >
-          <div ref={containerRef} className="flex items-end gap-6 md:gap-10 relative">
+          <div ref={containerRef} className="flex items-end gap-[3vw] md:gap-[5vw] relative pb-[8vw] md:pb-[6vw]">
             {/* Underline SVG */}
             <svg
               className="absolute left-0 right-0 pointer-events-none -z-10 overflow-visible"
               style={{
                 top: "100%",
-                marginTop: "16px", // position it cleanly below the letters
+                marginTop: "0.8vw",
                 width: "100%",
-                height: "6px",
+                height: "0.3vw",
               }}
             >
               {/* Glow line */}
               <line
                 x1="0"
-                y1="3"
+                y1="50%"
                 x2="100%"
-                y2="3"
+                y2="50%"
                 stroke="#ffffff"
                 strokeWidth="6"
                 strokeOpacity="0.15"
@@ -136,9 +136,9 @@ export default function LoadingScreen() {
               {/* Solid core line */}
               <line
                 x1="0"
-                y1="3"
+                y1="50%"
                 x2="100%"
-                y2="3"
+                y2="50%"
                 stroke="#ffffff"
                 strokeWidth="2.5"
                 strokeLinecap="round"
@@ -155,7 +155,7 @@ export default function LoadingScreen() {
                 initial={{ y: -300, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay, duration: 0.65, ease: [0.2, 0, 0.4, 1] }}
-                className="font-serif text-[22vw] md:text-[18vw] leading-none text-white uppercase select-none relative z-[3]"
+                className="font-serif text-[18vw] md:text-[18vw] leading-none text-white uppercase select-none relative z-[3]"
                 style={{ fontFamily: "var(--font-cormorant), serif" }}
               >
                 {char}
@@ -167,7 +167,7 @@ export default function LoadingScreen() {
               ref={penRef}
               src="/pen/pen.png"
               alt="Pen"
-              className="absolute h-[56vw] md:h-[44vw] w-auto object-contain drop-shadow-xl z-10"
+              className="absolute h-[52vw] md:h-[44vw] w-auto object-contain drop-shadow-xl z-10"
               style={{
                 transform: "translateY(-100%)",
                 transformOrigin: "left bottom",
@@ -175,17 +175,17 @@ export default function LoadingScreen() {
                 pointerEvents: "none",
               }}
             />
+
+            {/* UKA & ASSOCIATES sub-label fades in after letters settle */}
+            <motion.p
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 2.1, duration: 0.7, ease: "easeOut" }}
+              className="absolute left-1/2 -translate-x-1/2 top-[100%] mt-[6vw] md:mt-[4vw] font-sans text-[3.2vw] md:text-[1.1vw] uppercase tracking-[0.4em] text-white/50 whitespace-nowrap"
+            >
+              Umesh Kekre &amp; Associates
+            </motion.p>
           </div>
- 
-          {/* UKA & ASSOCIATES sub-label fades in after letters settle */}
-          <motion.p
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 2.1, duration: 0.7, ease: "easeOut" }}
-            className="absolute bottom-[34%] font-sans text-[2.5vw] md:text-[1.1vw] uppercase tracking-[0.4em] text-white/50"
-          >
-            Umesh Kekre &amp; Associates
-          </motion.p>
         </motion.div>
       )}
     </AnimatePresence>

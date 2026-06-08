@@ -73,17 +73,17 @@ export default function AuthorComposer() {
   }, []);
 
   return (
-    <div id="author-composer" ref={containerRef} className="horizontal-section w-screen h-screen flex-shrink-0 relative flex flex-col md:flex-row bg-black text-white">
+    <div id="author-composer" ref={containerRef} className="horizontal-section w-screen min-h-screen h-auto md:h-screen flex-shrink-0 relative flex flex-col md:flex-row bg-black text-white py-12 md:py-0">
       {/* Floating Rotating Circle SVG */}
       <motion.img
         src="https://benjaminrighetti.netlify.app/img/cercle.svg"
         alt="Circle decoration"
         animate={{ rotate: 360 }}
         transition={{ repeat: Infinity, duration: 20, ease: "linear" }}
-        className="absolute top-[10%] left-[45%] w-32 h-32 md:w-64 md:h-64 invert opacity-20 z-0 mix-blend-difference pointer-events-none"
+        className="absolute top-[10%] left-[45%] w-32 h-32 md:w-64 md:h-64 invert opacity-20 z-0 mix-blend-difference pointer-events-none hidden md:block"
       />
 
-      <div className="flex-1 flex flex-col justify-center px-8 md:pl-32 md:pr-16 z-10">
+      <div className="w-full md:flex-1 flex flex-col justify-center px-6 md:pl-32 md:pr-16 z-10 py-8 md:py-0">
         <div className="mb-12 overflow-visible flex flex-wrap gap-x-4 md:gap-x-6 gap-y-3">
           {words.map((word, wordIdx) => (
             <span key={wordIdx} className="inline-block whitespace-nowrap">
@@ -131,8 +131,8 @@ export default function AuthorComposer() {
         </motion.div>
       </div>
 
-      <div className="flex-1 flex flex-col justify-center px-8 md:pr-32 md:pl-16 relative mt-12 md:mt-0 z-10">
-        <div className="w-full max-w-md aspect-[3/4] relative overflow-hidden mb-12 self-end md:self-auto">
+      <div className="w-full md:flex-1 flex flex-col justify-center px-6 md:pr-32 md:pl-16 relative mt-12 md:mt-0 z-10 py-8 md:py-0">
+        <div className="w-full max-w-[280px] md:max-w-md aspect-[3/4] relative overflow-hidden mb-8 self-center md:self-auto">
           <ParallaxImage src="/right of architectre designer/Architecture.jpeg" alt="Architect Umesh Kekre" className="w-full h-full" />
         </div>
 
@@ -141,7 +141,7 @@ export default function AuthorComposer() {
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 1 }}
           viewport={{ once: true }}
-          className="max-w-xl self-end md:self-auto"
+          className="max-w-xl self-center md:self-auto text-center md:text-left"
         >
           <motion.p
             whileHover={{ y: -2, color: "#ffffff" }}

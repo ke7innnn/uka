@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import gsap from "gsap";
@@ -23,6 +23,14 @@ const blastPositions = [
 
 export default function InteractiveCards() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [dragConstraints, setDragConstraints] = useState({ left: -350, right: 350, top: -220, bottom: 220 });
+
+  useEffect(() => {
+    const isMobile = window.innerWidth < 768;
+    if (isMobile) {
+      setDragConstraints({ left: -90, right: 90, top: -150, bottom: 150 });
+    }
+  }, []);
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -58,11 +66,14 @@ export default function InteractiveCards() {
     });
 
     // Phase 2 (~70% of scroll): slow, deliberate throw outward
+    const isMobile = window.innerWidth < 768;
+    const scaleFactor = isMobile ? 0.25 : 1;
+
     tl.to(
       cards,
       {
-        x: (i) => blastPositions[i % blastPositions.length].x,
-        y: (i) => blastPositions[i % blastPositions.length].y,
+        x: (i) => blastPositions[i % blastPositions.length].x * scaleFactor,
+        y: (i) => blastPositions[i % blastPositions.length].y * scaleFactor,
         rotate: (i) => blastPositions[i % blastPositions.length].rotate,
         scale: 1,
         stagger: 0.08, // each card leaves slightly after the last
@@ -90,11 +101,11 @@ export default function InteractiveCards() {
           >
             <motion.div
               drag
-              dragConstraints={{ left: -350, right: 350, top: -220, bottom: 220 }}
+              dragConstraints={dragConstraints}
               dragElastic={0.1}
               whileDrag={{ scale: 1.08, cursor: "grabbing", zIndex: 50 }}
               whileHover={{ cursor: "grab", scale: 1.04, zIndex: 40 }}
-              className="w-40 h-56 md:w-52 md:h-72 shadow-2xl rounded-2xl overflow-hidden bg-gray-900 border border-white/20 relative"
+              className="w-28 h-40 md:w-52 md:h-72 shadow-2xl rounded-2xl overflow-hidden bg-gray-900 border border-white/20 relative"
             >
               <Image
                 src={src}

@@ -22,6 +22,16 @@ export default function Navbar() {
 
   const [visible, setVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [whatsappHref, setWhatsappHref] = useState("https://wa.me/919860146006");
+
+  useEffect(() => {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
+    if (!isMobile) {
+      setWhatsappHref("/whatsapp");
+    }
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -158,7 +168,7 @@ export default function Navbar() {
 
         {/* WhatsApp Button */}
         <a
-          href="https://wa.me/1234567890" 
+          href={whatsappHref} 
           target="_blank"
           rel="noopener noreferrer"
           className="group relative flex items-center justify-center w-[72px] h-[72px] md:w-[84px] md:h-[84px] rounded-full bg-[#0a0a0a]/80 border border-white/20 backdrop-blur-md shadow-2xl transition-all duration-500 hover:bg-white overflow-hidden"

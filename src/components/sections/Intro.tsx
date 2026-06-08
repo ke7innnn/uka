@@ -56,11 +56,11 @@ export default function Intro() {
     : [];
 
   return (
-    <div className="horizontal-section w-screen h-screen flex-shrink-0 bg-black flex flex-col relative overflow-hidden">
-      {/* Bio + Quotes Content Row (Constrained to 64vh to leave gap above marquee) */}
-      <div className="w-full h-[64vh] flex flex-col md:flex-row relative pt-8 md:pt-16">
+    <div className="horizontal-section w-screen min-h-screen h-auto md:h-screen flex-shrink-0 bg-black flex flex-col relative overflow-hidden pb-40 md:pb-0">
+      {/* Bio + Quotes Content Row (Constrained to 64vh on desktop to leave gap above marquee) */}
+      <div className="w-full h-auto md:h-[64vh] flex flex-col md:flex-row relative pt-12 md:pt-16 gap-8 md:gap-0 pb-16 md:pb-0">
         {/* ── Left: bio ── */}
-        <div className="flex-1 flex flex-col justify-center px-8 md:px-32 py-4 max-w-3xl">
+        <div className="flex-1 flex flex-col justify-center px-6 md:px-32 py-4 max-w-3xl">
           <motion.p
             initial="hidden"
             whileInView="visible"
@@ -81,9 +81,9 @@ export default function Intro() {
             ))}
           </motion.p>
         </div>
-
+ 
         {/* ── Right: quotes ── */}
-        <div className="flex-1 flex flex-col justify-center px-8 md:px-32 pb-4 md:pb-0 max-w-3xl">
+        <div className="flex-1 flex flex-col justify-center px-6 md:px-32 pb-4 md:pb-0 max-w-3xl">
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -114,9 +114,9 @@ export default function Intro() {
           </motion.div>
         </div>
       </div>
-
+ 
       {/* Subtle marquee helper prompt */}
-      <div className="absolute bottom-[21vh] md:bottom-[25vh] left-8 z-20 flex items-center gap-3">
+      <div className="relative md:absolute bottom-auto md:bottom-[25vh] left-6 md:left-8 z-20 flex items-center gap-3 mt-8 md:mt-0 px-6 md:px-0 pb-4 md:pb-0">
         <span className="text-[9px] md:text-[10px] font-sans tracking-[0.35em] uppercase text-white/40">
           Interactive Gallery
         </span>
@@ -125,9 +125,9 @@ export default function Intro() {
           Click to inspect
         </span>
       </div>
-
+ 
       {/* Marquee Strip (Absolute positioned with bottom offsets to leave margin gap below) */}
-      <div className="absolute bottom-6 md:bottom-10 left-0 w-full h-[20vh] md:h-[24vh] overflow-hidden flex bg-black z-20">
+      <div className="relative md:absolute bottom-0 md:bottom-10 left-0 w-full h-[20vh] md:h-[24vh] overflow-hidden flex bg-black z-20 mt-2 md:mt-0">
         <div className="animate-marquee flex h-full min-w-max">
           {[...activeProjects, ...activeProjects].map((p, i) => (
             <div 
