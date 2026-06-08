@@ -57,10 +57,6 @@ export default function OrganProfessor() {
 
   return (
     <div id="organ-professor" ref={containerRef} className="horizontal-section w-screen h-screen flex-shrink-0 relative flex flex-col md:flex-row bg-black text-white">
-      <div className="absolute top-8 left-8 text-white/50 font-sans tracking-widest text-sm z-10 hidden md:block">
-        4.
-      </div>
-
       <div className="w-full md:w-1/2 h-1/2 md:h-full relative overflow-hidden p-8 md:p-16 lg:p-24">
         <ParallaxImage src="/main umesh folder/umesh.jpeg" alt="Umesh Kekre" className="w-full h-full" />
       </div>

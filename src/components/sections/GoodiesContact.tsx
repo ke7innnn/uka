@@ -8,10 +8,6 @@ export default function GoodiesContact() {
 
   return (
     <div id="goodies-contact" className="horizontal-section w-screen h-screen flex-shrink-0 relative flex flex-col justify-between bg-black text-white px-8 md:px-32 py-12 md:py-24">
-      <div className="absolute top-8 left-8 text-white/50 font-sans tracking-widest text-sm z-10 hidden md:block">
-        6.
-      </div>
-
       <div className="flex flex-col mt-12 md:mt-0">
         <motion.h2
           initial={{ opacity: 0, y: 30 }}

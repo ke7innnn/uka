@@ -74,10 +74,6 @@ export default function AuthorComposer() {
 
   return (
     <div id="author-composer" ref={containerRef} className="horizontal-section w-screen h-screen flex-shrink-0 relative flex flex-col md:flex-row bg-black text-white">
-      <div className="absolute top-8 left-8 text-white/50 font-sans tracking-widest text-sm z-10 hidden md:block">
-        5.
-      </div>
-
       {/* Floating Rotating Circle SVG */}
       <motion.img
         src="https://benjaminrighetti.netlify.app/img/cercle.svg"

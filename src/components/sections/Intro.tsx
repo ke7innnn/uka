@@ -59,10 +59,6 @@ export default function Intro() {
     <div className="horizontal-section w-screen h-screen flex-shrink-0 bg-black flex flex-col relative overflow-hidden">
       {/* Bio + Quotes Content Row (Constrained to 64vh to leave gap above marquee) */}
       <div className="w-full h-[64vh] flex flex-col md:flex-row relative pt-8 md:pt-16">
-        <div className="absolute top-1/2 -left-12 -translate-y-1/2 -rotate-90 text-sm tracking-widest uppercase opacity-30 font-sans hidden md:block whitespace-nowrap">
-          In real life
-        </div>
-
         {/* ── Left: bio ── */}
         <div className="flex-1 flex flex-col justify-center px-8 md:px-32 py-4 max-w-3xl">
           <motion.p
