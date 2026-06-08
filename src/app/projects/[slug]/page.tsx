@@ -23,7 +23,7 @@ export default function ProjectDetail() {
     notFound();
   }
 
-  const { title, location, year, area, status, heroImage, images } = project;
+  const { title, heroImage, images } = project;
 
   const [introFinished, setIntroFinished] = useState(false);
   const [exitTransition, setExitTransition] = useState(false);
