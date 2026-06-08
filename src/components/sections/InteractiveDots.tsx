@@ -107,15 +107,6 @@ export default function InteractiveCards() {
           </div>
         ))}
       </div>
-
-      <div className="relative z-10 flex flex-col items-center pointer-events-none text-center">
-        <h2 className="font-serif text-5xl md:text-7xl mb-4 mix-blend-difference text-white drop-shadow-lg">
-          Let&apos;s play with these cards!
-        </h2>
-        <p className="font-sans text-sm md:text-base uppercase tracking-widest text-gray-300 mix-blend-difference drop-shadow-md">
-          Grab and drag them around, or scroll to continue
-        </p>
-      </div>
     </div>
   );
 }
