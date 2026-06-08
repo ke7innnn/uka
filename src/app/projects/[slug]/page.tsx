@@ -127,9 +127,6 @@ export default function ProjectDetail() {
         {!introFinished && <ArchitecturalTransition mode="enter" title={title} />}
         {exitTransition && <ArchitecturalTransition mode="exit" title={title} />}
         <motion.main
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
           className="min-h-screen bg-white text-black font-sans pt-32 pb-32 px-8 md:px-16 selection:bg-[#F59E0B] selection:text-white"
         >
         
@@ -165,36 +162,9 @@ export default function ProjectDetail() {
                 {title}
               </h1>
               
-              <div className="grid grid-cols-2 gap-8 border-t border-b border-gray-150 py-8 mb-12">
-                <div className="flex flex-col gap-1">
-                  <span className="text-[10px] uppercase tracking-widest text-gray-400 font-semibold">Status</span>
-                  <span className="text-sm font-medium">{status}</span>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <span className="text-[10px] uppercase tracking-widest text-gray-400 font-semibold">Year</span>
-                  <span className="text-sm font-medium">{year}</span>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <span className="text-[10px] uppercase tracking-widest text-gray-400 font-semibold">Location</span>
-                  <span className="text-sm font-medium">{location}</span>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <span className="text-[10px] uppercase tracking-widest text-gray-400 font-semibold">Area</span>
-                  <span className="text-sm font-medium">{area}</span>
-                </div>
-              </div>
 
-              <div>
-                <h2 className="text-xs uppercase tracking-[0.2em] text-[#F59E0B] font-semibold mb-6">Concept &amp; Context</h2>
-                <div className="flex flex-col gap-6 text-gray-600 font-light text-base leading-relaxed">
-                  <p>
-                    The project explores the dialogue between natural topography and structural intervention. By terracing the volumes along the site&apos;s natural contours, we minimized the ecological footprint while maximizing panoramic views.
-                  </p>
-                  <p>
-                    Materiality plays a crucial role in grounding the structure. Locally sourced stone, exposed concrete, and warm timber create a tactile experience that ages gracefully, rooting the architecture firmly in its context.
-                  </p>
-                </div>
-              </div>
+
+
             </div>
 
           </div>
@@ -236,9 +206,6 @@ export default function ProjectDetail() {
       {!introFinished && <ArchitecturalTransition mode="enter" title={title} />}
       {exitTransition && <ArchitecturalTransition mode="exit" title={title} />}
       <motion.main
-        initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
         className="min-h-screen bg-white text-black font-sans pt-32 pb-32 px-8 md:px-16 selection:bg-[#F59E0B] selection:text-white"
       >
       
@@ -261,24 +228,7 @@ export default function ProjectDetail() {
             {title}
           </h1>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-gray-200 pt-8">
-            <div className="flex flex-col gap-1">
-              <span className="text-[10px] uppercase tracking-widest text-gray-400">Status</span>
-              <span className="text-sm">{status}</span>
-            </div>
-            <div className="flex flex-col gap-1">
-              <span className="text-[10px] uppercase tracking-widest text-gray-400">Year</span>
-              <span className="text-sm">{year}</span>
-            </div>
-            <div className="flex flex-col gap-1">
-              <span className="text-[10px] uppercase tracking-widest text-gray-400">Location</span>
-              <span className="text-sm">{location}</span>
-            </div>
-            <div className="flex flex-col gap-1">
-              <span className="text-[10px] uppercase tracking-widest text-gray-400">Area</span>
-              <span className="text-sm">{area}</span>
-            </div>
-          </div>
+
         </div>
       </header>
 
@@ -292,20 +242,7 @@ export default function ProjectDetail() {
         />
       </div>
 
-      {/* ── CONTENT BODY ── */}
-      <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-16 mb-32">
-        <div className="md:col-span-4">
-          <h2 className="text-2xl font-light">Concept &amp; Context</h2>
-        </div>
-        <div className="md:col-span-8 flex flex-col gap-8">
-          <p className="text-lg leading-relaxed font-light text-gray-700">
-            The project explores the dialogue between natural topography and structural intervention. By terracing the volumes along the site&apos;s natural contours, we minimized the ecological footprint while maximizing panoramic views.
-          </p>
-          <p className="text-lg leading-relaxed font-light text-gray-700">
-            Materiality plays a crucial role in grounding the structure. Locally sourced stone, exposed concrete, and warm timber create a tactile experience that ages gracefully, rooting the architecture firmly in its context.
-          </p>
-        </div>
-      </div>
+
 
       {/* ── GALLERY GRID (Clean gallery flow, zero grey borders/frames) ── */}
       {displayImages.length > 0 && (

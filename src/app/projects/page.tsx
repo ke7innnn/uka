@@ -34,7 +34,7 @@ export default function ProjectsPage() {
   const [hovered, setHovered] = useState<number | null>(null);
   const [activeCard, setActiveCard] = useState<number | null>(null);
   const [pageTransitionDone, setPageTransitionDone] = useState(false);
-  const [isZoomed, setIsZoomed] = useState(false);
+  const [isZoomed, setIsZoomed] = useState(true);
   const [exitTransition, setExitTransition] = useState<{ active: boolean; slug: string; title: string } | null>(null);
   const [scrollY, setScrollY] = useState(0);
   const router = useRouter();
@@ -96,14 +96,8 @@ export default function ProjectsPage() {
       setPageTransitionDone(true);
     }, 1800);
 
-    // 2. Once the curtain is fully wiped and the roots-up building rise finishes (5.0s rise), zoom in smoothly!
-    const zoomTimer = setTimeout(() => {
-      setIsZoomed(true);
-    }, 6800); // 1800ms curtain + 5000ms construction rise
-
     return () => {
       clearTimeout(curtainTimer);
-      clearTimeout(zoomTimer);
     };
   }, []);
 
@@ -187,6 +181,11 @@ export default function ProjectsPage() {
           style={{ cursor: "default" }}
         >
         <motion.g
+          initial={{
+            x: (isZoomed || exitTransition?.active) ? translateX : 0,
+            y: (isZoomed || exitTransition?.active) ? translateY : 0,
+            scale: currentScale
+          }}
           animate={{
             x: (isZoomed || exitTransition?.active) ? translateX : 0,
             y: (isZoomed || exitTransition?.active) ? translateY : 0,
@@ -274,12 +273,8 @@ export default function ProjectsPage() {
           `}</style>
         </defs>
 
-        {/* ── BUILDING IMAGE (Holographic Time-Lapse Materialization from Roots) ── */}
-        <g style={{ 
-          animation: pageTransitionDone 
-            ? "constructionTimeLapse 5.0s cubic-bezier(0.25, 1, 0.5, 1) forwards" 
-            : "none"
-        }}>
+        {/* ── BUILDING IMAGE (Static, zoomed in from start) ── */}
+        <g>
           <image 
             href="/building/building.webp" 
             x="300" y="-245" 
@@ -289,8 +284,7 @@ export default function ProjectsPage() {
               imageRendering: "auto", 
               transform: "translate3d(0, 0, 0)",
               backfaceVisibility: "hidden",
-              WebkitBackfaceVisibility: "hidden",
-              clipPath: pageTransitionDone ? "none" : "inset(88.6% 0 0 0)"
+              WebkitBackfaceVisibility: "hidden"
             }}
           />
         </g>
@@ -364,8 +358,10 @@ export default function ProjectsPage() {
                 fill={isFloorHighlighted ? "#F59E0B" : "#111"} stroke={isFloorHighlighted ? "#F59E0B" : "#ccc"} strokeWidth="1"
                 style={{ 
                   transition: "fill 0.15s", 
-                  opacity: 0, 
-                  animation: `popNode 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) ${3.5 + i*0.06}s forwards`, 
+                  opacity: pageTransitionDone ? 1 : 0, 
+                  animation: pageTransitionDone 
+                    ? `popNode 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) ${0.1 + i*0.03}s forwards` 
+                    : "none", 
                   transformBox: "fill-box", 
                   transformOrigin: "center" 
                 }} />
@@ -467,9 +463,9 @@ export default function ProjectsPage() {
       <AnimatePresence>
         {!pageTransitionDone && (
           <motion.div
-            initial={{ clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)" }}
-            exit={{ clipPath: "polygon(0 0, 100% 0, 100% 0, 0 0)" }}
-            transition={{ duration: 0.9, ease: [0.76, 0, 0.24, 1] }}
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.9, ease: "easeOut" }}
             className="fixed inset-0 z-[80] bg-[#050505] flex flex-col items-center justify-center text-white"
           >
             <motion.div
@@ -484,7 +480,7 @@ export default function ProjectsPage() {
               >
                 UKA
               </h2>
-              <div className="w-16 h-[1px] bg-white/20 my-4" />
+              <div className="w-16 h-[1px] bg-white/60 my-4" />
               <p className="text-[10px] md:text-[11px] font-sans tracking-[0.45em] uppercase text-white/45">
                 Umesh Kekre &amp; Associates
               </p>
