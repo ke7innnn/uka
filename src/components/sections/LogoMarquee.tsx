@@ -3,16 +3,16 @@
 import Image from "next/image";
 
 const logos = [
-  "/uka_logos/1.jpg",
-  "/uka_logos/2.jpg",
-  "/uka_logos/3.jpg",
-  "/uka_logos/4.jpg",
-  "/uka_logos/5.jpg",
-  "/uka_logos/6.jpg",
-  "/uka_logos/7.jpg",
-  "/uka_logos/8.jpg",
-  "/uka_logos/9.jpg",
-  "/uka_logos/10.jpg",
+  "/logos/1.jpg",
+  "/logos/2.jpg",
+  "/logos/3.jpg",
+  "/logos/4.jpg",
+  "/logos/5.jpg",
+  "/logos/6.jpg",
+  "/logos/7.jpg",
+  "/logos/8.jpg",
+  "/logos/9.jpg",
+  "/logos/10.jpg",
 ];
 
 export default function LogoMarquee() {
