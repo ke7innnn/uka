@@ -14,10 +14,10 @@ export default function LoadingScreen() {
   useEffect(() => {
     document.body.style.overflow = "hidden";
  
-    const hideTimer = setTimeout(() => setVisible(false), 6500);
+    const hideTimer = setTimeout(() => setVisible(false), 9500);
     const unlockTimer = setTimeout(() => {
       document.body.style.overflow = "";
-    }, 7400);
+    }, 10400);
  
     if (penRef.current && lineRef.current && glowLineRef.current) {
       const tl = gsap.timeline({ delay: 0.5 });
@@ -26,7 +26,7 @@ export default function LoadingScreen() {
       // across all mobile/desktop aspect ratios without drifting.
       const isMobile = window.innerWidth < 768;
       const penTop = isMobile
-        ? "calc(100% + 24.6vw - 1px)"
+        ? "calc(100% + 24.6vw - 2px)"
         : "calc(100% + 18.8vw)";
 
       tl.set(penRef.current, {
