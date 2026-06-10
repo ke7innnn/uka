@@ -27,7 +27,7 @@ export default function LoadingScreen() {
       const isMobile = window.innerWidth < 768;
       const penTop = isMobile
         ? "calc(100% + 24.6vw - 1px)"
-        : "calc(100% + 19.4vw)";
+        : "calc(100% + 18.8vw)";
 
       tl.set(penRef.current, {
         left: "-17%",
