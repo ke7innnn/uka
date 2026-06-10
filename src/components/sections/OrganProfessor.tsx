@@ -56,13 +56,13 @@ export default function OrganProfessor() {
   }, []);
 
   return (
-    <div id="organ-professor" ref={containerRef} className="horizontal-section w-screen min-h-screen h-auto md:h-screen flex-shrink-0 relative flex flex-col md:flex-row bg-black text-white py-12 md:py-0">
+    <div id="organ-professor" ref={containerRef} className="horizontal-section w-screen min-h-screen h-auto md:h-screen flex-shrink-0 relative flex flex-col md:flex-row bg-black text-white py-8 md:py-0">
       <div className="w-full md:w-1/2 h-[45vh] md:h-full relative overflow-hidden p-6 md:p-16 lg:p-24">
         <ParallaxImage src="/main umesh folder/umesh.jpeg" alt="Umesh Kekre" className="w-full h-full" />
       </div>
  
-      <div className="w-full md:w-1/2 flex flex-col justify-center px-6 md:px-24 h-auto md:h-full z-10 py-8 md:py-0">
-        <div className="mb-12 overflow-visible flex flex-wrap gap-x-4 md:gap-x-6 gap-y-3">
+      <div className="w-full md:w-1/2 flex flex-col justify-center px-6 md:px-24 h-auto md:h-full z-10 py-4 md:py-0">
+        <div className="mb-6 md:mb-12 overflow-visible flex flex-wrap gap-x-4 md:gap-x-6 gap-y-3">
           {words.map((word, wordIdx) => (
             <span key={wordIdx} className="inline-block whitespace-nowrap">
               {word.split("").map((char, charIdx) => (

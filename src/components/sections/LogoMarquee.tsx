@@ -24,7 +24,7 @@ export default function LogoMarquee() {
           style={{ animationDuration: "50s" }}
         >
           {[...logos, ...logos].map((logo, i) => (
-            <li key={i} className="relative w-64 h-36 md:w-96 md:h-56 flex-shrink-0 mix-blend-screen">
+            <li key={i} className="relative w-80 h-56 md:w-96 md:h-56 flex-shrink-0 mix-blend-screen">
               <Image
                 src={logo}
                 alt={`Client Logo ${i}`}

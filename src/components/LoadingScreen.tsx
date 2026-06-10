@@ -12,37 +12,33 @@ export default function LoadingScreen() {
   const glowLineRef = useRef<SVGLineElement>(null);
  
   useEffect(() => {
-    // Lock scroll immediately while loader is showing
     document.body.style.overflow = "hidden";
  
-    // Fade out starts at 6.5s (3.0s pen completion + 3.5s hold), takes 0.9s — unlock scroll after full fade (7.4s)
     const hideTimer = setTimeout(() => setVisible(false), 6500);
     const unlockTimer = setTimeout(() => {
       document.body.style.overflow = "";
-    }, 7400); // 6500ms animation + 900ms fade
+    }, 7400);
  
-    // GSAP Underline & Pen Animation Timeline
     if (penRef.current && lineRef.current && glowLineRef.current) {
       const tl = gsap.timeline({ delay: 0.5 });
- 
-      // 1. Position pen at the far left end of the underline
-      // and set rotation to a natural writing angle (-18 degrees)
+
+      // Mobile uses vw-based margin (0.8vw) + bigger letters (18vw) → nib sits lower.
+      // Detect mobile to use a separate offset that keeps nib on the line.
+      const isMobile = window.innerWidth < 768;
+      const penTop = isMobile
+        ? "calc(100% + 2.8vw + 14vh - 2px)"   // mobile: less vh, tuned for 18vw letters
+        : "calc(100% + 2.8vw + 30vh - 3.5px)"; // desktop (unchanged)
+
       tl.set(penRef.current, {
         left: "-17%",
-        top: "calc(100% + 2.8vw + 30vh - 3.5px)", // perfectly align nib with the underline using top (bypassing GSAP transform parsing issue)
+        top: penTop,
         yPercent: -100, y: 0,
         rotation: -18,
         opacity: 0,
       });
  
-      // Fade the pen in at the start of the line
-      tl.to(penRef.current, {
-        opacity: 1,
-        duration: 0.2,
-        ease: "power1.out",
-      });
+      tl.to(penRef.current, { opacity: 1, duration: 0.2, ease: "power1.out" });
  
-      // 2. Pen travels right + line draws (perfectly in sync)
       tl.to(penRef.current, {
         left: "83%",
         duration: 1.3,
@@ -61,7 +57,6 @@ export default function LoadingScreen() {
         ease: "power1.inOut",
       }, "draw");
  
-      // 3. Brief pause at the end of the line
       tl.to({}, { duration: 0.2 });
     }
  
@@ -99,33 +94,18 @@ export default function LoadingScreen() {
                 height: "0.3vw",
               }}
             >
-              {/* Glow line */}
               <line
-                x1="0"
-                y1="50%"
-                x2="100%"
-                y2="50%"
-                stroke="#ffffff"
-                strokeWidth="6"
-                strokeOpacity="0.15"
-                strokeLinecap="round"
-                pathLength="100"
-                strokeDasharray="100"
-                strokeDashoffset="100"
+                x1="0" y1="50%" x2="100%" y2="50%"
+                stroke="#ffffff" strokeWidth="6" strokeOpacity="0.15"
+                strokeLinecap="round" pathLength="100"
+                strokeDasharray="100" strokeDashoffset="100"
                 ref={glowLineRef}
               />
-              {/* Solid core line */}
               <line
-                x1="0"
-                y1="50%"
-                x2="100%"
-                y2="50%"
-                stroke="#ffffff"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                pathLength="100"
-                strokeDasharray="100"
-                strokeDashoffset="100"
+                x1="0" y1="50%" x2="100%" y2="50%"
+                stroke="#ffffff" strokeWidth="2.5"
+                strokeLinecap="round" pathLength="100"
+                strokeDasharray="100" strokeDashoffset="100"
                 ref={lineRef}
               />
             </svg>
@@ -147,7 +127,7 @@ export default function LoadingScreen() {
               ref={penRef}
               src="/pen/pen.png"
               alt="Pen"
-              className="absolute h-[52vw] md:h-[44vw] w-auto object-contain drop-shadow-xl z-10"
+              className="absolute h-[56vw] md:h-[44vw] w-auto object-contain drop-shadow-xl z-10"
               style={{
                 transformOrigin: "left bottom",
                 opacity: 0,
@@ -156,12 +136,12 @@ export default function LoadingScreen() {
             />
           </div>
 
-          {/* UKA & ASSOCIATES sub-label fades in after letters settle */}
+          {/* Sub-label */}
           <motion.p
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 2.1, duration: 0.7, ease: "easeOut" }}
-            className="font-sans text-[3.2vw] md:text-[1.1vw] uppercase tracking-[0.4em] text-white/50 whitespace-nowrap mt-[3.5vw] md:mt-[2.5vw]"
+            className="font-sans text-[3.8vw] md:text-[1.1vw] uppercase tracking-[0.4em] text-white/50 whitespace-nowrap mt-[4vw] md:mt-[2.5vw]"
           >
             Umesh Kekre &amp; Associates
           </motion.p>

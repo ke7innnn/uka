@@ -55,9 +55,9 @@ export default function Intro() {
     : [];
 
   return (
-    <div className="horizontal-section w-screen min-h-screen h-auto md:h-screen flex-shrink-0 bg-black flex flex-col relative overflow-hidden pb-40 md:pb-0">
+    <div className="horizontal-section w-screen min-h-screen h-auto md:h-screen flex-shrink-0 bg-black flex flex-col relative overflow-hidden pb-24 md:pb-0">
       {/* Bio + Quotes Content Row (Constrained to 64vh on desktop to leave gap above marquee) */}
-      <div className="w-full h-auto md:h-[64vh] flex flex-col md:flex-row relative pt-12 md:pt-16 gap-8 md:gap-0 pb-16 md:pb-0">
+      <div className="w-full h-auto md:h-[64vh] flex flex-col md:flex-row relative pt-8 md:pt-16 gap-6 md:gap-0 pb-8 md:pb-0">
         {/* ── Left: bio ── */}
         <div className="flex-1 flex flex-col justify-center px-6 md:px-32 py-4 max-w-3xl">
           <motion.p
@@ -110,7 +110,7 @@ export default function Intro() {
       </div>
  
       {/* Subtle marquee helper prompt */}
-      <div className="relative md:absolute bottom-auto md:bottom-[25vh] left-6 md:left-8 z-20 flex items-center gap-3 mt-8 md:mt-0 px-6 md:px-0 pb-4 md:pb-0">
+      <div className="relative md:absolute bottom-auto md:bottom-[25vh] left-6 md:left-8 z-20 flex items-center gap-3 mt-4 md:mt-0 px-6 md:px-0 pb-2 md:pb-0">
         <span className="text-[9px] md:text-[10px] font-sans tracking-[0.35em] uppercase text-white/40">
           Interactive Gallery
         </span>
