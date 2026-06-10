@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { PROJECTS_DATA, Project } from "@/lib/projectsData";
 
 const quoteText = "Design begins when mind silences and spaces speak!!";
-const quoteAuthor = "Umesh Kekre";
 
 const bioText = "Umesh Kekre is a rising visionary architect. With over one decade of experience in shaping environments, he leads a practice dedicated to innovative, sustainable, and context-driven design. His portfolio spans residential, commercial, and institutional projects, each characterized by a profound respect for materials, natural light, and the human experience.";
 
@@ -105,12 +104,7 @@ export default function Intro() {
               ))}
               &rdquo;
             </p>
-            <motion.p
-              variants={wordVariants}
-              className="font-sans text-xs uppercase tracking-widest text-gray-500 transition-all duration-300 hover:tracking-[0.25em] hover:text-[#e2c97e] cursor-default w-fit"
-            >
-              — {quoteAuthor}
-            </motion.p>
+
           </motion.div>
         </div>
       </div>

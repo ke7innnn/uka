@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useLenis } from "lenis/react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 
@@ -16,7 +15,6 @@ const navLinks = [
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const lenis = useLenis();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -51,14 +49,17 @@ export default function Navbar() {
 
   const handleNavClick = (id: string) => {
     setIsOpen(false);
-    
+
     setTimeout(() => {
       if (id.startsWith("#")) {
-        const el = document.getElementById(id.replace("#", ""));
-        if (el && pathname === "/") {
-          lenis?.scrollTo(el, { duration: 1.5, offset: 0 });
-        } else {
+        const sectionId = id.replace("#", "");
+        if (pathname !== "/") {
           router.push("/" + id);
+          return;
+        }
+        const el = document.getElementById(sectionId);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
         }
       } else {
         router.push(id);

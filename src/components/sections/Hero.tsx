@@ -44,7 +44,7 @@ export default function Hero() {
         <motion.p
           initial={{ opacity: 0 }} animate={{ opacity: 0.8 }}
           transition={{ duration: 1.5, delay: 2 }}
-          className="font-sans uppercase text-sm md:text-xl mt-8 md:mt-12"
+          className="font-sans uppercase text-sm md:text-xl mt-8 md:mt-12 tracking-[1em] md:tracking-[1.6em]"
         >
           Architect
         </motion.p>
@@ -56,7 +56,6 @@ export default function Hero() {
         transition={{ duration: 1, delay: 2.5 }}
         className="absolute bottom-12 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 text-sm font-sans uppercase tracking-widest"
       >
-        <span>Scroll</span>
         <motion.div animate={{ y: [0, 10, 0] }} transition={{ repeat: Infinity, duration: 1.5 }}>
           ↓
         </motion.div>

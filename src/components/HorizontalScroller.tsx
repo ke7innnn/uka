@@ -63,7 +63,7 @@ export default function HorizontalScroller({ children }: { children: React.React
   }
 
   return (
-    <div ref={containerRef} className="w-full h-screen overflow-hidden bg-black relative">
+    <div ref={containerRef} data-horizontal-container className="w-full h-screen overflow-hidden bg-black relative">
       <div ref={sectionsRef} className="flex h-full w-[max-content]">
         {children}
       </div>

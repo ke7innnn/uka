@@ -77,15 +77,6 @@ export default function OrganProfessor() {
           ))}
         </div>
 
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
-          viewport={{ once: true }}
-          className="font-sans text-sm md:text-base leading-relaxed text-gray-300 max-w-xl mb-12"
-        >
-          Umesh Kekre is deeply committed to architectural education and serves as a guest critic and mentor at leading design schools. Having learned from master architects during his formative years, he believes it is essential to pass on his knowledge, passion for sustainable design, and practical expertise to the next generation of architects.
-        </motion.p>
 
         <div className="flex flex-col md:flex-row gap-8 md:gap-16">
           <div>

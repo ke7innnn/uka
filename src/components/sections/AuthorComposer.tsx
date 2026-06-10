@@ -120,12 +120,7 @@ export default function AuthorComposer() {
             ))}
             &rdquo;
           </p>
-          <motion.p
-            variants={wordVariants}
-            className="font-sans text-xs uppercase tracking-widest text-gray-500 transition-all duration-300 hover:tracking-[0.25em] hover:text-[#e2c97e] cursor-default w-fit mb-8"
-          >
-            — UMESH KEKRE
-          </motion.p>
+
 
 
         </motion.div>
@@ -151,11 +146,7 @@ export default function AuthorComposer() {
           >
             &ldquo;Every client is a reminder that someone believes in your vision&rdquo;
           </motion.p>
-          <motion.p
-            className="font-sans text-[10px] md:text-xs uppercase tracking-widest text-gray-500 cursor-default mb-8 w-fit hover:text-[#e2c97e] transition-colors duration-300"
-          >
-            — Umesh Kekre
-          </motion.p>
+
 
         </motion.div>
       </div>
