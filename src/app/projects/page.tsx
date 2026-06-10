@@ -43,6 +43,16 @@ export default function ProjectsPage() {
 
   const [fromProjectTitle, setFromProjectTitle] = useState<string | null>(null);
   const [introTransitionFinished, setIntroTransitionFinished] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   useEffect(() => {
     const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
@@ -157,120 +167,34 @@ export default function ProjectsPage() {
 
   // activeIndex auto-glow is removed to ensure floors only highlight on physical mouse hover or click
 
-  const currentScale = exitTransition?.active ? 10 : (isZoomed ? ZOOM_SCALE : 1);
+  const zoomScale = isMobile ? 3.6 : ZOOM_SCALE;
+  const currentScale = exitTransition?.active ? 10 : (isZoomed ? zoomScale : 1);
 
   // Calculate smooth 2D translations
   let translateX = 0;
   if ((isZoomed || exitTransition?.active) && activeCard !== null) {
     const p = PROJECTS[activeCard];
     const isL = p.side === "L";
-    const cardWidth = 193 * 0.50; // Active card has scale 0.50
-    const cardX = isL ? 520 - cardWidth : 880;
-    const zoomX = cardX + cardWidth / 2;
-    translateX = (700 - zoomX) * currentScale;
+    const cardWidth = 193 * (isMobile ? 1.15 : 0.50);
+    const cardX = isL ? (isMobile ? 550 - cardWidth : 520 - cardWidth) : (isMobile ? 850 : 880);
+    
+    if (isMobile) {
+      if (isL) {
+        // Align card's left edge exactly with the screen's left edge (x=0 in SVG space)
+        translateX = (700 - cardX) * currentScale - 700;
+      } else {
+        // Align card's right edge exactly with the screen's right edge (x=1400 in SVG space)
+        translateX = (700 - (cardX + cardWidth)) * currentScale + 700;
+      }
+    } else {
+      const zoomX = cardX + cardWidth / 2;
+      translateX = (700 - zoomX) * currentScale;
+    }
   }
   const translateY = (isZoomed || exitTransition?.active) ? (305 - targetY) * currentScale : 0;
 
-  // Mobile-only premium card list
-  const MobileProjectsList = () => {
-    const visibleProjects = PROJECTS.filter(p => !p.isComingSoon);
-    const comingSoon = PROJECTS.filter(p => p.isComingSoon);
-    const all = [...visibleProjects, ...comingSoon];
-
-    return (
-      <div className="md:hidden min-h-screen bg-[#050505] text-white">
-        {/* Sticky header */}
-        <div className="sticky top-0 z-30 bg-[#050505]/90 backdrop-blur-md border-b border-white/5 px-5 py-4 flex items-center justify-between">
-          <div>
-            <p className="font-serif text-xl tracking-wide" style={{ fontFamily: "var(--font-cormorant), serif" }}>Projects</p>
-            <p className="text-[10px] uppercase tracking-[0.3em] text-white/40 mt-0.5">Umesh Kekre &amp; Associates</p>
-          </div>
-          <span className="text-[10px] tracking-[0.2em] uppercase text-white/30 border border-white/10 rounded-full px-3 py-1">
-            {visibleProjects.length} Works
-          </span>
-        </div>
-
-        {/* Card list */}
-        <div className="flex flex-col">
-          {all.map((p, i) => (
-            <motion.div
-              key={p.id}
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.07 * i, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-              onClick={() => {
-                if (!p.isComingSoon) {
-                  setExitTransition({ active: true, slug: p.slug, title: p.title });
-                  setTimeout(() => router.push(`/projects/${p.slug}`), 900);
-                }
-              }}
-              className={`relative w-full overflow-hidden ${p.isComingSoon ? "opacity-50 pointer-events-none" : "cursor-pointer"}`}
-              style={{ height: "72vw", maxHeight: 300 }}
-            >
-              {/* Full-bleed hero image */}
-              <img
-                src={p.heroImage}
-                alt={p.title}
-                className="absolute inset-0 w-full h-full object-cover"
-                style={{ filter: "grayscale(100%) brightness(0.5)" }}
-              />
-              {/* Bottom gradient */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent" />
-              {/* Category badge */}
-              <div className="absolute top-4 left-4">
-                <span className="text-[9px] uppercase tracking-[0.3em] text-white/50 font-sans bg-black/40 backdrop-blur-sm border border-white/10 rounded-full px-2.5 py-1">
-                  {p.isComingSoon ? "Coming Soon" : p.cat}
-                </span>
-              </div>
-              {/* Index number */}
-              <div className="absolute top-4 right-4">
-                <span className="text-[11px] font-sans text-white/20 tracking-widest">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-              </div>
-              {/* Bottom info */}
-              <div className="absolute bottom-0 left-0 right-0 px-5 pb-5">
-                <h2
-                  className="font-serif text-[6.5vw] leading-tight text-white mb-2"
-                  style={{ fontFamily: "var(--font-cormorant), serif" }}
-                >
-                  {p.isComingSoon ? "Coming Soon" : p.title}
-                </h2>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${p.isComingSoon ? "bg-amber-400" : "bg-emerald-400"}`} />
-                    <span className="text-[10px] uppercase tracking-widest text-white/40 font-sans">
-                      {p.isComingSoon ? "In Pipeline" : "Completed"}
-                    </span>
-                  </div>
-                  {!p.isComingSoon && (
-                    <span className="text-[10px] uppercase tracking-widest text-[#F59E0B] font-sans">View →</span>
-                  )}
-                </div>
-              </div>
-              {/* Separator */}
-              <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-white/5" />
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Footer */}
-        <div className="px-5 py-10 border-t border-white/5 text-center">
-          <p className="text-[10px] uppercase tracking-[0.35em] text-white/20 font-sans">
-            Umesh Kekre &amp; Associates · Mumbai
-          </p>
-        </div>
-      </div>
-    );
-  };
-
   return (
-    <>
-      {/* ── MOBILE VIEW ── */}
-      <MobileProjectsList />
-
-      {/* ── DESKTOP VIEW (untouched) ── */}
-      <div className="hidden md:block w-screen h-[350vh] bg-[#050505]">
+    <div className="w-screen h-[350vh] bg-[#050505]">
       {/* Sticky container that keeps the SVG viewport locked to the screen */}
       <div className="sticky top-0 w-screen h-screen overflow-hidden">
         <p className="absolute top-5 right-8 z-10 text-[11px] tracking-[0.22em] uppercase text-white/40">25 Projects</p>
@@ -400,11 +324,13 @@ export default function ProjectsPage() {
           
           // Dynamic scaling: active card is significantly larger and pushed way far to left/right to prevent any overlap
           const isHighlighted = activeCard === i;
-          const currentScale = isHighlighted ? 0.50 : CARD_SCALE;
-          const currentWidth = 193 * currentScale;
-          const currentHeight = 232 * currentScale;
+          const localCardScale = isHighlighted ? (isMobile ? 1.15 : 0.50) : (isMobile ? 0.85 : CARD_SCALE);
+          const currentWidth = 193 * localCardScale;
+          const currentHeight = 232 * localCardScale;
           
-          const cardX = isL ? (isHighlighted ? 520 - currentWidth : 596 - currentWidth) : (isHighlighted ? 880 : 804);
+          const cardX = isL 
+            ? (isHighlighted ? (isMobile ? 550 - currentWidth : 520 - currentWidth) : (isMobile ? 596 - currentWidth : 596 - currentWidth)) 
+            : (isHighlighted ? (isMobile ? 850 : 880) : (isMobile ? 804 : 804));
           const endX = isL ? cardX + currentWidth : cardX;
           const midX = nx + (endX - nx) / 2;
           let cardY = isHighlighted ? ny - 65 : ny - 40;
@@ -423,8 +349,8 @@ export default function ProjectsPage() {
                 zIndex: isFloorHighlighted ? 50 : 1, 
                 position: "relative" 
               }}
-              onMouseEnter={() => { setHovered(i); }}
-              onMouseLeave={() => { setHovered(null); }}
+              onMouseEnter={() => { if (!isMobile) setHovered(i); }}
+              onMouseLeave={() => { if (!isMobile) setHovered(null); }}
               onClick={(e) => {
                 e.stopPropagation();
                 const projectPct = (p.nodeY - IMAGE_TOP_Y) / (IMAGE_BOTTOM_Y - IMAGE_TOP_Y);
@@ -444,6 +370,9 @@ export default function ProjectsPage() {
                 window.scrollTo({ top: targetScrollY, behavior: "smooth" });
                 setActiveCard(activeCard === i ? null : i); // toggle click-to-pin
               }}>
+
+              {/* Invisible large hit target for easy tapping on mobile */}
+              <circle cx={nx} cy={ny + 3.5} r={isMobile ? 25 : 10} fill="transparent" />
 
               {/* floor hover overlay (3D Curved V-Shape Perspective Path covering the WHOLE floor) */}
               <path 
@@ -473,7 +402,7 @@ export default function ProjectsPage() {
 
               {/* hover card in pure SVG to fix Safari zoom bugs */}
               {isCardVisible && (
-                <g transform={`translate(${cardX}, ${cardY}) scale(${currentScale})`}>
+                <g transform={`translate(${cardX}, ${cardY}) scale(${localCardScale})`}>
                   {/* Outer border & shadow (simulated) */}
                   <rect x="0" y="0" width="193" height="232" fill="#0d0d0d" stroke="#2a2a2a" strokeWidth="1" rx="3" />
                   
@@ -548,12 +477,6 @@ export default function ProjectsPage() {
         </motion.g>
 
         {/* Full-screen anti-aliasing soft overlay */}
-        <rect 
-          x="-500" y="-500" 
-          width="2400" height="2000" 
-          fill="url(#building-overlay)" 
-          style={{ pointerEvents: "none" }}
-        />
       </svg>
       </div>{/* /sticky */}
 
@@ -597,6 +520,5 @@ export default function ProjectsPage() {
         <ArchitecturalTransition mode="enter" title={fromProjectTitle} />
       )}
     </div>
-    </>
   );
 }
