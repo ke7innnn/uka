@@ -175,16 +175,16 @@ export default function ProjectsPage() {
   if ((isZoomed || exitTransition?.active) && activeCard !== null) {
     const p = PROJECTS[activeCard];
     const isL = p.side === "L";
-    const cardWidth = 193 * (isMobile ? 0.90 : 0.50);
+    const cardWidth = 193 * (isMobile ? 0.85 : 0.50);
     const cardX = isL ? (isMobile ? 550 - cardWidth : 520 - cardWidth) : (isMobile ? 850 : 880);
     
     if (isMobile) {
       if (isL) {
-        // Align card's left edge exactly with the screen's left edge (x=0 in SVG space)
-        translateX = (700 - cardX) * currentScale - 700;
+        // Align card's left edge exactly 60 SVG units from the screen's left edge
+        translateX = (700 - cardX) * currentScale - 640;
       } else {
-        // Align card's right edge exactly with the screen's right edge (x=1400 in SVG space)
-        translateX = (700 - (cardX + cardWidth)) * currentScale + 700;
+        // Align card's right edge exactly 60 SVG units from the screen's right edge
+        translateX = (700 - (cardX + cardWidth)) * currentScale + 640;
       }
     } else {
       const zoomX = cardX + cardWidth / 2;
@@ -195,7 +195,7 @@ export default function ProjectsPage() {
   if (isZoomed || exitTransition?.active) {
     if (activeCard !== null) {
       const p = PROJECTS[activeCard];
-      const localCardScale = isMobile ? 0.90 : 0.50;
+      const localCardScale = isMobile ? 0.85 : 0.50;
       const currentHeight = 232 * localCardScale;
       let cardY = p.nodeY - 65;
       if (cardY + currentHeight > 760) {
@@ -343,7 +343,7 @@ export default function ProjectsPage() {
           
           // Dynamic scaling: active card is significantly larger and pushed way far to left/right to prevent any overlap
           const isHighlighted = activeCard === i;
-          const localCardScale = isHighlighted ? (isMobile ? 1.15 : 0.50) : (isMobile ? 0.85 : CARD_SCALE);
+          const localCardScale = isHighlighted ? (isMobile ? 0.85 : 0.50) : (isMobile ? 0.65 : CARD_SCALE);
           const currentWidth = 193 * localCardScale;
           const currentHeight = 232 * localCardScale;
           
