@@ -127,11 +127,11 @@ export default function ProjectDetail() {
         {!introFinished && <ArchitecturalTransition mode="enter" title={title} />}
         {exitTransition && <ArchitecturalTransition mode="exit" title={title} />}
         <motion.main
-          className="min-h-screen bg-white text-black font-sans pt-32 pb-32 px-8 md:px-16 selection:bg-[#F59E0B] selection:text-white"
+          className="min-h-screen bg-white text-black font-sans pt-20 md:pt-32 pb-16 md:pb-32 px-5 md:px-16 selection:bg-[#F59E0B] selection:text-white"
         >
         
         {/* ── BREADCRUMB / BACK ── */}
-        <div className="max-w-7xl mx-auto mb-16 flex justify-end">
+        <div className="max-w-7xl mx-auto mb-8 md:mb-16 flex justify-end">
           <Link 
             href={`/projects?from=${slug}`} 
             onClick={handleBackToIndex}
@@ -158,7 +158,7 @@ export default function ProjectDetail() {
 
             {/* CONTENT & METADATA (Occupies Right half blank space, premium editorial typography) */}
             <div className="lg:col-span-7 flex flex-col justify-start lg:sticky lg:top-32">
-              <h1 className="text-4xl md:text-6xl font-light tracking-tight mb-8">
+              <h1 className="text-3xl md:text-6xl font-light tracking-tight mb-6 md:mb-8">
                 {title}
               </h1>
               
@@ -206,11 +206,11 @@ export default function ProjectDetail() {
       {!introFinished && <ArchitecturalTransition mode="enter" title={title} />}
       {exitTransition && <ArchitecturalTransition mode="exit" title={title} />}
       <motion.main
-        className="min-h-screen bg-white text-black font-sans pt-32 pb-32 px-8 md:px-16 selection:bg-[#F59E0B] selection:text-white"
+        className="min-h-screen bg-white text-black font-sans pt-20 md:pt-32 pb-16 md:pb-32 px-8 md:px-16 selection:bg-[#F59E0B] selection:text-white"
       >
       
       {/* ── BREADCRUMB / BACK ── */}
-      <div className="max-w-7xl mx-auto mb-16 flex justify-end">
+      <div className="max-w-7xl mx-auto mb-8 md:mb-16 flex justify-end">
         <Link 
           href={`/projects?from=${slug}`} 
           onClick={handleBackToIndex}
@@ -222,9 +222,9 @@ export default function ProjectDetail() {
       </div>
 
       {/* ── HEADER ── */}
-      <header className="max-w-7xl mx-auto flex flex-col md:flex-row gap-16 items-end mb-24">
+      <header className="max-w-7xl mx-auto flex flex-col md:flex-row gap-16 items-end mb-16 md:mb-24">
         <div className="flex-1">
-          <h1 className="text-5xl md:text-7xl font-light tracking-tight mb-8">
+          <h1 className="text-3xl md:text-7xl font-light tracking-tight mb-6 md:mb-8">
             {title}
           </h1>
           
@@ -233,7 +233,7 @@ export default function ProjectDetail() {
       </header>
 
       {/* ── LANDSCAPE HERO IMAGE (Clean, zero grey borders/frames) ── */}
-      <div className="max-w-7xl mx-auto w-full mb-32 overflow-hidden rounded-lg">
+      <div className="max-w-7xl mx-auto w-full mb-16 md:mb-32 overflow-hidden rounded-lg">
         <img
           src={heroImage}
           alt={title}
@@ -246,7 +246,7 @@ export default function ProjectDetail() {
 
       {/* ── GALLERY GRID (Clean gallery flow, zero grey borders/frames) ── */}
       {displayImages.length > 0 && (
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 mb-32">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8 mb-16 md:mb-32">
           {displayImages.map((imgUrl, i) => (
             <div key={imgUrl} className="relative overflow-hidden group rounded-lg">
               <img

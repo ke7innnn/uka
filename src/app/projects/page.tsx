@@ -171,8 +171,106 @@ export default function ProjectsPage() {
   }
   const translateY = (isZoomed || exitTransition?.active) ? (305 - targetY) * currentScale : 0;
 
+  // Mobile-only premium card list
+  const MobileProjectsList = () => {
+    const visibleProjects = PROJECTS.filter(p => !p.isComingSoon);
+    const comingSoon = PROJECTS.filter(p => p.isComingSoon);
+    const all = [...visibleProjects, ...comingSoon];
+
+    return (
+      <div className="md:hidden min-h-screen bg-[#050505] text-white">
+        {/* Sticky header */}
+        <div className="sticky top-0 z-30 bg-[#050505]/90 backdrop-blur-md border-b border-white/5 px-5 py-4 flex items-center justify-between">
+          <div>
+            <p className="font-serif text-xl tracking-wide" style={{ fontFamily: "var(--font-cormorant), serif" }}>Projects</p>
+            <p className="text-[10px] uppercase tracking-[0.3em] text-white/40 mt-0.5">Umesh Kekre &amp; Associates</p>
+          </div>
+          <span className="text-[10px] tracking-[0.2em] uppercase text-white/30 border border-white/10 rounded-full px-3 py-1">
+            {visibleProjects.length} Works
+          </span>
+        </div>
+
+        {/* Card list */}
+        <div className="flex flex-col">
+          {all.map((p, i) => (
+            <motion.div
+              key={p.id}
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.07 * i, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+              onClick={() => {
+                if (!p.isComingSoon) {
+                  setExitTransition({ active: true, slug: p.slug, title: p.title });
+                  setTimeout(() => router.push(`/projects/${p.slug}`), 900);
+                }
+              }}
+              className={`relative w-full overflow-hidden ${p.isComingSoon ? "opacity-50 pointer-events-none" : "cursor-pointer"}`}
+              style={{ height: "72vw", maxHeight: 300 }}
+            >
+              {/* Full-bleed hero image */}
+              <img
+                src={p.heroImage}
+                alt={p.title}
+                className="absolute inset-0 w-full h-full object-cover"
+                style={{ filter: "grayscale(100%) brightness(0.5)" }}
+              />
+              {/* Bottom gradient */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent" />
+              {/* Category badge */}
+              <div className="absolute top-4 left-4">
+                <span className="text-[9px] uppercase tracking-[0.3em] text-white/50 font-sans bg-black/40 backdrop-blur-sm border border-white/10 rounded-full px-2.5 py-1">
+                  {p.isComingSoon ? "Coming Soon" : p.cat}
+                </span>
+              </div>
+              {/* Index number */}
+              <div className="absolute top-4 right-4">
+                <span className="text-[11px] font-sans text-white/20 tracking-widest">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+              </div>
+              {/* Bottom info */}
+              <div className="absolute bottom-0 left-0 right-0 px-5 pb-5">
+                <h2
+                  className="font-serif text-[6.5vw] leading-tight text-white mb-2"
+                  style={{ fontFamily: "var(--font-cormorant), serif" }}
+                >
+                  {p.isComingSoon ? "Coming Soon" : p.title}
+                </h2>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${p.isComingSoon ? "bg-amber-400" : "bg-emerald-400"}`} />
+                    <span className="text-[10px] uppercase tracking-widest text-white/40 font-sans">
+                      {p.isComingSoon ? "In Pipeline" : "Completed"}
+                    </span>
+                  </div>
+                  {!p.isComingSoon && (
+                    <span className="text-[10px] uppercase tracking-widest text-[#F59E0B] font-sans">View →</span>
+                  )}
+                </div>
+              </div>
+              {/* Separator */}
+              <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-white/5" />
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Footer */}
+        <div className="px-5 py-10 border-t border-white/5 text-center">
+          <p className="text-[10px] uppercase tracking-[0.35em] text-white/20 font-sans">
+            Umesh Kekre &amp; Associates · Mumbai
+          </p>
+        </div>
+      </div>
+    );
+  };
+
   return (
-    <div className="w-screen h-[350vh] bg-[#050505]">
+    <>
+      {/* ── MOBILE VIEW ── */}
+      <MobileProjectsList />
+
+      {/* ── DESKTOP VIEW (untouched) ── */}
+      <div className="hidden md:block w-screen h-[350vh] bg-[#050505]">
       {/* Sticky container that keeps the SVG viewport locked to the screen */}
       <div className="sticky top-0 w-screen h-screen overflow-hidden">
         <p className="absolute top-5 right-8 z-10 text-[11px] tracking-[0.22em] uppercase text-white/40">25 Projects</p>
@@ -499,5 +597,6 @@ export default function ProjectsPage() {
         <ArchitecturalTransition mode="enter" title={fromProjectTitle} />
       )}
     </div>
+    </>
   );
 }
