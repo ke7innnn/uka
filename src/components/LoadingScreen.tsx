@@ -22,12 +22,12 @@ export default function LoadingScreen() {
     if (penRef.current && lineRef.current && glowLineRef.current) {
       const tl = gsap.timeline({ delay: 0.5 });
 
-      // Mobile uses vw-based margin (0.8vw) + bigger letters (18vw) → nib sits lower.
-      // Detect mobile to use a separate offset that keeps nib on the line.
+      // Use stable vw-based offsets instead of vh to ensure the pen tip aligns perfectly
+      // across all mobile/desktop aspect ratios without drifting.
       const isMobile = window.innerWidth < 768;
       const penTop = isMobile
-        ? "calc(100% + 2.8vw + 14vh - 2px)"   // mobile: less vh, tuned for 18vw letters
-        : "calc(100% + 2.8vw + 30vh - 3.5px)"; // desktop (unchanged)
+        ? "calc(100% + 24.6vw)"
+        : "calc(100% + 19.4vw)";
 
       tl.set(penRef.current, {
         left: "-17%",
@@ -83,7 +83,7 @@ export default function LoadingScreen() {
           transition={{ duration: 0.9, ease: "easeInOut" }}
           className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center"
         >
-          <div ref={containerRef} className="flex items-end gap-[1.5vw] md:gap-[2vw] relative">
+          <div ref={containerRef} className="flex items-end gap-[5vw] md:gap-[2vw] relative">
             {/* Underline SVG */}
             <svg
               className="absolute left-0 right-0 pointer-events-none -z-10 overflow-visible"
@@ -116,7 +116,7 @@ export default function LoadingScreen() {
                 initial={{ y: -300, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay, duration: 0.65, ease: [0.2, 0, 0.4, 1] }}
-                className="font-serif text-[18vw] md:text-[18vw] leading-none text-white uppercase select-none relative z-[3]"
+                className="font-serif text-[23vw] md:text-[18vw] leading-none text-white uppercase select-none relative z-[3]"
                 style={{ fontFamily: "var(--font-cormorant), serif" }}
               >
                 {char}
@@ -135,13 +135,13 @@ export default function LoadingScreen() {
               }}
             />
           </div>
-
+ 
           {/* Sub-label */}
           <motion.p
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 2.1, duration: 0.7, ease: "easeOut" }}
-            className="font-sans text-[3.8vw] md:text-[1.1vw] uppercase tracking-[0.4em] text-white/50 whitespace-nowrap mt-[4vw] md:mt-[2.5vw]"
+            className="font-sans text-[3.2vw] md:text-[1.1vw] uppercase tracking-[0.38em] text-white/50 whitespace-nowrap mt-[5vw] md:mt-[2.5vw]"
           >
             Umesh Kekre &amp; Associates
           </motion.p>

@@ -167,7 +167,7 @@ export default function ProjectsPage() {
 
   // activeIndex auto-glow is removed to ensure floors only highlight on physical mouse hover or click
 
-  const zoomScale = isMobile ? 3.6 : ZOOM_SCALE;
+  const zoomScale = isMobile ? 4.6 : ZOOM_SCALE;
   const currentScale = exitTransition?.active ? 10 : (isZoomed ? zoomScale : 1);
 
   // Calculate smooth 2D translations
@@ -175,7 +175,7 @@ export default function ProjectsPage() {
   if ((isZoomed || exitTransition?.active) && activeCard !== null) {
     const p = PROJECTS[activeCard];
     const isL = p.side === "L";
-    const cardWidth = 193 * (isMobile ? 1.15 : 0.50);
+    const cardWidth = 193 * (isMobile ? 0.90 : 0.50);
     const cardX = isL ? (isMobile ? 550 - cardWidth : 520 - cardWidth) : (isMobile ? 850 : 880);
     
     if (isMobile) {
@@ -213,10 +213,14 @@ export default function ProjectsPage() {
             y: (isZoomed || exitTransition?.active) ? translateY : 0,
             scale: currentScale
           }}
-          transition={{
-            duration: exitTransition?.active ? 0.8 : 2.0,
-            ease: exitTransition?.active ? [0.7, 0, 0.3, 1] : [0.16, 1, 0.3, 1]
-          }}
+          transition={
+            exitTransition?.active
+              ? { duration: 0.8, ease: [0.7, 0, 0.3, 1] }
+              : (pageTransitionDone
+                  ? { type: "spring", stiffness: 90, damping: 20, mass: 0.8 } // buttery smooth spring scroll physics
+                  : { duration: 2.0, ease: [0.16, 1, 0.3, 1] } // slow entrance zoom
+                )
+          }
           style={{ 
             transformOrigin: "700px 305px",
             willChange: "transform" 
