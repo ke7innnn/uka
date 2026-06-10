@@ -54,6 +54,24 @@ export default function ProjectsPage() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
+  // Preload all project images (hero images and gallery photos) in the background
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      PROJECTS.forEach((p) => {
+        if (p.heroImage) {
+          const img = new window.Image();
+          img.src = p.heroImage;
+        }
+        if (p.images && Array.isArray(p.images)) {
+          p.images.forEach((imgUrl) => {
+            const img = new window.Image();
+            img.src = imgUrl;
+          });
+        }
+      });
+    }
+  }, []);
+
   useEffect(() => {
     const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
     const fromSlug = params?.get("from");
