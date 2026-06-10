@@ -191,7 +191,22 @@ export default function ProjectsPage() {
       translateX = (700 - zoomX) * currentScale;
     }
   }
-  const translateY = (isZoomed || exitTransition?.active) ? (305 - targetY) * currentScale : 0;
+  let translateY = 0;
+  if (isZoomed || exitTransition?.active) {
+    if (activeCard !== null) {
+      const p = PROJECTS[activeCard];
+      const localCardScale = isMobile ? 0.90 : 0.50;
+      const currentHeight = 232 * localCardScale;
+      let cardY = p.nodeY - 65;
+      if (cardY + currentHeight > 760) {
+        cardY = 760 - currentHeight;
+      }
+      const cardCenterY = cardY + currentHeight / 2;
+      translateY = (305 - cardCenterY) * currentScale;
+    } else {
+      translateY = (305 - targetY) * currentScale;
+    }
+  }
 
   return (
     <div className="w-screen h-[350vh] bg-[#050505]">

@@ -26,7 +26,7 @@ export default function LoadingScreen() {
       // across all mobile/desktop aspect ratios without drifting.
       const isMobile = window.innerWidth < 768;
       const penTop = isMobile
-        ? "calc(100% + 24.6vw)"
+        ? "calc(100% + 24.6vw - 1px)"
         : "calc(100% + 19.4vw)";
 
       tl.set(penRef.current, {
@@ -141,7 +141,7 @@ export default function LoadingScreen() {
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 2.1, duration: 0.7, ease: "easeOut" }}
-            className="font-sans text-[3.2vw] md:text-[1.1vw] uppercase tracking-[0.38em] text-white/50 whitespace-nowrap mt-[5vw] md:mt-[2.5vw]"
+            className="font-sans text-[2.6vw] md:text-[1.1vw] uppercase tracking-[0.22em] text-white/50 whitespace-nowrap mt-[5vw] md:mt-[2.5vw]"
           >
             Umesh Kekre &amp; Associates
           </motion.p>
