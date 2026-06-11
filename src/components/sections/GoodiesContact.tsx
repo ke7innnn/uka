@@ -51,25 +51,7 @@ export default function GoodiesContact() {
           </motion.a>
         </div>
 
-        <div className="flex flex-col items-start md:items-end gap-4 w-full md:w-auto">
-          <div className="flex gap-6 mb-4">
-            {["YouTube", "Twitter", "Instagram", "Facebook"].map((social, i) => (
-              <motion.a
-                key={i}
-                href="#"
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                viewport={{ once: true }}
-                className="font-sans text-xs uppercase tracking-widest text-gray-500 hover:text-white transition-colors"
-              >
-                {social}
-              </motion.a>
-            ))}
-          </div>
-
-
-        </div>
+        <div className="flex flex-col items-start md:items-end gap-4 w-full md:w-auto" />
       </div>
     </div>
   );
