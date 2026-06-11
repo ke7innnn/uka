@@ -6,7 +6,7 @@ import { useParams, notFound, useRouter } from "next/navigation";
 import { PROJECTS_DATA } from "@/lib/projectsData";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import ArchitecturalTransition from "@/components/ArchitecturalTransition";
 
 if (typeof window !== "undefined") {
@@ -62,6 +62,125 @@ export default function ProjectDetail() {
         return true;
       });
   })();
+
+  // Lightbox logic states
+  const [activeImageIndex, setActiveImageIndex] = useState<number | null>(null);
+  const [direction, setDirection] = useState(0); // -1 for left, 1 for right
+  const allImages = [heroImage, ...displayImages];
+
+  const openLightbox = (index: number) => {
+    setDirection(0);
+    setActiveImageIndex(index);
+  };
+
+  // Handle keyboard events for modal navigation (ArrowLeft, ArrowRight, Escape)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (activeImageIndex === null) return;
+      if (e.key === "Escape") {
+        setActiveImageIndex(null);
+      } else if (e.key === "ArrowLeft" && activeImageIndex > 0) {
+        setDirection(-1);
+        setActiveImageIndex(activeImageIndex - 1);
+      } else if (e.key === "ArrowRight" && activeImageIndex < allImages.length - 1) {
+        setDirection(1);
+        setActiveImageIndex(activeImageIndex + 1);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [activeImageIndex, allImages.length]);
+
+  const slideVariants = {
+    enter: (dir: number) => ({
+      x: dir > 0 ? 80 : dir < 0 ? -80 : 0,
+      scale: dir === 0 ? 0.95 : 1,
+      opacity: 0,
+    }),
+    center: {
+      x: 0,
+      scale: 1,
+      opacity: 1,
+    },
+    exit: (dir: number) => ({
+      x: dir > 0 ? -80 : dir < 0 ? 80 : 0,
+      scale: dir === 0 ? 0.95 : 1,
+      opacity: 0,
+    }),
+  };
+
+  const renderLightbox = () => (
+    <AnimatePresence initial={false} custom={direction}>
+      {activeImageIndex !== null && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center select-none"
+          onClick={() => setActiveImageIndex(null)}
+        >
+          {/* Close Button */}
+          <button
+            onClick={() => setActiveImageIndex(null)}
+            className="absolute top-8 right-8 text-white/60 hover:text-white text-xs uppercase tracking-widest font-sans transition-colors z-[60] border border-white/20 rounded-full px-4 py-2 bg-black/40 hover:bg-black/60"
+          >
+            Close [X]
+          </button>
+          {/* Prev Button */}
+          {activeImageIndex > 0 && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setDirection(-1);
+                setActiveImageIndex(activeImageIndex - 1);
+              }}
+              className="absolute left-8 text-white/50 hover:text-white text-2xl font-serif transition-colors z-[60] bg-black/40 border border-white/10 w-12 h-12 rounded-full flex items-center justify-center hover:border-white/30 hover:bg-black/60"
+            >
+              {"<"}
+            </button>
+          )}
+          {/* Next Button */}
+          {activeImageIndex < allImages.length - 1 && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setDirection(1);
+                setActiveImageIndex(activeImageIndex + 1);
+              }}
+              className="absolute right-8 text-white/50 hover:text-white text-2xl font-serif transition-colors z-[60] bg-black/40 border border-white/10 w-12 h-12 rounded-full flex items-center justify-center hover:border-white/30 hover:bg-black/60"
+            >
+              {">"}
+            </button>
+          )}
+          {/* Image Container with Animation */}
+          <motion.div
+            key={activeImageIndex}
+            custom={direction}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{
+              x: { type: "spring", stiffness: 300, damping: 30 },
+              opacity: { duration: 0.2 },
+              scale: { duration: 0.3 }
+            }}
+            className="relative w-[90vw] h-[80vh] flex items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={allImages[activeImageIndex]}
+              alt={`Quick view image ${activeImageIndex + 1}`}
+              className="max-w-full max-h-full object-contain rounded-md shadow-2xl"
+            />
+            <div className="absolute bottom-[-40px] left-1/2 -translate-x-1/2 text-center text-xs uppercase tracking-widest text-white/50">
+              {activeImageIndex + 1} / {allImages.length}
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 
   // Premium GSAP ScrollTrigger Parallax effect
   useEffect(() => {
@@ -141,7 +260,10 @@ export default function ProjectDetail() {
         </header>
 
         {/* ── HERO IMAGE (Clean, zero borders, fits aspect ratio) ── */}
-        <div className="max-w-5xl mx-auto w-full mb-12 md:mb-24 overflow-hidden rounded-lg flex justify-center">
+        <div 
+          className="max-w-5xl mx-auto w-full mb-12 md:mb-24 overflow-hidden rounded-lg flex justify-center cursor-zoom-in"
+          onClick={() => openLightbox(0)}
+        >
           <img
             src={heroImage}
             alt={title}
@@ -159,7 +281,11 @@ export default function ProjectDetail() {
             
             <div className="columns-1 md:columns-2 gap-6 md:gap-8 [column-fill:_balance]">
               {displayImages.map((imgUrl, i) => (
-                <div key={imgUrl} className="break-inside-avoid mb-6 md:mb-8 overflow-hidden rounded-lg group">
+                <div 
+                  key={imgUrl} 
+                  className="break-inside-avoid mb-6 md:mb-8 overflow-hidden rounded-lg group cursor-zoom-in"
+                  onClick={() => openLightbox(i + 1)}
+                >
                   <img
                     src={imgUrl}
                     alt={`Gallery image ${i + 1}`}
@@ -171,6 +297,7 @@ export default function ProjectDetail() {
           </div>
         )}
       </motion.main>
+      {renderLightbox()}
     </>
   );
 }
