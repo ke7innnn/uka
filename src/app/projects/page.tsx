@@ -338,11 +338,11 @@ export default function ProjectsPage() {
             href="/building/building.webp" 
             x="1200" y="-980" 
             width="3200" height="4400" 
-            transform="scale(0.25)"
             preserveAspectRatio="xMidYMid meet" 
             style={{ 
               imageRendering: "smooth", 
-              transform: "translate3d(0, 0, 0)",
+              transform: "scale(0.25) translate3d(0, 0, 0)",
+              transformOrigin: "0px 0px",
               backfaceVisibility: "hidden",
               WebkitBackfaceVisibility: "hidden"
             }}
