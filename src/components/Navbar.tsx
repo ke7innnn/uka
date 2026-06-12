@@ -6,10 +6,10 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 
 const navLinks = [
-  { id: "/", num: "", title: "Home" },
-  { id: "/projects", num: "1.", title: "Projects" },
-  { id: "#organ-professor", num: "2.", title: "About Umesh Kekre" },
-  { id: "#goodies-contact", num: "3.", title: "Resources & Contact" },
+  { id: "/", num: "1.", title: "Home" },
+  { id: "/projects", num: "2.", title: "Projects" },
+  { id: "#organ-professor", num: "3.", title: "About Umesh Kekre" },
+  { id: "#goodies-contact", num: "4.", title: "Resources & Contact" },
 ];
 
 export default function Navbar() {

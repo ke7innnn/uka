@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import LogoMarquee from "./LogoMarquee";
 
 export default function GoodiesContact() {
-  const contactText = "For inquiries and collaborations, you can write to Umesh Kekre".split(" ");
+  const contactText = "For enquiries and collaborations, you can write to Umesh Kekre".split(" ");
 
   return (
     <div id="goodies-contact" className="horizontal-section w-screen min-h-screen h-auto md:h-screen flex-shrink-0 relative flex flex-col justify-between bg-black text-white px-6 md:px-32 py-10 md:py-24 gap-8 md:gap-12">

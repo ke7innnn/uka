@@ -332,15 +332,16 @@ export default function ProjectsPage() {
           `}</style>
         </defs>
 
-        {/* ── BUILDING IMAGE (Static, zoomed in from start) ── */}
+        {/* ── BUILDING IMAGE (High-resolution 4K rendering to prevent browser blur on zoom) ── */}
         <g>
           <image 
             href="/building/building.webp" 
-            x="300" y="-245" 
-            width="800" height="1100" 
+            x="1200" y="-980" 
+            width="3200" height="4400" 
+            transform="scale(0.25)"
             preserveAspectRatio="xMidYMid meet" 
             style={{ 
-              imageRendering: "auto", 
+              imageRendering: "smooth", 
               transform: "translate3d(0, 0, 0)",
               backfaceVisibility: "hidden",
               WebkitBackfaceVisibility: "hidden"
